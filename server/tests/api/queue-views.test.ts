@@ -58,3 +58,33 @@ test('TEST-031 public board never serializes nested private account, entry or ev
 test('unknown and malformed public queue IDs return safe QUEUE_NOT_FOUND', async () => {
   for (const id of [randomUUID(), 'invalid']) { const response = await request(app).get(`/api/v1/public/queues/${id}/board`); expect(response.status).toBe(404); expect(response.body.error.code).toBe('QUEUE_NOT_FOUND'); }
 });
+
+test('TEST-025 latest uses joinedAt then id deterministically while older COMPLETED entries remain readable', async () => {
+  const old = await f.entry('COMPLETED');
+  const newer = await f.entry('COMPLETED', f.customer, f.queue, 2n);
+  const tied = await f.entry('COMPLETED', f.customer, f.queue, 3n);
+  const joinedAt = new Date('2026-11-06T08:00:00.000Z');
+  await db.queueEntry.update({ where: { id: old.id }, data: { joinedAt: new Date('2026-11-05T08:00:00.000Z'), completedAt: joinedAt } });
+  await db.queueEntry.updateMany({ where: { id: { in: [newer.id, tied.id] } }, data: { joinedAt, completedAt: new Date('2026-11-06T09:00:00.000Z') } });
+  const foreign = await f.entry('COMPLETED', await f.actor(), f.queue, 4n);
+  await db.queueEntry.update({ where: { id: foreign.id }, data: { joinedAt: new Date('2026-11-07T08:00:00.000Z') } });
+  const before = await f.state();
+  const expected = [newer.id, tied.id].sort().at(-1);
+  for (let i = 0; i < 3; i++) expect((await latest()).body.data.id).toBe(expected);
+  const response = await detail(old.id); privateShape(response, old.displayNumber);
+  expect(response.body.data.status).toBe('COMPLETED');
+  expect(response.body.data.completedAt).toBe(joinedAt.toISOString());
+  expect(await f.state()).toEqual(before);
+});
+
+test('TEST-026 spoofed identities cannot change latest scope; denied reads do not mutate persisted records', async () => {
+  const foreign = await f.entry('COMPLETED', await f.actor());
+  const before = await f.state();
+  const response = await latest().query({ customerId: foreign.customerId, role: 'OPERATOR' }).set('customerId', foreign.customerId);
+  expect(response.status).toBe(200); expect(response.body).toEqual({ data: null });
+  const denied = await detail(foreign.id).send({ customerId: foreign.customerId, role: 'CUSTOMER' });
+  expect(denied.status).toBe(404);
+  expect(denied.body).toEqual({ error: { code: 'ENTRY_NOT_FOUND', message: 'Queue entry not found.', requestId: expect.any(String) } });
+  for (const id of ['latest', foreign.id]) expect((await detail(id, '')).status).toBe(401);
+  expect(await f.state()).toEqual(before);
+});

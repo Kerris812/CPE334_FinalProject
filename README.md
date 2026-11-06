@@ -79,7 +79,7 @@ Schema uses UUID primary keys, restricted foreign-key deletion, normalized lower
 
 TEST-024 now joins through one actual API process, restarts and reseeds, retrieves the persisted entry through the second process, verifies its unchanged audit event, and allocates the next number beyond 9999. No full customer/operator service lifecycle journey is claimed.
 
-Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/foundation-verification.md). The baseline docs describe the entire future sprint, not completed functionality.
+Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/verification-log.md). The baseline docs describe the entire future sprint, not completed functionality.
 
 Implementation and local verification were assisted by Codex; teammate review and release acceptance remain outstanding.
 
@@ -89,11 +89,6 @@ Open `/login` and use one of the seeded emails above with its ignored local role
 
 Auth endpoints: `POST /api/v1/auth/login` (email/password JSON → 200 safe identity and expiry); `GET /api/v1/auth/me` (200 safe identity); `POST /api/v1/auth/logout` (JSON `{}` → 204). Errors follow the engineering API envelope. Missing/expired/revoked sessions return 401; unknown account and wrong password return the same generic 401. Invalid fields return 422; malformed JSON returns 400. Unsafe requests require `application/json` and an exact allowed `Origin` (missing/opaque/foreign origins return 403). Browser fetch supplies Origin automatically. Command-line clients must explicitly supply it.
 
-<<<<<<< Updated upstream
-`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce the session gate, with authenticated queue operations still returning 404 until their feature is implemented.
-
-F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/f01-verification.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
-=======
 `qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce both session and role gates. Operator queue/entry assignment guards run before reserved service workflows, which still return 404 after authorization until their feature is implemented. Customer entry reads constrain the query by both entry ID and authenticated customer ID.
 
 F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/verification-log.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
@@ -127,4 +122,3 @@ Joining locks the customer and queue rows, validates role/activity and OPEN stat
 The my-queue and public board screens poll every 10 seconds while visible, stop after unmount, expose accessible loading/error/empty states, and use server-authoritative data. The public board reads slot and aggregate count in one database snapshot and never serializes private records. Cancellation, no-show and operator transitions remain unimplemented.
 
 Fresh test evidence after the reset, exact commands, changed files and limitations: [F-03/F-04 verification](docs/f03-f04-verification.md). No previous implementation's results are reused.
->>>>>>> Stashed changes

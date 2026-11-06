@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-<<<<<<< Updated upstream
-import { AuthError, authRequest, home, isUnauthenticated } from './auth-api';
-=======
 import { AuthError, authRequest, home, isUnauthenticated, isPublicBoard, routeAccess } from './auth-api';
 import { CustomerQueues } from './CustomerQueues';
 import { PublicQueueBoard } from './PublicQueueBoard';
->>>>>>> Stashed changes
 import type { User } from './auth-api';
 
 function navigate(path: string) { window.history.replaceState({}, '', path); }
@@ -85,11 +81,13 @@ export function App() {
       if (value) {
         setUser(value);
         if (['/', '/login'].includes(window.location.pathname)) { navigate(home(value)); setPath(home(value)); }
-      } else signedOut();
+      } else if (!isPublicBoard(window.location.pathname)) signedOut();
     }).catch(error => {
       if (!active) return;
-      if (isUnauthenticated(error)) signedOut();
-      else setRestoreError(true);
+      if (isUnauthenticated(error)) {
+        setUser(null);
+        if (!isPublicBoard(window.location.pathname)) signedOut();
+      } else setRestoreError(true);
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [attempt]);
@@ -107,15 +105,15 @@ export function App() {
       else setLogoutError('Unable to log out. Please try again.');
     } finally { logoutPending.current = false; setLoggingOut(false); }
   }
-  const forbidden = user && ((path.startsWith('/operator') && user.role !== 'OPERATOR') || (path === '/queues' && user.role !== 'CUSTOMER'));
+  const publicBoard = isPublicBoard(path);
+  const access = user ? routeAccess(user, path) : null;
+  useEffect(() => {
+    if (!loading && !restoreError && !user && !isPublicBoard(path) && path !== '/login') signedOut();
+  }, [path, user, loading, restoreError]);
   return <main>
     <h1>Restaurant Queue</h1>
     <p>Queue and service management</p>
-<<<<<<< Updated upstream
-    {loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
-=======
     {publicBoard ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
->>>>>>> Stashed changes
       <p role="alert">Unable to restore your session. Please try again.</p>
       <button onClick={() => setAttempt(value => value + 1)}>Retry</button>
     </section> : user ? <>
@@ -125,14 +123,7 @@ export function App() {
       </header>
       {logoutError && <p role="alert">{logoutError}</p>}
       {loggingOut && <p role="status">Logging out…</p>}
-<<<<<<< Updated upstream
-      {forbidden ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : <section>
-        <h2>{user.role === 'CUSTOMER' ? 'Queues' : 'Operator desk'}</h2>
-        <p>You are signed in. {user.role === 'CUSTOMER' ? 'Queue joining' : 'Service controls'} will be available in a later feature.</p>
-      </section>}
-=======
       {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <section><h2>Operator desk</h2><p>Service controls will be available in a later feature.</p></section>}
->>>>>>> Stashed changes
     </> : <Login onLogin={signedIn} />}
   </main>;
 }

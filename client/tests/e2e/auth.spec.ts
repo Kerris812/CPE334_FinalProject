@@ -27,8 +27,20 @@ for (const [role, email, key, path] of [
     await page.reload();
     await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    // Direct URL navigation and direct HTTP both enforce the restored server role.
+    await page.goto(role === 'customer' ? '/operator/desk' : '/my-queue');
+    await expect(page.getByRole('heading', { name: 'Access denied' })).toBeVisible();
+    const forbidden = await page.request.get(role === 'customer' ? '/api/v1/operator/queues' : '/api/v1/customer/entries/latest');
+    expect(forbidden.status()).toBe(403);
     await page.getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(/\/login$/);
     expect((await page.request.get('/api/v1/auth/me')).status()).toBe(401);
   });
 }
+
+test('anonymous public display URL does not become an authenticated role', async ({ page }) => {
+  await page.goto('/board/restaurant');
+  await expect(page.getByRole('heading', { name: 'Public queue display' })).toBeVisible();
+  await expect(page).toHaveURL(/\/board\/restaurant$/);
+  await expect(page.getByLabel('Password', { exact: true })).toHaveCount(0);
+});

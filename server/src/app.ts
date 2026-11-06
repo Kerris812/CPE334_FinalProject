@@ -3,6 +3,7 @@ import type { ErrorRequestHandler } from 'express';
 import type { PrismaClient } from '@prisma/client';
 import { database } from './infrastructure/database.js';
 import { authentication } from './auth/auth.js';
+import { requireRole, requireQueueAssignment, requireEntryAssignment, requireOwnedEntry, currentUser } from './authorization/guards.js';
 import { ApiError, sendError } from './http/errors.js';
 
 interface AppOptions {
@@ -17,18 +18,42 @@ export function createApp(options: AppOptions = {}) {
     res.json({ status: 'ok', service: 'restaurant-queue-api' });
   });
   app.use('/api/v1', (_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
-  app.use(express.json({ limit: '16kb', strict: false }));
+  const parseJson = express.json({ limit: '16kb', strict: false });
+  const db = options.db ?? database;
   const auth = authentication(
-    options.db ?? database,
+    db,
     options.now ?? (() => new Date()),
     process.env.NODE_ENV === 'production' || process.env.COOKIE_SECURE === 'true',
     options.webOrigin ?? process.env.WEB_ORIGIN ?? 'http://127.0.0.1:5173',
   );
   app.use('/api/v1/auth', auth.router);
   // Shared session gate for future private routers; queue behavior remains unimplemented.
-  app.use(['/api/v1/queues', '/api/v1/customer', '/api/v1/operator'], auth.protect, (req, res, next) => {
+  const privateNamespaces = ['/api/v1/queues', '/api/v1/customer', '/api/v1/operator'];
+  // Identity and role take precedence over body parsing and mutation content checks.
+  app.use(privateNamespaces, auth.protect);
+  app.use('/api/v1/operator', requireRole('OPERATOR'));
+  app.use(['/api/v1/queues', '/api/v1/customer'], requireRole('CUSTOMER'));
+  app.use(privateNamespaces, (req, res, next) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return auth.mutation(req, res, next);
     next();
+  }, parseJson);
+  app.get('/api/v1/operator/queues', async (_req, res) => {
+    const queues = await db.queue.findMany({
+      where: { assignments: { some: { operatorId: currentUser(res).id } } },
+      select: { id: true, code: true, name: true, state: true },
+      orderBy: { code: 'asc' },
+    });
+    res.json({ data: queues });
+  });
+  // Reserve guards for future workflows; authorized requests still fall through to 404.
+  app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db));
+  app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db));
+  app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db));
+  app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db));
+  // /latest must not be interpreted as an entry UUID before its future route exists.
+  app.get('/api/v1/customer/entries/:entryId', (req, res, next) => {
+    if (req.params.entryId === 'latest') return next();
+    return requireOwnedEntry(db)(req, res, next);
   });
   app.use((_req, res) => sendError(res, new ApiError(404, 'NOT_FOUND', 'Resource not found.')));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {

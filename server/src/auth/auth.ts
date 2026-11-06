@@ -2,14 +2,14 @@ import { createHash, randomBytes } from 'node:crypto';
 import { argon2id, hash, verify } from 'argon2';
 import type { PrismaClient, User } from '@prisma/client';
 import type { CookieOptions, RequestHandler } from 'express';
-import { Router } from 'express';
+import { Router, json } from 'express';
 import { ApiError } from '../http/errors.js';
+import { requireAuthentication } from './session.js';
 
 export const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const COOKIE = 'qs_session';
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex');
 const identity = (user: User) => ({ id: user.id, displayName: user.displayName, role: user.role });
-const unauthenticated = () => new ApiError(401, 'UNAUTHENTICATED', 'Please sign in to continue.');
 // Unknown accounts still perform Argon2id verification; no submitted secrets are cached.
 let dummyHash: Promise<string> | undefined;
 const fallbackHash = () => dummyHash ??= hash(randomBytes(32), { type: argon2id });
@@ -27,16 +27,7 @@ export function credentials(input: unknown) {
 
 export function authentication(db: PrismaClient, now: () => Date, secure: boolean, webOrigin: string) {
   const cookies: CookieOptions = { httpOnly: true, sameSite: 'lax', secure, path: '/' };
-  const protect: RequestHandler = async (req, res, next) => {
-    const cookie = req.headers.cookie?.split(';').map(part => part.trim()).find(part => part.startsWith(`${COOKIE}=`));
-    const token = cookie?.slice(COOKIE.length + 1);
-    if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) throw unauthenticated();
-    const session = await db.session.findUnique({ where: { tokenHash: tokenHash(token) }, include: { user: true } });
-    if (!session || session.revokedAt || session.expiresAt <= now() || !session.user.isActive) throw unauthenticated();
-    res.locals.session = session;
-    res.locals.user = identity(session.user);
-    next();
-  };
+  const protect = requireAuthentication(db, now);
   const mutation: RequestHandler = (req, _res, next) => {
     // Missing and opaque ("null") origins are rejected as well as foreign origins.
     if (req.get('Origin') !== webOrigin) throw new ApiError(403, 'FORBIDDEN', 'Request origin is not allowed.');
@@ -44,7 +35,8 @@ export function authentication(db: PrismaClient, now: () => Date, secure: boolea
     next();
   };
   const router = Router();
-  router.post('/login', mutation, async (req, res) => {
+  const parseJson = json({ limit: '16kb', strict: false });
+  router.post('/login', parseJson, mutation, async (req, res) => {
     const { email, password } = credentials(req.body);
     const user = await db.user.findUnique({ where: { email } });
     const storedHash = user?.passwordHash.startsWith('$argon2id$') ? user.passwordHash : await fallbackHash();
@@ -60,7 +52,7 @@ export function authentication(db: PrismaClient, now: () => Date, secure: boolea
     res.json({ data: { user: identity(user), expiresAt: expiresAt.toISOString() } });
   });
   router.get('/me', protect, (_req, res) => { res.json({ data: { user: res.locals.user } }); });
-  router.post('/logout', protect, mutation, async (_req, res) => {
+  router.post('/logout', protect, mutation, parseJson, async (_req, res) => {
     await db.session.update({ where: { id: res.locals.session.id }, data: { revokedAt: now() } });
     res.clearCookie(COOKIE, cookies);
     res.status(204).end();

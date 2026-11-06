@@ -1,0 +1,128 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts -t TEST-01[0-3]|operator cannot|sessions fail closed
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "restaurant_queue_test", schema "public" at "127.0.0.1:55432"
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/chanya/Desktop/CPE334_FinalProject/server
+
+ ❯ tests/api/authorization.test.ts (6 tests | 5 failed) 350ms
+   × TEST-010 assigned operator receives only assigned queue public metadata 53ms
+   × TEST-011 unassigned operator has empty list and cannot inspect or mutate R 33ms
+   × TEST-012 customers cannot list operator queues or call/start/complete 31ms
+   × TEST-013 forged role and identities cannot override the authenticated customer 32ms
+   × operator cannot use customer discovery, join or private entry routes 32ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/authorization.test.ts > TEST-010 assigned operator receives only assigned queue public metadata
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/api/authorization.test.ts:55:27
+     53|   const before = await state();
+     54|   const response = await request(app).get('/api/v1/operator/queues').s…
+     55|   expect(response.status).toBe(200);
+       |                           ^
+     56|   expect(response.body).toEqual({ data: [{ id: queueId, code: 'R', nam…
+     57|   expect(await state()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/api/authorization.test.ts > TEST-011 unassigned operator has empty list and cannot inspect or mutate R
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/api/authorization.test.ts:64:23
+     62|   const before = await state();
+     63|   const list = await request(app).get('/api/v1/operator/queues').set('…
+     64|   expect(list.status).toBe(200);
+       |                       ^
+     65|   expect(list.body).toEqual({ data: [] });
+     66|   denied(await request(app).get(`/api/v1/operator/queues/${queueId}/de…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/api/authorization.test.ts > TEST-012 customers cannot list operator queues or call/start/complete
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ denied tests/api/authorization.test.ts:36:27
+     34| }
+     35| function denied(response: request.Response, status: number, code: stri…
+     36|   expect(response.status).toBe(status);
+       |                           ^
+     37|   expect(response.body).toEqual({ error: { code, message: expect.any(S…
+     38|   for (const privateValue of [queueId, entryId, customerId]) expect(JS…
+ ❯ tests/api/authorization.test.ts:76:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/api/authorization.test.ts > TEST-013 forged role and identities cannot override the authenticated customer
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ denied tests/api/authorization.test.ts:36:27
+     34| }
+     35| function denied(response: request.Response, status: number, code: stri…
+     36|   expect(response.status).toBe(status);
+       |                           ^
+     37|   expect(response.body).toEqual({ error: { code, message: expect.any(S…
+     38|   for (const privateValue of [queueId, entryId, customerId]) expect(JS…
+ ❯ tests/api/authorization.test.ts:86:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/api/authorization.test.ts > operator cannot use customer discovery, join or private entry routes
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ denied tests/api/authorization.test.ts:36:27
+     34| }
+     35| function denied(response: request.Response, status: number, code: stri…
+     36|   expect(response.status).toBe(status);
+       |                           ^
+     37|   expect(response.body).toEqual({ error: { code, message: expect.any(S…
+     38|   for (const privateValue of [queueId, entryId, customerId]) expect(JS…
+ ❯ tests/api/authorization.test.ts:96:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed | 4 skipped (5)
+      Tests  5 failed | 1 passed | 14 skipped (20)
+   Start at  13:10:05
+   Duration  919ms (tests 52%, import 36%, transform 10%, worker 1%)
+

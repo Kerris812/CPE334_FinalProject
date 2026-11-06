@@ -79,7 +79,7 @@ Schema uses UUID primary keys, restricted foreign-key deletion, normalized lower
 
 TEST-015 support includes durable entry/event tables, sequence-preserving seed and a real process restart test for foundation data. Full entry/event restart verification must be added once join/read APIs exist; it is **not claimed complete**.
 
-Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/foundation-verification.md). The baseline docs describe the entire future sprint, not completed functionality.
+Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/verification-log.md). The baseline docs describe the entire future sprint, not completed functionality.
 
 Implementation and local verification were assisted by Codex; teammate review and release acceptance remain outstanding.
 
@@ -89,6 +89,18 @@ Open `/login` and use one of the seeded emails above with its ignored local role
 
 Auth endpoints: `POST /api/v1/auth/login` (email/password JSON → 200 safe identity and expiry); `GET /api/v1/auth/me` (200 safe identity); `POST /api/v1/auth/logout` (JSON `{}` → 204). Errors follow the engineering API envelope. Missing/expired/revoked sessions return 401; unknown account and wrong password return the same generic 401. Invalid fields return 422; malformed JSON returns 400. Unsafe requests require `application/json` and an exact allowed `Origin` (missing/opaque/foreign origins return 403). Browser fetch supplies Origin automatically. Command-line clients must explicitly supply it.
 
-`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce the session gate, with authenticated queue operations still returning 404 until their feature is implemented.
+`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce both session and role gates. Queue assignment and private entry ownership guards run before reserved workflows; permitted workflow requests still return 404 until their feature is implemented.
 
-F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/f01-verification.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
+F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/verification-log.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
+
+## Role and queue permissions (Issue04)
+
+`GET /api/v1/operator/queues` returns only the current operator's assigned queues as `{data:[{id,code,name,state}]}`. Seeded Operator A sees R; Operator B receives an empty list. Customers receive 403. No role or identity from body, query or headers can override the database-backed session.
+
+Reusable middleware lives in `server/src/auth/session.ts` and `server/src/authorization/guards.ts`. Protected namespaces require CUSTOMER for `/api/v1/queues` and `/api/v1/customer`, and OPERATOR for `/api/v1/operator`. Desk/call routes verify the queue assignment; start/complete routes derive the queue from the persisted entry before verifying assignment. Ownership guards constrain the lookup by both entry ID and authenticated customer ID, giving foreign/missing entries the same nonleaking `404 ENTRY_NOT_FOUND`. Missing, expired, revoked or inactive sessions receive 401; forbidden roles and unassigned operators receive 403. The public board remains anonymous, with no extra role.
+
+The React route policy uses the identity restored by `/auth/me`: customers can open `/queues` and `/my-queue`; operators can open `/operator` and `/operator/*`. Wrong-role routes show Access denied. Anonymous private routes redirect to `/login`; `/board/:queueId` remains public and currently shows an explicitly unavailable board shell. Any other path resolves to "Page not found" under `routeAccess`. Backend checks apply to direct HTTP requests independently of these UI guards.
+
+Only the assigned queue listing is a new working queue endpoint. Discovery, joining, desk, service actions, private entry DTOs and board data remain future work. The tests use explicit test-only authorization routes to prove successful guard composition and denied-write protection without adding fake successful production endpoints. Full TEST-010 desk behavior, TEST-026 cross-customer HTTP DTO coverage and TEST-015 entry/event persistence await their feature endpoints. Future mutation services must verify permissions within their transaction as well, so assignment changes cannot race a write.
+
+Actual RED/GREEN/REFACTOR results and the complete changed-file list: [Issue04 verification](docs/verification-log.md). No database migration or new role was required.

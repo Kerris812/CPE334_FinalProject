@@ -25,3 +25,12 @@ export async function authRequest(path: string, body?: { email: string; password
 export const home = (user: User) => user.role === 'CUSTOMER' ? '/queues' : '/operator/desk';
 
 export const isUnauthenticated = (error: unknown) => error instanceof AuthError && error.status === 401;
+
+/** Navigation follows the server-authenticated identity; backend guards remain authoritative. */
+export const isPublicBoard = (path: string) => /^\/board\/[^/]+\/?$/.test(path);
+export function routeAccess(user: User, path: string): 'allowed' | 'forbidden' | 'missing' {
+  if (isPublicBoard(path)) return 'allowed';
+  if (path === '/queues' || path === '/my-queue') return user.role === 'CUSTOMER' ? 'allowed' : 'forbidden';
+  if (path === '/operator' || path.startsWith('/operator/')) return user.role === 'OPERATOR' ? 'allowed' : 'forbidden';
+  return 'missing';
+}

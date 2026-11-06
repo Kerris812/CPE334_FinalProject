@@ -6,7 +6,7 @@
 
 ## Coverage and execution status
 
-AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../f01-verification.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../foundation-verification.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
+AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../verification-log.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../verification-log.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
 
 ## Software Test Specification
 
@@ -313,10 +313,10 @@ Before implementing, every AC-001–044 is `NOT RUN` in [Part F evidence matrix]
 | AC-007 | TEST-007 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
 | AC-008 | TEST-008 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
 | AC-009 | TEST-009 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-010 | TEST-010 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-011 | TEST-011 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-012 | TEST-012 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-013 | TEST-013 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
+| AC-010 | TEST-010 | Not yet implemented | Planned | Not run | **PASS** for the assigned-operator queue listing. **PARTIAL** for "R desk authorized 200": the desk handler is not implemented, so an authorized request falls through to 404. Re-run in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
+| AC-011 | TEST-011 | Not yet implemented | Planned | Not run | **PASS** for 403 on desk/call/start/complete and the empty listing for Operator B. Re-run downstream checks in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
+| AC-012 | TEST-012 | Not yet implemented | Planned | Not run | **PASS** for customer 403 on call/start/complete and the operator listing. Re-run in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
+| AC-013 | TEST-013 | Not yet implemented | Planned | Not run | **PASS** for forged role and identity in headers and body. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
 | AC-014 | TEST-014 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
 | AC-015 | TEST-015 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
 | AC-016 | TEST-016 | Not yet implemented | Planned | Not run | **NOT RUN** | — |

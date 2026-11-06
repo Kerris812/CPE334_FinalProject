@@ -1,0 +1,314 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ❯ tests/ui/login.test.tsx (6 tests | 6 failed) 6062ms
+   × login has accessible fields, password toggle, no role selector and associated validation 1020ms
+   × login submits once, announces loading, and redirects customer from trusted response 1011ms
+   × restores operator identity via me on reload and logs out to login 1008ms
+   × shows generic credentials errors and server field validation with safe retry 1009ms
+   × connection failures during identity restore are retryable and do not show private content 1007ms
+   × failed logout keeps identity with retry; unauthenticated logout clears identity 1006ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/login.test.tsx > login has accessible fields, password toggle, no role selector and associated validation
+TestingLibraryElementError: Unable to find a label with the text of: Email
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/login.test.tsx:13:56
+     11| });
+     12| afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+     13| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     14| function fill() {
+     15|   fireEvent.change(screen.getByLabelText('Email'), { target: { value: …
+ ❯ tests/ui/login.test.tsx:19:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/ui/login.test.tsx > login submits once, announces loading, and redirects customer from trusted response
+TestingLibraryElementError: Unable to find a label with the text of: Email
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/login.test.tsx:13:56
+     11| });
+     12| afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+     13| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     14| function fill() {
+     15|   fireEvent.change(screen.getByLabelText('Email'), { target: { value: …
+ ❯ tests/ui/login.test.tsx:29:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/ui/login.test.tsx > restores operator identity via me on reload and logs out to login
+TestingLibraryElementError: Unable to find an element with the text: Customer A. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/login.test.tsx:45:16
+     43|   fetchMock.mockResolvedValueOnce(response(200, { data: { user: { ...u…
+     44|   render(<App />);
+     45|   await screen.findByText('Customer A');
+       |                ^
+     46|   expect(window.location.pathname).toBe('/operator/desk');
+     47|   fetchMock.mockResolvedValueOnce(response(204));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/ui/login.test.tsx > shows generic credentials errors and server field validation with safe retry
+TestingLibraryElementError: Unable to find a label with the text of: Email
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/login.test.tsx:13:56
+     11| });
+     12| afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+     13| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     14| function fill() {
+     15|   fireEvent.change(screen.getByLabelText('Email'), { target: { value: …
+ ❯ tests/ui/login.test.tsx:54:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/ui/login.test.tsx > connection failures during identity restore are retryable and do not show private content
+TestingLibraryElementError: Unable to find role="button" and name "Retry"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/login.test.tsx:67:16
+     65|   fetchMock.mockRejectedValueOnce(new Error('offline'));
+     66|   render(<App />);
+     67|   await screen.findByRole('button', { name: 'Retry' });
+       |                ^
+     68|   expect(screen.queryByText('Customer A')).toBeNull();
+     69|   fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/ui/login.test.tsx > failed logout keeps identity with retry; unauthenticated logout clears identity
+TestingLibraryElementError: Unable to find an element with the text: Customer A. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<p>[39m
+        [0mProject foundation is ready. Customer and operator workflows will follow.[0m
+      [36m</p>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/login.test.tsx:74:33
+     72| test('failed logout keeps identity with retry; unauthenticated logout …
+     73|   fetchMock.mockResolvedValueOnce(response(200, { data: { user } }));
+     74|   render(<App />); await screen.findByText('Customer A');
+       |                                 ^
+     75|   fetchMock.mockRejectedValueOnce(new Error('offline'));
+     76|   fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  6 failed | 1 passed (7)
+   Start at  19:30:35
+   Duration  6.64s (tests 86%, environment 11%, import 2%, transform 1%)
+

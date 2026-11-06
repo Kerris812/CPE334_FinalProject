@@ -1,6 +1,6 @@
 # CPE334 Restaurant Queue and Service Management System
 
-Issue02 foundation: React/Vite/TypeScript client, Express/TypeScript API, persistent PostgreSQL with Prisma, Argon2id synthetic seed, Vitest/Supertest and Playwright. Authentication, joining and operator workflows are subsequent issues. Only `GET /health` is implemented as an API endpoint.
+React/Vite/TypeScript client, Express/TypeScript API, PostgreSQL with Prisma, Argon2id synthetic seed, Vitest/Supertest and Playwright. F-01 implements login, current identity, logout and database-backed sessions. Queue joining and operator service workflows remain subsequent features.
 
 ## Requirements and installation
 
@@ -28,7 +28,7 @@ Edit ignored `server/.env`: replace `QUEUE_USER` with `queue_local`, `LOCAL_PASS
 node --input-type=module -e 'import fs from "node:fs"; import crypto from "node:crypto"; const p="server/.env"; let s=fs.readFileSync(p,"utf8"); for (const k of ["DEMO_CUSTOMER_PASSWORD","DEMO_OPERATOR_PASSWORD"]) s=s.replace(new RegExp("^"+k+"=.*$","m"),k+"="+crypto.randomBytes(24).toString("base64url")); fs.writeFileSync(p,s,{mode:0o600});'
 ```
 
-The local passwords are synthetic secrets; keep them in the ignored environment file. Never use real personal credentials. `DATABASE_URL` is server-only; never expose it through a `VITE_` variable. Reserved auth settings in the example are for later work and have no authentication behavior yet.
+The local passwords are synthetic secrets; keep them in the ignored environment file. Never use real personal credentials. `DATABASE_URL` is server-only; never expose it through a `VITE_` variable. Set `WEB_ORIGIN` to the exact browser origin, including host and port (default `http://127.0.0.1:5173`). Use that same hostname in the browser; `localhost` and `127.0.0.1` are different origins. `COOKIE_SECURE=true` enables HTTPS cookies locally; production always uses Secure even if this setting is false. Sessions expire absolutely after eight hours, with no sliding renewal or configurable TTL.
 
 ```sh
 npm --prefix server run db:generate
@@ -73,7 +73,7 @@ cd ..
 npm --prefix client run test:e2e
 ```
 
-Run API tests before E2E. Leave ports 3000, 3001 and 5173 free. Playwright starts/stops its own API and Vite servers; its API uses `TEST_DATABASE_URL`. The smoke test loads React and verifies Vite proxies the real Express health response. It is not the future full queue journey.
+Run API tests before E2E. Leave ports 3000, 3001 and 5173 free. Playwright starts/stops its own API and Vite servers; its API uses `TEST_DATABASE_URL`. The smoke test verifies the real Express health proxy. TEST-001 also exercises customer/operator login, reload identity, 360 px layout and logout through React → Express → PostgreSQL. Run API tests first to seed the test database. It is not the future full queue journey.
 
 Schema uses UUID primary keys, restricted foreign-key deletion, normalized lowercase unique emails, UTC `TIMESTAMPTZ`, bigint sequence counters, party size checks and database partial unique indexes for one active entry per customer and one active service slot per queue. SQL-only constraints are in `server/prisma/migrations/0001_foundation/migration.sql`; preserve them in later migrations rather than replacing migrations with `db push`. Lifecycle values WAITING/CALLED/SERVING/COMPLETED and reserved CANCELLED/NO_SHOW, plus OPEN/PAUSED/CLOSED queue states, are persisted enums. Service transition enforcement, immutable fields and append-only event writes belong to the later queue service; no transition endpoints exist here. Operator role enforcement currently occurs in seed, as specified, and must also be enforced by future assignment services.
 
@@ -82,3 +82,13 @@ TEST-015 support includes durable entry/event tables, sequence-preserving seed a
 Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/foundation-verification.md). The baseline docs describe the entire future sprint, not completed functionality.
 
 Implementation and local verification were assisted by Codex; teammate review and release acceptance remain outstanding.
+
+## Login and sessions (F-01)
+
+Open `/login` and use one of the seeded emails above with its ignored local role-specific password. The form has no role selector. Customer login opens `/queues`; operator login opens `/operator/desk`. These are authenticated landing pages; queue and service controls are not implemented yet. Reload uses `GET /api/v1/auth/me` to restore identity. `Log out` revokes the current session in PostgreSQL before clearing its cookie; other sessions remain active.
+
+Auth endpoints: `POST /api/v1/auth/login` (email/password JSON → 200 safe identity and expiry); `GET /api/v1/auth/me` (200 safe identity); `POST /api/v1/auth/logout` (JSON `{}` → 204). Errors follow the engineering API envelope. Missing/expired/revoked sessions return 401; unknown account and wrong password return the same generic 401. Invalid fields return 422; malformed JSON returns 400. Unsafe requests require `application/json` and an exact allowed `Origin` (missing/opaque/foreign origins return 403). Browser fetch supplies Origin automatically. Command-line clients must explicitly supply it.
+
+`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce the session gate, with authenticated queue operations still returning 404 until their feature is implemented.
+
+F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/f01-verification.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.

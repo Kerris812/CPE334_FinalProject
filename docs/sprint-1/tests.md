@@ -6,7 +6,7 @@
 
 ## Coverage and execution status
 
-AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. All results are **NOT RUN**. `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
+AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../f01-verification.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../foundation-verification.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
 
 ## Software Test Specification
 

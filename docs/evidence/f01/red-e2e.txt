@@ -1,0 +1,64 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test tests/e2e/auth.spec.ts
+
+[WebServer] (node:35987) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:35988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:36014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:36016) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout (30.1s)
+(node:36131) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout (30.1s)
+
+
+  1) tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout ────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      15 |     await page.setViewportSize({ width: 360, height: 780 });
+      16 |     await page.goto('/login');
+    > 17 |     await page.getByLabel('Email').fill(email);
+         |                                    ^
+      18 |     await page.getByLabel('Password', { exact: true }).fill(secret(key));
+      19 |     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+      20 |     await expect(page).toHaveURL(new RegExp(`${path}$`));
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/auth.spec.ts:17:36
+
+    Error Context: test-results/auth-TEST-001-customer-real-login-reload-identity-and-logout/error-context.md
+
+  2) tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout ────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      15 |     await page.setViewportSize({ width: 360, height: 780 });
+      16 |     await page.goto('/login');
+    > 17 |     await page.getByLabel('Email').fill(email);
+         |                                    ^
+      18 |     await page.getByLabel('Password', { exact: true }).fill(secret(key));
+      19 |     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+      20 |     await expect(page).toHaveURL(new RegExp(`${path}$`));
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/auth.spec.ts:17:36
+
+    Error Context: test-results/auth-TEST-001-operator-real-login-reload-identity-and-logout/error-context.md
+
+  2 failed
+    tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout ─────────
+    tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout ─────────

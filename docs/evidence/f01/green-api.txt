@@ -1,0 +1,35 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts --reporter=verbose
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "cpe334_auth_test", schema "public" at "127.0.0.1:55432"
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ✓ tests/api/database.test.ts > TEST-009 migrations and seed repeat without duplicate records or resetting state 1432ms
+ ✓ tests/api/database.test.ts > database constraints enforce active customer, service slot, party size and foreign keys 12ms
+ ✓ tests/api/auth.test.ts > TEST-001 valid customer and operator login use server identity 92ms
+ ✓ tests/api/auth.test.ts > TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions 160ms
+ ✓ tests/api/auth.test.ts > TEST-003 me returns only current identity and reads account activity from DB 36ms
+ ✓ tests/api/auth.test.ts > TEST-004 logout revokes only this session before 204 and prevents replay 70ms
+ ✓ tests/api/auth.test.ts > TEST-005 missing, malformed and unknown sessions cannot access protected requests 9ms
+ ✓ tests/api/auth.test.ts > TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal 45ms
+ ✓ tests/api/auth.test.ts > TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence 13ms
+ ✓ tests/api/auth.test.ts > TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets 131ms
+ ✓ tests/api/auth.test.ts > TEST-050 origin and JSON protection reject unsafe requests without revoking session 52ms
+ ✓ tests/api/auth.test.ts > TEST-051 repository failures return safe 500 JSON without credential logging or cookies 49ms
+ ✓ tests/api/restart.test.ts > foundation seed identities and counter survive an actual API process restart 358ms
+ ✓ tests/api/health.test.ts > TEST-014 anonymous health returns only safe status and service 14ms
+
+ Test Files  4 passed (4)
+      Tests  14 passed (14)
+   Start at  19:36:23
+   Duration  3.00s (tests 92%, import 7%, transform 1%)
+

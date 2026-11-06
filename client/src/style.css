@@ -1,3 +1,21 @@
-body { margin: 0; background: #FBF3E6; color: #2F2626; font-family: system-ui, sans-serif; }
-main { max-width: 48rem; margin: 4rem auto; padding: 1.5rem; }
-h1 { color: #6F0E22; }
+:root { font-family: system-ui, sans-serif; color: #2F2626; background: #FBF3E6; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 48rem; margin: 3rem auto; padding: 1.5rem; }
+h1, h2 { color: #6F0E22; }
+h1 { font-size: clamp(1.7rem, 6vw, 2.5rem); }
+.account { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; border-bottom: 1px solid #8A6F5B; padding-bottom: 1rem; }
+.card { margin: 2rem auto; padding: clamp(1rem, 4vw, 2rem); border: 1px solid #8A6F5B; border-radius: .6rem; max-width: 28rem; }
+form { display: grid; gap: .75rem; }
+label { font-weight: 650; }
+input, button { font: inherit; min-height: 44px; border-radius: .25rem; }
+input { width: 100%; padding: .65rem; background: #fff; border: 1px solid #8A6F5B; color: #2F2626; }
+button { padding: .65rem 1rem; cursor: pointer; background: #6F0E22; color: #FBF3E6; border: 1px solid #6F0E22; font-weight: 650; }
+button.secondary { background: transparent; color: #6F0E22; }
+button:disabled { cursor: wait; opacity: .7; }
+:focus-visible { outline: 3px solid #6F0E22; outline-offset: 3px; }
+a { color: #6F0E22; }
+.error, [role=alert] { color: #6F0E22; }
+.error { margin: 0; font-size: .95rem; }
+[aria-invalid=true] { border: 2px solid #6F0E22; }
+@media (max-width: 400px) { main { margin-top: 1rem; padding: 1rem; } }

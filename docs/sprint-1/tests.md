@@ -8,6 +8,8 @@
 
 AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../verification-log.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../verification-log.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
 
+Actual F-03/F-04 execution after the reset (TEST-016–031 and TEST-047–048) is recorded in [F-03/F-04 verification](../f03-f04-verification.md), with fresh RED/GREEN output, commands and counts. Historical baseline status below is not a claim about current execution.
+
 ## Software Test Specification
 
 **Status:** TESTS PLANNED; NOT IMPLEMENTED OR RUN.  

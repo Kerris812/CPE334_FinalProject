@@ -19,3 +19,13 @@ a { color: #6F0E22; }
 .error { margin: 0; font-size: .95rem; }
 [aria-invalid=true] { border: 2px solid #6F0E22; }
 @media (max-width: 400px) { main { margin-top: 1rem; padding: 1rem; } }
+.queue-ticket { margin: 1.5rem 0; padding: 1.5rem; border: 2px solid #6F0E22; border-radius: .6rem; text-align: center; }
+.queue-number { display: block; font-size: clamp(2.5rem, 10vw, 4.5rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.queue-status { display: inline-block; padding: .4rem .75rem; border: 1px solid #8A6F5B; border-radius: .3rem; font-weight: 700; }
+.status-called { background: #6F0E22; color: #FBF3E6; }
+.status-serving { background: #D7B15D; color: #2F2626; }
+.status-completed { background: #2F2626; color: #FBF3E6; }
+.queue-form { margin-left: 0; }
+.queue-times dd { margin: .5rem 0; }
+.waiting-count { font-size: 2rem; font-variant-numeric: tabular-nums; }
+select { font: inherit; min-height: 44px; max-width: 100%; background: #FBF3E6; color: #2F2626; border: 1px solid #8A6F5B; }

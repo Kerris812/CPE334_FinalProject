@@ -1,0 +1,43 @@
+
+> restaurant-queue-server@0.1.0 test:unit
+> vitest run tests/unit
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/unit/queue-rules.test.ts (2 tests | 2 failed) 6ms
+   × TEST-047 format queue numbers without a four-digit maximum 5ms
+   × TEST-048 party size accepts only integers one through eight 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/queue-rules.test.ts > TEST-047 format queue numbers without a four-digit maximum
+Error: Cannot find module '/src/queues/rules.js' imported from /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server/tests/unit/queue-rules.test.ts
+ ❯ tests/unit/queue-rules.test.ts:3:33
+      1| import { expect, test } from 'vitest';
+      2| test('TEST-047 format queue numbers without a four-digit maximum', asy…
+      3|   const { formatQueueNumber } = await import('../../src/queues/rules.j…
+       |                                 ^
+      4|   for (const [sequence, expected] of [[1n, 'R-0001'], [9n, 'R-0009'], …
+      5| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/unit/queue-rules.test.ts > TEST-048 party size accepts only integers one through eight
+Error: Cannot find module '/src/queues/rules.js' imported from /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server/tests/unit/queue-rules.test.ts
+ ❯ tests/unit/queue-rules.test.ts:7:33
+      5| });
+      6| test('TEST-048 party size accepts only integers one through eight', as…
+      7|   const { validatePartySize } = await import('../../src/queues/rules.j…
+       |                                 ^
+      8|   for (const value of [1, 8]) expect(validatePartySize(value)).toBe(va…
+      9|   for (const value of [0, 9, -1, 1.5, '3', null, undefined, NaN, Infin…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 1 passed (3)
+   Start at  22:16:19
+   Duration  96ms (transform 58%, import 19%, tests 15%, worker 8%)
+

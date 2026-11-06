@@ -181,3 +181,26 @@ Added:
 - `docs/evidence/issue04/api-red.txt`
 - `docs/evidence/issue04/api-green.txt`
 - `docs/evidence/issue04/api-refactor-green.txt`
+
+
+## F-03/F-04 reimplementation after reset — 6 November 2026
+
+Fresh work starts from `19572d952d059d4fa4b1112127cfc63977c8db73`. The earlier sections remain historical evidence for their respective scopes. Customer joining, private queue reads and anonymous board are now implemented and tested; their earlier deferrals above are superseded by [the new verification report](f03-f04-verification.md). Final current suites: 3 unit, 49 API, 19 UI and 6 browser tests pass, with zero failures/skips; both builds pass. Actual RED and GREEN outputs and changed files are linked in that report. No commit or push was made.
+
+
+## Feature/base conflict resolution — 6 November 2026
+
+Integrated `origin/sprint-1` at `19572d952d059d4fa4b1112127cfc63977c8db73` into `feature/5-join-queue`, starting at `8afcc50`. Conflicts were in README, App.tsx and this verification log. The feature commit also contained earlier stash-conflict markers in README and App.tsx; these were removed by combining the intended customer/public queue pages with the base's session restoration, public-route handling, role checks and not-found behavior. Both verification histories and the base's documentation/artifact consolidation were retained. No queue service, database schema or test assertions were changed.
+
+Verification on the resolved tree:
+
+| Command | Result |
+| --- | --- |
+| `npm --prefix server run test:unit` | 3 passed, 0 failed, 0 skipped |
+| `npm --prefix server run test:api -- --reporter=verbose` | 49 passed, 0 failed, 0 skipped; real isolated PostgreSQL |
+| `npm --prefix client run test:ui` | 19 passed, 0 failed, 0 skipped |
+| `E2E_API_PORT=3100 E2E_WEB_PORT=5273 npm --prefix client run test:e2e` | 6 passed, 0 failed, 0 skipped |
+| `npm --prefix server run build` | Passed TypeScript build |
+| `npm --prefix client run build` | Passed TypeScript and Vite build |
+
+Total: 77 passed, 0 failed, 0 skipped. Conflict-marker scan and resolved-file whitespace checks passed. The full merge-index whitespace check reports one inherited blank line at EOF in incoming `artifacts/evidence/issue04/api-red.txt`; that historical raw evidence is preserved verbatim. Historical screenshots/cache metadata overwritten only by verification tools were restored from their pre-test copies. PR #14 was already merged and belongs to the authorization branch; it was not modified. No PR was merged, closed or approved as part of this work. The integration commit and push apply only to `feature/5-join-queue`.

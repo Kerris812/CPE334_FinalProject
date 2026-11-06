@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { AuthError, authRequest, home, isUnauthenticated, isPublicBoard, routeAccess } from './auth-api';
+import { CustomerQueues } from './CustomerQueues';
+import { PublicQueueBoard } from './PublicQueueBoard';
 import type { User } from './auth-api';
 
 function navigate(path: string) { window.history.replaceState({}, '', path); }
@@ -111,7 +113,7 @@ export function App() {
   return <main>
     <h1>Restaurant Queue</h1>
     <p>Queue and service management</p>
-    {publicBoard ? <section><h2>Public queue display</h2><p>The public board will be available in a later feature.</p></section> : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
+    {publicBoard ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
       <p role="alert">Unable to restore your session. Please try again.</p>
       <button onClick={() => setAttempt(value => value + 1)}>Retry</button>
     </section> : user ? <>
@@ -121,10 +123,7 @@ export function App() {
       </header>
       {logoutError && <p role="alert">{logoutError}</p>}
       {loggingOut && <p role="status">Logging out…</p>}
-      {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : <section>
-        <h2>{user.role === 'CUSTOMER' ? 'Queues' : 'Operator desk'}</h2>
-        <p>You are signed in. {user.role === 'CUSTOMER' ? 'Queue joining' : 'Service controls'} will be available in a later feature.</p>
-      </section>}
+      {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <section><h2>Operator desk</h2><p>Service controls will be available in a later feature.</p></section>}
     </> : <Login onLogin={signedIn} />}
   </main>;
 }

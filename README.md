@@ -1,6 +1,6 @@
 # CPE334 Restaurant Queue and Service Management System
 
-React/Vite/TypeScript client, Express/TypeScript API, PostgreSQL with Prisma, Argon2id synthetic seed, Vitest/Supertest and Playwright. F-01 implements login, current identity, logout and database-backed sessions. Queue joining and operator service workflows remain subsequent features.
+React/Vite/TypeScript client, Express/TypeScript API, PostgreSQL with Prisma, Argon2id synthetic seed, Vitest/Supertest and Playwright. F-01 implements login, current identity, logout and database-backed sessions. F-03/F-04 implement customer queue joining, saved customer entries and the anonymous public board. Operator service workflows remain subsequent features.
 
 ## Requirements and installation
 
@@ -47,7 +47,7 @@ npm --prefix server run dev
 npm --prefix client run dev
 ```
 
-API: `http://127.0.0.1:3000`; UI: `http://127.0.0.1:5173`. Vite proxies `/api/v1` and `/health` to port 3000. If changing `PORT`, also change both Vite proxy targets and Playwright's backend URL. Startup connects to PostgreSQL before listening; no migrations, seeds or deletions run on startup. Health is a public process health response, not a continuous DB readiness monitor.
+API: `http://127.0.0.1:3000`; UI: `http://127.0.0.1:5173`. Vite proxies `/api/v1` and `/health` to port 3000. If changing the API port, set Vite's `API_PROXY_TARGET`. Browser tests accept `E2E_API_PORT` and `E2E_WEB_PORT` for separate local servers. Startup connects to PostgreSQL before listening; no migrations, seeds or deletions run on startup. Health is a public process health response, not a continuous DB readiness monitor.
 
 ```sh
 curl --fail http://127.0.0.1:3000/health
@@ -73,11 +73,11 @@ cd ..
 npm --prefix client run test:e2e
 ```
 
-Run API tests before E2E. Leave ports 3000, 3001 and 5173 free. Playwright starts/stops its own API and Vite servers; its API uses `TEST_DATABASE_URL`. The smoke test verifies the real Express health proxy. TEST-001 also exercises customer/operator login, reload identity, 360 px layout and logout through React → Express → PostgreSQL. Run API tests first to seed the test database. It is not the future full queue journey.
+Run API and browser suites sequentially because they share the disposable database and baseline tests assert exact seed counts. API restart tests require ports 3001 and 3302 free. Browser defaults use ports 3000 and 5173; when development servers are running, use `E2E_API_PORT=3100 E2E_WEB_PORT=5273 npm --prefix client run test:e2e`. Playwright starts/stops its own API and Vite servers; its API uses `TEST_DATABASE_URL`. The smoke test verifies the real Express health proxy. TEST-001 also exercises customer/operator login, reload identity, 360 px layout and logout through React → Express → PostgreSQL. Run API tests first to seed the test database. TEST-030 additionally exercises mobile loading, empty/error recovery, validation, joining and saved entry restoration; the anonymous board is verified independently. Operator transitions remain outside these journeys.
 
 Schema uses UUID primary keys, restricted foreign-key deletion, normalized lowercase unique emails, UTC `TIMESTAMPTZ`, bigint sequence counters, party size checks and database partial unique indexes for one active entry per customer and one active service slot per queue. SQL-only constraints are in `server/prisma/migrations/0001_foundation/migration.sql`; preserve them in later migrations rather than replacing migrations with `db push`. Lifecycle values WAITING/CALLED/SERVING/COMPLETED and reserved CANCELLED/NO_SHOW, plus OPEN/PAUSED/CLOSED queue states, are persisted enums. Service transition enforcement, immutable fields and append-only event writes belong to the later queue service; no transition endpoints exist here. Operator role enforcement currently occurs in seed, as specified, and must also be enforced by future assignment services.
 
-TEST-015 support includes durable entry/event tables, sequence-preserving seed and a real process restart test for foundation data. Full entry/event restart verification must be added once join/read APIs exist; it is **not claimed complete**.
+TEST-024 now joins through one actual API process, restarts and reseeds, retrieves the persisted entry through the second process, verifies its unchanged audit event, and allocates the next number beyond 9999. No full customer/operator service lifecycle journey is claimed.
 
 Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/verification-log.md). The baseline docs describe the entire future sprint, not completed functionality.
 
@@ -85,11 +85,11 @@ Implementation and local verification were assisted by Codex; teammate review an
 
 ## Login and sessions (F-01)
 
-Open `/login` and use one of the seeded emails above with its ignored local role-specific password. The form has no role selector. Customer login opens `/queues`; operator login opens `/operator/desk`. These are authenticated landing pages; queue and service controls are not implemented yet. Reload uses `GET /api/v1/auth/me` to restore identity. `Log out` revokes the current session in PostgreSQL before clearing its cookie; other sessions remain active.
+Open `/login` and use one of the seeded emails above with its ignored local role-specific password. The form has no role selector. Customer login opens `/queues`; operator login opens `/operator/desk`. Customers can join and view their saved queue entry; the operator desk remains a landing page pending service workflow implementation. Reload uses `GET /api/v1/auth/me` to restore identity. `Log out` revokes the current session in PostgreSQL before clearing its cookie; other sessions remain active.
 
 Auth endpoints: `POST /api/v1/auth/login` (email/password JSON → 200 safe identity and expiry); `GET /api/v1/auth/me` (200 safe identity); `POST /api/v1/auth/logout` (JSON `{}` → 204). Errors follow the engineering API envelope. Missing/expired/revoked sessions return 401; unknown account and wrong password return the same generic 401. Invalid fields return 422; malformed JSON returns 400. Unsafe requests require `application/json` and an exact allowed `Origin` (missing/opaque/foreign origins return 403). Browser fetch supplies Origin automatically. Command-line clients must explicitly supply it.
 
-`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce both session and role gates. Queue assignment and private entry ownership guards run before reserved workflows; permitted workflow requests still return 404 until their feature is implemented.
+`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce both session and role gates. Operator queue/entry assignment guards run before reserved service workflows, which still return 404 after authorization until their feature is implemented. Customer entry reads constrain the query by both entry ID and authenticated customer ID.
 
 F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/verification-log.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
 
@@ -99,8 +99,26 @@ F-01 test commands, actual RED/GREEN output, counts and limitations: [verificati
 
 Reusable middleware lives in `server/src/auth/session.ts` and `server/src/authorization/guards.ts`. Protected namespaces require CUSTOMER for `/api/v1/queues` and `/api/v1/customer`, and OPERATOR for `/api/v1/operator`. Desk/call routes verify the queue assignment; start/complete routes derive the queue from the persisted entry before verifying assignment. Ownership guards constrain the lookup by both entry ID and authenticated customer ID, giving foreign/missing entries the same nonleaking `404 ENTRY_NOT_FOUND`. Missing, expired, revoked or inactive sessions receive 401; forbidden roles and unassigned operators receive 403. The public board remains anonymous, with no extra role.
 
-The React route policy uses the identity restored by `/auth/me`: customers can open `/queues` and `/my-queue`; operators can open `/operator` and `/operator/*`. Wrong-role routes show Access denied. Anonymous private routes redirect to `/login`; `/board/:queueId` remains public and currently shows an explicitly unavailable board shell. Any other path resolves to "Page not found" under `routeAccess`. Backend checks apply to direct HTTP requests independently of these UI guards.
+The React route policy uses the identity restored by `/auth/me`: customers can open `/queues` and `/my-queue`; operators can open `/operator` and `/operator/*`. Wrong-role routes show Access denied. Anonymous private routes redirect to `/login`; `/board/:queueId` remains public and now renders the explicitly allowlisted public board. Any other path resolves to "Page not found" under `routeAccess`. Backend checks apply to direct HTTP requests independently of these UI guards.
 
-Only the assigned queue listing is a new working queue endpoint. Discovery, joining, desk, service actions, private entry DTOs and board data remain future work. The tests use explicit test-only authorization routes to prove successful guard composition and denied-write protection without adding fake successful production endpoints. Full TEST-010 desk behavior, TEST-026 cross-customer HTTP DTO coverage and TEST-015 entry/event persistence await their feature endpoints. Future mutation services must verify permissions within their transaction as well, so assignment changes cannot race a write.
+The assigned queue listing, customer discovery/joining, owned entry reads and public board now have working handlers. Desk and service actions remain guarded reserved routes. Existing authorization fixtures continue to prove composition and denied-write protection; TEST-026 now covers the real private DTO endpoint. Joining rechecks the persisted customer role/activity under a row lock inside its transaction. Future operator mutations must likewise verify permissions transactionally so assignment changes cannot race a write.
 
 Actual RED/GREEN/REFACTOR results and the complete changed-file list: [Issue04 verification](docs/verification-log.md). No database migration or new role was required.
+
+## Customer queues and public board (F-03/F-04)
+
+After customer login, `/queues` loads OPEN queues. Enter a party size from 1 through 8, then select `Join queue`. The server creates a WAITING entry and returns its number, starting at `R-0001` for the seeded queue. `View my queue` opens `/my-queue`; refreshing the page restores the saved entry. Active WAITING/CALLED/SERVING entries block another join across all queues; completed entries permit a new join.
+
+Endpoints:
+
+- `GET /api/v1/queues` — CUSTOMER-only safe OPEN queue metadata.
+- `POST /api/v1/queues/:queueId/entries` — CUSTOMER-only JSON `{"partySize":4}`, returning 201 with the saved entry.
+- `GET /api/v1/customer/entries/latest` — owned latest entry, including completed, or `data:null`.
+- `GET /api/v1/customer/entries/:entryId` — owned entry; foreign/missing IDs share a generic 404.
+- `GET /api/v1/public/queues/:queueId/board` — anonymous, strictly queueCode/calledNumber/serviceState/waitingCount.
+
+Joining locks the customer and queue rows, validates role/activity and OPEN state, increments the persisted counter, inserts the entry and appends JOINED in one PostgreSQL transaction. Existing unique/partial indexes are retained. Rejected or failed transactions do not consume a number or leave an event. No migration or new dependency is needed.
+
+The my-queue and public board screens poll every 10 seconds while visible, stop after unmount, expose accessible loading/error/empty states, and use server-authoritative data. The public board reads slot and aggregate count in one database snapshot and never serializes private records. Cancellation, no-show and operator transitions remain unimplemented.
+
+Fresh test evidence after the reset, exact commands, changed files and limitations: [F-03/F-04 verification](docs/f03-f04-verification.md). No previous implementation's results are reused.

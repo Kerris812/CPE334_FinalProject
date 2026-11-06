@@ -1,0 +1,78 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test tests/e2e/queue-journey.spec.ts
+
+[WebServer] (node:54536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:54537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:54563) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:54568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/e2e/queue-journey.spec.ts:21:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload (5.5s)
+(node:54592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login (5.1s)
+
+
+  1) tests/e2e/queue-journey.spec.ts:21:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Party size')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Party size') with timeout 5000ms
+      - waiting for getByLabel('Party size')
+
+
+      22 |   await page.setViewportSize({ width: 360, height: 780 }); await page.goto('/login');
+      23 |   await page.getByLabel('Email').fill(customer.email); await page.getByLabel('Password', { exact: true }).fill(process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOMER_PASSWORD); await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    > 24 |   await expect(page.getByLabel('Party size')).toBeVisible();
+         |                                               ^
+      25 |   let release!: () => void;
+      26 |   const gate = new Promise<void>(resolve => { release = resolve; });
+      27 |   await page.route('**/api/v1/customer/entries/latest', async route => { await gate; await route.continue(); });
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/queue-journey.spec.ts:24:47
+
+    Error Context: test-results/queue-journey-TEST-030-mob-6c838-d-persisted-my-queue-reload/error-context.md
+
+    Error Context: test-results/queue-journey-TEST-030-mob-6c838-d-persisted-my-queue-reload/error-context.md
+
+  2) tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('B7261-10000', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('B7261-10000', { exact: true }) with timeout 5000ms
+      - waiting for getByText('B7261-10000', { exact: true })
+
+
+      42 |   await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED' } });
+      43 |   await page.setViewportSize({ width: 360, height: 780 }); await page.goto(`/board/${queue.id}`);
+    > 44 |   await expect(page.getByText(`${queue.code}-10000`, { exact: true })).toBeVisible(); await expect(page.getByText('CALLED')).toBeVisible(); expect(await page.getByLabel('Password').count()).toBe(0);
+         |                                                                        ^
+      45 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      46 |   await page.screenshot({ path: '../docs/evidence/f03-f04/public-board-mobile.png', fullPage: true });
+      47 | });
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/queue-journey.spec.ts:44:72
+
+    Error Context: test-results/queue-journey-anonymous-pu-cfbe6-public-values-without-login/error-context.md
+
+    Error Context: test-results/queue-journey-anonymous-pu-cfbe6-public-values-without-login/error-context.md
+
+  2 failed
+    tests/e2e/queue-journey.spec.ts:21:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload 
+    tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login 

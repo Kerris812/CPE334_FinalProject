@@ -6,7 +6,7 @@ const response = (status: number, body?: unknown) => ({ ok: status >= 200 && sta
 let fetchMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   window.history.replaceState({}, '', '/login');
-  fetchMock = vi.fn().mockResolvedValue(response(401));
+  fetchMock = vi.fn(async (path: string) => path === '/api/v1/queues' ? response(200, { data: [] }) : path.endsWith('/entries/latest') ? response(200, { data: null }) : response(401));
   vi.stubGlobal('fetch', fetchMock);
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });

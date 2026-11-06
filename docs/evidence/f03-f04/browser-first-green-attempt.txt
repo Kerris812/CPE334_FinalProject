@@ -1,0 +1,58 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test
+
+[WebServer] (node:55128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:55129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:55155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 3 workers
+
+(node:55159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55160) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55161) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/e2e/foundation.spec.ts:2:1 › foundation loads and Vite proxies the real health endpoint (392ms)
+  ✓  1 tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout (794ms)
+  ✓  4 tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout (395ms)
+  ✓  3 tests/e2e/queue-journey.spec.ts:21:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload (1.2s)
+  ✓  5 tests/e2e/auth.spec.ts:41:1 › anonymous public display URL does not become an authenticated role (105ms)
+  ✘  6 tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login (126ms)
+
+
+  1) tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('CALLED')
+    Expected: visible
+    Error: strict mode violation: getByText('CALLED') resolved to 2 elements:
+        1) <p>Currently called number</p> aka getByText('Currently called number')
+        2) <p class="queue-status status-called">CALLED</p> aka getByText('CALLED', { exact: true })
+
+    Call log:
+      - Expect "toBeVisible" getByText('CALLED') with timeout 5000ms
+      - waiting for getByText('CALLED')
+
+
+      42 |   await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED' } });
+      43 |   await page.setViewportSize({ width: 360, height: 780 }); await page.goto(`/board/${queue.id}`);
+    > 44 |   await expect(page.getByText(`${queue.code}-10000`, { exact: true })).toBeVisible(); await expect(page.getByText('CALLED')).toBeVisible(); expect(await page.getByLabel('Password').count()).toBe(0);
+         |                                                                                                                              ^
+      45 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      46 |   await page.screenshot({ path: '../docs/evidence/f03-f04/public-board-mobile.png', fullPage: true });
+      47 | });
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/queue-journey.spec.ts:44:126
+
+    Error Context: test-results/queue-journey-anonymous-pu-cfbe6-public-values-without-login/error-context.md
+
+    Error Context: test-results/queue-journey-anonymous-pu-cfbe6-public-values-without-login/error-context.md
+
+  1 failed
+    tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login 
+  5 passed (3.0s)

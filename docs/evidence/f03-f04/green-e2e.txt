@@ -1,0 +1,27 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test
+
+[WebServer] (node:56544) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56571) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 3 workers
+
+(node:56574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:56575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:56573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/foundation.spec.ts:2:1 › foundation loads and Vite proxies the real health endpoint (366ms)
+  ✓  2 tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout (721ms)
+  ✓  4 tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout (392ms)
+  ✓  3 tests/e2e/queue-journey.spec.ts:21:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload (1.2s)
+  ✓  5 tests/e2e/auth.spec.ts:41:1 › anonymous public display URL does not become an authenticated role (106ms)
+  ✓  6 tests/e2e/queue-journey.spec.ts:41:1 › anonymous public board renders only fixture public values without login (145ms)
+
+  6 passed (3.0s)

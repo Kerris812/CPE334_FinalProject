@@ -3,7 +3,8 @@ import type { ErrorRequestHandler } from 'express';
 import type { PrismaClient } from '@prisma/client';
 import { database } from './infrastructure/database.js';
 import { authentication } from './auth/auth.js';
-import { requireRole, requireQueueAssignment, requireEntryAssignment, requireOwnedEntry, currentUser } from './authorization/guards.js';
+import { requireRole, requireQueueAssignment, requireEntryAssignment, currentUser } from './authorization/guards.js';
+import { queueRoutes, customerEntryRoutes, publicBoardRoutes } from './queues/routes.js';
 import { ApiError, sendError } from './http/errors.js';
 
 interface AppOptions {
@@ -27,7 +28,7 @@ export function createApp(options: AppOptions = {}) {
     options.webOrigin ?? process.env.WEB_ORIGIN ?? 'http://127.0.0.1:5173',
   );
   app.use('/api/v1/auth', auth.router);
-  // Shared session gate for future private routers; queue behavior remains unimplemented.
+  // Shared session gate for private routers.
   const privateNamespaces = ['/api/v1/queues', '/api/v1/customer', '/api/v1/operator'];
   // Identity and role take precedence over body parsing and mutation content checks.
   app.use(privateNamespaces, auth.protect);
@@ -37,6 +38,9 @@ export function createApp(options: AppOptions = {}) {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return auth.mutation(req, res, next);
     next();
   }, parseJson);
+  app.use('/api/v1/queues', queueRoutes(db));
+  app.use('/api/v1/customer/entries', customerEntryRoutes(db));
+  app.use('/api/v1/public/queues', publicBoardRoutes(db));
   app.get('/api/v1/operator/queues', async (_req, res) => {
     const queues = await db.queue.findMany({
       where: { assignments: { some: { operatorId: currentUser(res).id } } },
@@ -50,11 +54,6 @@ export function createApp(options: AppOptions = {}) {
   app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db));
   app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db));
   app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db));
-  // /latest must not be interpreted as an entry UUID before its future route exists.
-  app.get('/api/v1/customer/entries/:entryId', (req, res, next) => {
-    if (req.params.entryId === 'latest') return next();
-    return requireOwnedEntry(db)(req, res, next);
-  });
   app.use((_req, res) => sendError(res, new ApiError(404, 'NOT_FOUND', 'Resource not found.')));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
     if (error instanceof ApiError) { sendError(res, error); return; }

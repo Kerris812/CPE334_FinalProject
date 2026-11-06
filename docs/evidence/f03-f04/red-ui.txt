@@ -1,0 +1,743 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ❯ tests/ui/queues.test.tsx (9 tests | 9 failed) 8105ms
+   × queue form displays server metadata and associated party-size validation 1025ms
+   × pending join disables double submission and displays authoritative number with my-queue link 1010ms
+   × duplicate conflict refreshes own latest entry and shows actionable message 1009ms
+   × queue discovery recovers from connection errors and supports empty state 1009ms
+   × my-queue reload reads saved entry and completed entries allow a new join 1011ms
+   × join handles server field validation, unavailable queues and expired identity 1008ms
+   × public board stays anonymous and displays only public number, state and count 1008ms
+   × public board distinguishes loading, empty, missing and retryable errors 1010ms
+   × my-queue polls while visible and stops polling after unmount 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/queues.test.tsx > queue form displays server metadata and associated party-size validation
+TestingLibraryElementError: Unable to find a label with the text of: Party size
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/queues.test.tsx:14:56
+     12| });
+     13| afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers()…
+     14| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     15| test('queue form displays server metadata and associated party-size va…
+     16|   await form(); expect(screen.getByText(queue.name)).toBeTruthy();
+ ❯ tests/ui/queues.test.tsx:16:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > pending join disables double submission and displays authoritative number with my-queue link
+TestingLibraryElementError: Unable to find a label with the text of: Party size
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/queues.test.tsx:14:56
+     12| });
+     13| afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers()…
+     14| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     15| test('queue form displays server metadata and associated party-size va…
+     16|   await form(); expect(screen.getByText(queue.name)).toBeTruthy();
+ ❯ tests/ui/queues.test.tsx:21:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > duplicate conflict refreshes own latest entry and shows actionable message
+TestingLibraryElementError: Unable to find a label with the text of: Party size
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/queues.test.tsx:14:56
+     12| });
+     13| afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers()…
+     14| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     15| test('queue form displays server metadata and associated party-size va…
+     16|   await form(); expect(screen.getByText(queue.name)).toBeTruthy();
+ ❯ tests/ui/queues.test.tsx:28:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > queue discovery recovers from connection errors and supports empty state
+TestingLibraryElementError: Unable to find role="button" and name "Retry"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/queues.test.tsx:33:33
+     31| test('queue discovery recovers from connection errors and supports emp…
+     32|   mock.mockResolvedValueOnce(response(200, { data: { user: { id: 'cust…
+     33|   render(<App />); await screen.findByRole('button', { name: 'Retry' }…
+       |                                 ^
+     34|   mock.mockImplementation(async (path: string) => path.endsWith('/entr…
+     35|   fireEvent.click(screen.getByRole('button', { name: 'Retry' })); awai…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > my-queue reload reads saved entry and completed entries allow a new join
+TestingLibraryElementError: Unable to find an element with the text: R-10000. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/queues.test.tsx:40:33
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > join handles server field validation, unavailable queues and expired identity
+TestingLibraryElementError: Unable to find a label with the text of: Party size
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ form tests/ui/queues.test.tsx:14:56
+     12| });
+     13| afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers()…
+     14| async function form() { render(<App />); return screen.findByLabelText…
+       |                                                        ^
+     15| test('queue form displays server metadata and associated party-size va…
+     16|   await form(); expect(screen.getByText(queue.name)).toBeTruthy();
+ ❯ tests/ui/queues.test.tsx:46:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > public board stays anonymous and displays only public number, state and count
+TestingLibraryElementError: Unable to find an element with the text: R-0007. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mPublic queue display[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mThe public board will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mPublic queue display[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mThe public board will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/queues.test.tsx:54:33
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > public board distinguishes loading, empty, missing and retryable errors
+TestingLibraryElementError: Unable to find an element with the text: Queue not found.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mPublic queue display[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mThe public board will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mPublic queue display[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mThe public board will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/queues.test.tsx:59:33
+     57|   window.history.replaceState({}, '', '/board/queue-id');
+     58|   mock.mockImplementation(async (path: string) => path.includes('/publ…
+     59|   render(<App />); await screen.findByText('Queue not found.'); cleanu…
+       |                                 ^
+     60|   mock.mockImplementation(async (path: string) => path.includes('/publ…
+     61|   render(<App />); await screen.findByRole('button', { name: 'Retry' }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  tests/ui/queues.test.tsx > my-queue polls while visible and stops polling after unmount
+TestingLibraryElementError: Unable to find an element with the text: WAITING. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main>[39m
+      [36m<h1>[39m
+        [0mRestaurant Queue[0m
+      [36m</h1>[39m
+      [36m<p>[39m
+        [0mQueue and service management[0m
+      [36m</p>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"account"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<strong>[39m
+            [0mCustomer A[0m
+          [36m</strong>[39m
+          [36m<p>[39m
+            [0mCustomer[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button>[39m
+          [0mLog out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<section>[39m
+        [36m<h2>[39m
+          [0mQueues[0m
+        [36m</h2>[39m
+        [36m<p>[39m
+          [0mYou are signed in. [0m
+          [0mQueue joining[0m
+          [0m will be available in a later feature.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/ui/queues.test.tsx:71:17
+     69|   vi.useFakeTimers();
+     70|   await act(async () => { render(<App />); });
+     71|   expect(screen.getByText('WAITING')).toBeTruthy();
+       |                 ^
+     72|   const visible = vi.spyOn(document, 'visibilityState', 'get').mockRet…
+     73|   status = 'CALLED'; await act(async () => { await vi.advanceTimersByT…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  9 failed | 10 passed (19)
+   Start at  22:18:28
+   Duration  8.74s (tests 79%, environment 16%, import 3%, transform 2%)
+

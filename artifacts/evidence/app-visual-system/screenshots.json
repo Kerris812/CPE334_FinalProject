@@ -1,0 +1,394 @@
+[
+  {
+    "file": "board-called-1440.png",
+    "page": "board",
+    "state": "called",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-called-360.png",
+    "page": "board",
+    "state": "called",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-completed-1440.png",
+    "page": "board",
+    "state": "completed",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-completed-360.png",
+    "page": "board",
+    "state": "completed",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-empty-1440.png",
+    "page": "board",
+    "state": "empty",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-empty-360.png",
+    "page": "board",
+    "state": "empty",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-error-1440.png",
+    "page": "board",
+    "state": "error",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-error-360.png",
+    "page": "board",
+    "state": "error",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-loading-1440.png",
+    "page": "board",
+    "state": "loading",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-loading-360.png",
+    "page": "board",
+    "state": "loading",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-serving-1440.png",
+    "page": "board",
+    "state": "serving",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "board-serving-360.png",
+    "page": "board",
+    "state": "serving",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-empty-1440.png",
+    "page": "login",
+    "state": "empty",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-empty-360.png",
+    "page": "login",
+    "state": "empty",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-error-1440.png",
+    "page": "login",
+    "state": "error",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-error-360.png",
+    "page": "login",
+    "state": "error",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-loading-1440.png",
+    "page": "login",
+    "state": "loading",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "login-loading-360.png",
+    "page": "login",
+    "state": "loading",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-called-1440.png",
+    "page": "my-queue",
+    "state": "called",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-called-360.png",
+    "page": "my-queue",
+    "state": "called",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-completed-1440.png",
+    "page": "my-queue",
+    "state": "completed",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-completed-360.png",
+    "page": "my-queue",
+    "state": "completed",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-empty-1440.png",
+    "page": "my-queue",
+    "state": "empty",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-empty-360.png",
+    "page": "my-queue",
+    "state": "empty",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-error-1440.png",
+    "page": "my-queue",
+    "state": "error",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-error-360.png",
+    "page": "my-queue",
+    "state": "error",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-loading-1440.png",
+    "page": "my-queue",
+    "state": "loading",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-loading-360.png",
+    "page": "my-queue",
+    "state": "loading",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-serving-1440.png",
+    "page": "my-queue",
+    "state": "serving",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "my-queue-serving-360.png",
+    "page": "my-queue",
+    "state": "serving",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-called-1440.png",
+    "page": "operator",
+    "state": "called",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-called-360.png",
+    "page": "operator",
+    "state": "called",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-completed-1440.png",
+    "page": "operator",
+    "state": "completed",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-completed-360.png",
+    "page": "operator",
+    "state": "completed",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-empty-1440.png",
+    "page": "operator",
+    "state": "empty",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-empty-360.png",
+    "page": "operator",
+    "state": "empty",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-error-1440.png",
+    "page": "operator",
+    "state": "error",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-error-360.png",
+    "page": "operator",
+    "state": "error",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-loading-1440.png",
+    "page": "operator",
+    "state": "loading",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-loading-360.png",
+    "page": "operator",
+    "state": "loading",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-serving-1440.png",
+    "page": "operator",
+    "state": "serving",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "operator-serving-360.png",
+    "page": "operator",
+    "state": "serving",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-called-1440.png",
+    "page": "queues",
+    "state": "called",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-called-360.png",
+    "page": "queues",
+    "state": "called",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-completed-1440.png",
+    "page": "queues",
+    "state": "completed",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-completed-360.png",
+    "page": "queues",
+    "state": "completed",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-empty-1440.png",
+    "page": "queues",
+    "state": "empty",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-empty-360.png",
+    "page": "queues",
+    "state": "empty",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-error-1440.png",
+    "page": "queues",
+    "state": "error",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-error-360.png",
+    "page": "queues",
+    "state": "error",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-form-1440.png",
+    "page": "queues",
+    "state": "form",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-form-360.png",
+    "page": "queues",
+    "state": "form",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-loading-1440.png",
+    "page": "queues",
+    "state": "loading",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-loading-360.png",
+    "page": "queues",
+    "state": "loading",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-serving-1440.png",
+    "page": "queues",
+    "state": "serving",
+    "width": 1440,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  },
+  {
+    "file": "queues-serving-360.png",
+    "page": "queues",
+    "state": "serving",
+    "width": 360,
+    "source": "Rendered application with controlled synthetic API responses; not a deployment or real customer data"
+  }
+]

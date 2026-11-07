@@ -1,0 +1,56 @@
+{
+  "scope": "Public board UI refinement; no backend endpoint/schema/authentication/workflow changes",
+  "baseCommit": "4055a963b345dc1182b90ee8ab93e74145dbcaa1",
+  "uncommittedChangesIncluded": true,
+  "recordedAt": "2026-11-07T10:00:09.995Z",
+  "verification": [
+    {
+      "command": "npm --prefix client run test:ui",
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "command": "npm --prefix client run build",
+      "exitCode": 0
+    },
+    {
+      "command": "node .local/run-verification.mjs test npm --prefix client run test:e2e",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    }
+  ],
+  "viewportWidths": [
+    1440,
+    1024,
+    768,
+    360
+  ],
+  "publicApiFieldAllowlist": [
+    "queueCode",
+    "calledNumber",
+    "serviceState",
+    "waitingCount"
+  ],
+  "notes": [
+    "Updated time is local response receipt time, not an added API field.",
+    "Only existing anonymous R/S board endpoints and the directly selected queue are read for UI navigation.",
+    "Queue names are generic headings derived from public queueCode, never private metadata."
+  ],
+  "sourceSha256": {
+    "client/src/App.tsx": "8d00004bbfd9bca50b979db1f3b31fb710543297e87ad0b824c569bf2a17eb3e",
+    "client/src/PublicQueueBoard.tsx": "bb11a7bb2d18525940a2d8f130aeae205681677f5b6091c830f8b2ad155d8139",
+    "client/src/public-board.css": "1ff528e990debb1bb89bc149f96d4b318147a46703221cd9cad5c07d3b502c66",
+    "client/src/style.css": "0215729bb499ffcf3347d06bb09d0fe21554b62ea75088d8196443363b4fcb01",
+    "client/tests/ui/public-board.test.tsx": "ca0078bacbbd3520bff315bce8b86849328aae68e31ec4b5dc801f7b16696910",
+    "client/tests/ui/queues.test.tsx": "6f5012981a9b66092128bb1bd58db70b7c8a9c0fbbd03be191c78bee3d9472b4",
+    "client/tests/e2e/public-board.spec.ts": "97322a2c785d3edb1bd459191f995d416e2c8b32de06a03701966949bfb73ad6",
+    "client/tests/e2e/operator-workflow.spec.ts": "eef7b1f9e78345a705778eb131a7153c38ff81eec01ccd89d8c1b01847c26492",
+    "client/tests/e2e/party-routing.spec.ts": "4e8444bd8e4042da13c15fe1906665a2031f20d14232e897fc9e730ac6e2bfae",
+    "client/tests/e2e/sprint1-journey.spec.ts": "19504493e280227e370ad9eafbca69eb697f9accd33dd7872b0b921202a299b8",
+    "docs/sprint-1/ui-spec.md": "9a74d1d01d59be9287dce93d454ee9988965c066cd651235e5841594f73d36ca"
+  }
+}

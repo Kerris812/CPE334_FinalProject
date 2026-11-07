@@ -9,3 +9,7 @@ test-results/
 *.log
 .DS_Store
 .local/
+
+# Local compiler/bundler caches (curated evidence under artifacts/evidence is intentional).
+.vite/
+*.tsbuildinfo

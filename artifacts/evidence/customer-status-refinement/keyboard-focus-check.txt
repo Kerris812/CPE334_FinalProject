@@ -1,0 +1,20 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test tests/e2e/customer-status.spec.ts
+
+[WebServer] (node:25233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:25234) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:25260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:25271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/customer-status.spec.ts:26:1 › TEST-030 360px private status supports loading, empty, retry, all persisted stages and reload (1.6s)
+  ✓  2 tests/e2e/customer-status.spec.ts:94:1 › TEST-030 a revoked private session returns the status page to login (601ms)
+  ✓  3 tests/e2e/customer-status.spec.ts:109:1 › customer status keeps R-10000 intact with palette badges and quiet actions at every width (793ms)
+
+  3 passed (4.5s)

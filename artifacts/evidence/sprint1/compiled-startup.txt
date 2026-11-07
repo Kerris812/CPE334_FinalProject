@@ -1,0 +1,2 @@
+Restaurant queue API listening on port 3101
+{"command":"npm --prefix server start (compiled dist/index.js)","port":3101,"status":200,"body":{"status":"ok","service":"restaurant-queue-api"}}

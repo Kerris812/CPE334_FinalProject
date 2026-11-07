@@ -1,0 +1,10 @@
+
+> restaurant-queue-server@0.1.0 db:seed
+> tsx scripts/seed.ts
+
+Synthetic seed complete.
+
+> restaurant-queue-server@0.1.0 db:seed
+> tsx scripts/seed.ts
+
+Synthetic seed complete.

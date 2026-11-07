@@ -1,10 +1,10 @@
 # CPE334 Restaurant Queue and Service Management System
 
-React/Vite/TypeScript client, Express/TypeScript API, PostgreSQL with Prisma, Argon2id synthetic seed, Vitest/Supertest and Playwright. F-01 implements login, current identity, logout and database-backed sessions. F-03/F-04 implement customer queue joining, saved customer entries and the anonymous public board. Operator service workflows remain subsequent features.
+Sprint 1 integrates F01–F05: session authentication, queue assignments, customer joining and private status, anonymous public boards, and FIFO operator service. React/Vite/TypeScript, Express/TypeScript, PostgreSQL/Prisma, Argon2id, Vitest/Supertest and Playwright. The four [engineering contracts](docs/sprint-1/specification.md) include the approved two-queue revision.
 
 ## Requirements and installation
 
-Use Node.js 24 LTS (verified with 24.14.0), npm 11, and PostgreSQL 16 (verified with 16.15). Run commands from the repository root. Install/start PostgreSQL using your platform's package manager first. No Docker is required.
+Use Node.js 22 or later (tested: 24.14.0), npm, and a running PostgreSQL server (tested: Homebrew PostgreSQL 17.11 on macOS ARM64). Run commands from the repository root. This verification used local PostgreSQL without Docker.
 
 ```sh
 npm --prefix server ci
@@ -13,7 +13,7 @@ cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-Provision a dedicated local login and **two different databases** using a PostgreSQL administrator connection. In `psql`, use `\password queue_local` to set a local password interactively:
+Create a local database login and two **different** databases using a PostgreSQL administrator connection. Set the password interactively in `psql`:
 
 ```sql
 CREATE ROLE queue_local LOGIN;
@@ -22,111 +22,130 @@ CREATE DATABASE restaurant_queue OWNER queue_local;
 CREATE DATABASE restaurant_queue_test OWNER queue_local;
 ```
 
-Edit ignored `server/.env`: replace `QUEUE_USER` with `queue_local`, `LOCAL_PASSWORD` with the URL-encoded local password, and set the PostgreSQL host/port. Supply generated synthetic values for `DEMO_CUSTOMER_PASSWORD` and `DEMO_OPERATOR_PASSWORD`. For example, this writes random passwords directly to the local file without printing them:
+Edit ignored `server/.env`:
+
+| Variable | Local configuration |
+| --- | --- |
+| `DATABASE_URL` | Development PostgreSQL URL; replace example username/password/host/database. URL-encode password characters. |
+| `TEST_DATABASE_URL` | Separate disposable PostgreSQL database whose name ends in `_test`. Never point it at development or shared data. |
+| `DEMO_CUSTOMER_PASSWORD` | Locally chosen synthetic password for both seeded customers. |
+| `DEMO_OPERATOR_PASSWORD` | Locally chosen synthetic password for both seeded operators. |
+| `PORT` | API port; default `3000`. |
+| `WEB_ORIGIN` | Exact browser origin; default `http://127.0.0.1:5173`. |
+| `COOKIE_SECURE` | `false` for local HTTP; production always enables Secure cookies. |
+| `NODE_ENV` | `development` locally; production requires HTTPS. |
+| `TZ` | `UTC`. |
+
+Generate local demo passwords without printing them, **before the first seed**:
 
 ```sh
-node --input-type=module -e 'import fs from "node:fs"; import crypto from "node:crypto"; const p="server/.env"; let s=fs.readFileSync(p,"utf8"); for (const k of ["DEMO_CUSTOMER_PASSWORD","DEMO_OPERATOR_PASSWORD"]) s=s.replace(new RegExp("^"+k+"=.*$","m"),k+"="+crypto.randomBytes(24).toString("base64url")); fs.writeFileSync(p,s,{mode:0o600});'
-```
-
-The local passwords are synthetic secrets; keep them in the ignored environment file. Never use real personal credentials. `DATABASE_URL` is server-only; never expose it through a `VITE_` variable. Set `WEB_ORIGIN` to the exact browser origin, including host and port (default `http://127.0.0.1:5173`). Use that same hostname in the browser; `localhost` and `127.0.0.1` are different origins. `COOKIE_SECURE=true` enables HTTPS cookies locally; production always uses Secure even if this setting is false. Sessions expire absolutely after eight hours, with no sliding renewal or configurable TTL.
-
-```sh
+node --input-type=module <<'JS'
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+const path = 'server/.env';
+let text = fs.readFileSync(path, 'utf8');
+for (const name of ['DEMO_CUSTOMER_PASSWORD', 'DEMO_OPERATOR_PASSWORD']) {
+  text = text.replace(new RegExp('^' + name + '=.*$', 'm'), name + '=' + crypto.randomBytes(24).toString('base64url'));
+}
+fs.writeFileSync(path, text, { mode: 0o600 });
+JS
 npm --prefix server run db:generate
 npm --prefix server run db:migrate
 npm --prefix server run db:seed
 ```
 
-`db:migrate` uses Prisma migrate deploy; it never resets data. `db:seed` upserts by email/code in a transaction. Fresh data is queue `R` / `Restaurant Waiting Queue` in `OPEN`, Customer A/B (`customer.a@example.test`, `customer.b@example.test`), Operator A/B (`operator.a@example.test`, `operator.b@example.test`), and only Operator A assigned to R. No entries are seeded. Passwords are Argon2id hashes. Rerunning seed preserves existing hashes, account settings, queue state, sequence counters, entries, history and other assignments; it is not a password rotation or assignment reconciliation tool. Conflicting existing account roles cause seed to fail safely.
+Migrations use `prisma migrate deploy`, without resetting data. Seed is transactional and idempotent: it preserves existing hashes, sessions, counters, queue states, entries and history. Changing the environment password afterward does **not** rotate an existing account's password. Contradictory seeded roles or assignments fail safely without deleting existing data. Do not use real personal credentials or put database secrets in `VITE_` variables.
 
-## Start and build
+### Seeded accounts and queues
 
-In separate terminals:
+| Account | Email | Password source | Assignment |
+| --- | --- | --- | --- |
+| Customer A | `customer.a@example.test` | `DEMO_CUSTOMER_PASSWORD` in local `server/.env` | Customer routes |
+| Customer B | `customer.b@example.test` | Same customer password | Customer routes |
+| Operator A | `operator.a@example.test` | `DEMO_OPERATOR_PASSWORD` | R only |
+| Operator B | `operator.b@example.test` | Same operator password | S only |
+
+Queue R accepts parties 1–4; S accepts 5–8. Both start OPEN with counter zero and no entries. Each has an independent FIFO counter and one CALLED/SERVING slot; one active entry per customer applies across both queues. Existing historical parties retain their original numbers and may finish service. Seed does not renumber or reroute history.
+
+## Run the application
+
+Use separate terminals:
 
 ```sh
 npm --prefix server run dev
 npm --prefix client run dev
 ```
 
-API: `http://127.0.0.1:3000`; UI: `http://127.0.0.1:5173`. Vite proxies `/api/v1` and `/health` to port 3000. If changing the API port, set Vite's `API_PROXY_TARGET`. Browser tests accept `E2E_API_PORT` and `E2E_WEB_PORT` for separate local servers. Startup connects to PostgreSQL before listening; no migrations, seeds or deletions run on startup. Health is a public process health response, not a continuous DB readiness monitor.
+Open [login](http://127.0.0.1:5173/login). Use the seeded email and corresponding local password above. Customers reach `/queues`, join their party-size queue, then open `/my-queue`; operators reach `/operator/desk`. Operators call the FIFO head, start service, then complete it. Reload restores the session from `/auth/me`.
+
+The **View public board** link is available from the login/home screen and authenticated pages. Anonymous URLs:
+
+- [Both queues](http://127.0.0.1:5173/board)
+- [Queue R](http://127.0.0.1:5173/board/R)
+- [Queue S](http://127.0.0.1:5173/board/S)
+
+Boards poll every ten seconds while visible and support manual refresh/retry. They show only queue code, called number/state and waiting count. Public boards have no login controls or customer details.
+
+API runs at `http://127.0.0.1:3000`; Vite proxies `/api/v1` and `/health`. Use the same hostname as `WEB_ORIGIN`: `localhost` and `127.0.0.1` are different origins. When changing API port, set client `API_PROXY_TARGET`. Authenticated mutations require the configured Origin and JSON where specified. Sessions use opaque tokens in HttpOnly SameSite=Lax cookies, SHA-256 hashes in PostgreSQL, and an absolute eight-hour lifetime.
 
 ```sh
 curl --fail http://127.0.0.1:3000/health
-# {"status":"ok","service":"restaurant-queue-api"}
 npm --prefix server run build
 npm --prefix client run build
+# After building, with the same server environment configured:
 npm --prefix server start
 ```
 
-Stop the development API before using `start` on the same port. Frontend production output is `client/dist`; API output is `server/dist`. Production same-origin hosting is a later deployment task.
+Startup connects to PostgreSQL before listening; it does not migrate, seed or delete data. `/health` is process health, not a continuous database readiness monitor. Production hosting must serve the built client with SPA route fallback and proxy the API under the same origin. No deployment is represented as verified.
 
 ## Tests
 
-`TEST_DATABASE_URL` must identify a dedicated disposable PostgreSQL database whose name ends in `_test`, different from `DATABASE_URL`. API tests migrate that database automatically, create synthetic fixture entries, and remove only the entries they created. They never truncate tables or reset databases. Use a fresh, empty test database for initial validation; retain the same ignored synthetic passwords across repeat runs. Do not use a shared/production database. Unexpected unrelated records intentionally fail the exact seed-count assertions.
+Install Chromium once:
 
 ```sh
-npm --prefix server run test:unit
-npm --prefix server run test:api
-npm --prefix client run test:ui
 cd client
 npx playwright install chromium
 cd ..
-npm --prefix client run test:e2e
 ```
 
-Run API and browser suites sequentially because they share the disposable database and baseline tests assert exact seed counts. API restart tests require ports 3001 and 3302 free. Browser defaults use ports 3000 and 5173; when development servers are running, use `E2E_API_PORT=3100 E2E_WEB_PORT=5273 npm --prefix client run test:e2e`. Playwright starts/stops its own API and Vite servers; its API uses `TEST_DATABASE_URL`. The smoke test verifies the real Express health proxy. TEST-001 also exercises customer/operator login, reload identity, 360 px layout and logout through React → Express → PostgreSQL. Run API tests first to seed the test database. TEST-030 additionally exercises mobile loading, empty/error recovery, validation, joining and saved entry restoration; the anonymous board is verified independently. Operator transitions remain outside these journeys.
+Use a fresh, disposable `_test` database and configure `TEST_DATABASE_URL` separately from `DATABASE_URL`. Prepare it explicitly; the E2E launcher does not automatically migrate or seed:
 
-Schema uses UUID primary keys, restricted foreign-key deletion, normalized lowercase unique emails, UTC `TIMESTAMPTZ`, bigint sequence counters, party size checks and database partial unique indexes for one active entry per customer and one active service slot per queue. SQL-only constraints are in `server/prisma/migrations/0001_foundation/migration.sql`; preserve them in later migrations rather than replacing migrations with `db push`. Lifecycle values WAITING/CALLED/SERVING/COMPLETED and reserved CANCELLED/NO_SHOW, plus OPEN/PAUSED/CLOSED queue states, are persisted enums. Service transition enforcement, immutable fields and append-only event writes belong to the later queue service; no transition endpoints exist here. Operator role enforcement currently occurs in seed, as specified, and must also be enforced by future assignment services.
+```sh
+# This subprocess overrides DATABASE_URL only for migrating/seeding TEST_DATABASE_URL.
+node --input-type=module <<'JS'
+import { createRequire } from 'node:module';
+import { spawnSync } from 'node:child_process';
+const require = createRequire(new URL('./server/package.json', import.meta.url));
+require('dotenv').config({ path: 'server/.env', quiet: true });
+const { testDatabaseUrl } = await import('./server/src/infrastructure/test-database.ts');
+const databaseUrl = testDatabaseUrl(process.env.TEST_DATABASE_URL, process.env.DATABASE_URL);
+for (const task of ['db:migrate', 'db:seed']) {
+  const result = spawnSync('npm', ['--prefix', 'server', 'run', task], {
+    env: { ...process.env, DATABASE_URL: databaseUrl }, stdio: 'inherit',
+  });
+  if (result.status !== 0) process.exit(result.status ?? 1);
+}
+JS
+npm --prefix server run test:unit -- --reporter=verbose
+npm --prefix server run test:api -- --reporter=verbose
+npm --prefix client run test:ui -- --reporter=verbose
+E2E_API_PORT=3100 E2E_WEB_PORT=5273 npm --prefix client run test:e2e
+npm --prefix server run build
+npm --prefix client run build
+```
 
-TEST-024 now joins through one actual API process, restarts and reseeds, retrieves the persisted entry through the second process, verifies its unchanged audit event, and allocates the next number beyond 9999. No full customer/operator service lifecycle journey is claimed.
+The preparation snippet uses Node's TypeScript support (Node 22.18+ or Node 24). The database guard refuses missing URLs, names without `_test`, and matching development/test database names. API tests deploy migrations and use real PostgreSQL fixtures. Run API and E2E suites **sequentially** because they share the test database. Reserve ports 3302/3310 for restart tests and 3100/5273 for the example E2E servers. Stop other servers on configured ports; Playwright does not reuse an existing server.
 
-Engineering contracts: [specification](docs/sprint-1/specification.md), [API](docs/sprint-1/api-spec.md), [tests](docs/sprint-1/tests.md), [UI](docs/sprint-1/ui-spec.md). Actual foundation validation and limitations: [verification](docs/verification-log.md). The baseline docs describe the entire future sprint, not completed functionality.
+The release journey requires a clean seeded fixture: both counters zero and no queue entries. It asserts this instead of clearing unknown data to manufacture `R-0001`. Fixtures clean their own synthetic data; these commands are unsuitable for a shared database. To rerun against a database containing other entries, provision a new disposable `_test` database and update the URL. Test fixture cleanup can restore test counters; application workflows never reset counters or delete audit history.
 
-Implementation and local verification were assisted by Codex; teammate review and release acceptance remain outstanding.
+## Verification and release status
 
-## Login and sessions (F-01)
+Latest local run: **161 passed, 0 failed, 0 skipped** (10 unit, 80 API, 53 UI, 18 E2E); both TypeScript/build commands passed. All AC-001–044 and TEST-001–049 have executed traceability. Additional TEST-050–057 protect origins, errors and approved R/S behavior.
 
-Open `/login` and use one of the seeded emails above with its ignored local role-specific password. The form has no role selector. Customer login opens `/queues`; operator login opens `/operator/desk`. Customers can join and view their saved queue entry; the operator desk remains a landing page pending service workflow implementation. Reload uses `GET /api/v1/auth/me` to restore identity. `Log out` revokes the current session in PostgreSQL before clearing its cookie; other sessions remain active.
+- [Acceptance coverage](docs/sprint-1/acceptance-coverage.md)
+- [Commands, results, screenshots, restart and security evidence](docs/sprint-1/release-verification.md)
+- [Draft v0.1.0 release notes and outstanding release risks](docs/releases/v0.1.0.md)
 
-Auth endpoints: `POST /api/v1/auth/login` (email/password JSON → 200 safe identity and expiry); `GET /api/v1/auth/me` (200 safe identity); `POST /api/v1/auth/logout` (JSON `{}` → 204). Errors follow the engineering API envelope. Missing/expired/revoked sessions return 401; unknown account and wrong password return the same generic 401. Invalid fields return 422; malformed JSON returns 400. Unsafe requests require `application/json` and an exact allowed `Origin` (missing/opaque/foreign origins return 403). Browser fetch supplies Origin automatically. Command-line clients must explicitly supply it.
+Server dependency audit reports four high-severity affected packages in the Prisma dependency chain; client audit reports zero. These remain unresolved and require dependency/security review before release. Local passing tests do not establish peer approval, GitHub mergeability, deployment readiness or a published release.
 
-`qs_session` contains 32 random bytes encoded as base64url and uses HttpOnly, SameSite=Lax, Path=/, and Max-Age=28800. Only its SHA-256 digest persists in the existing sessions table. Authentication checks the session and account activity in PostgreSQL on each protected request. Passwords must use Argon2id. Responses are marked `Cache-Control: no-store`; credentials and internal exceptions are not logged. Private queue API namespaces enforce both session and role gates. Operator queue/entry assignment guards run before reserved service workflows, which still return 404 after authorization until their feature is implemented. Customer entry reads constrain the query by both entry ID and authenticated customer ID.
-
-F-01 test commands, actual RED/GREEN output, counts and limitations: [verification](docs/verification-log.md). To select a planned test: `npm --prefix server run test:api -- -t TEST-006`. No schema migration is needed for F-01.
-
-## Role and queue permissions (Issue04)
-
-`GET /api/v1/operator/queues` returns only the current operator's assigned queues as `{data:[{id,code,name,state}]}`. Seeded Operator A sees R; Operator B receives an empty list. Customers receive 403. No role or identity from body, query or headers can override the database-backed session.
-
-Reusable middleware lives in `server/src/auth/session.ts` and `server/src/authorization/guards.ts`. Protected namespaces require CUSTOMER for `/api/v1/queues` and `/api/v1/customer`, and OPERATOR for `/api/v1/operator`. Desk/call routes verify the queue assignment; start/complete routes derive the queue from the persisted entry before verifying assignment. Ownership guards constrain the lookup by both entry ID and authenticated customer ID, giving foreign/missing entries the same nonleaking `404 ENTRY_NOT_FOUND`. Missing, expired, revoked or inactive sessions receive 401; forbidden roles and unassigned operators receive 403. The public board remains anonymous, with no extra role.
-
-The React route policy uses the identity restored by `/auth/me`: customers can open `/queues` and `/my-queue`; operators can open `/operator` and `/operator/*`. Wrong-role routes show Access denied. Anonymous private routes redirect to `/login`; `/board/:queueId` remains public and now renders the explicitly allowlisted public board. Any other path resolves to "Page not found" under `routeAccess`. Backend checks apply to direct HTTP requests independently of these UI guards.
-
-The assigned queue listing, customer discovery/joining, owned entry reads and public board now have working handlers. Desk and service actions remain guarded reserved routes. Existing authorization fixtures continue to prove composition and denied-write protection; TEST-026 now covers the real private DTO endpoint. Joining rechecks the persisted customer role/activity under a row lock inside its transaction. Future operator mutations must likewise verify permissions transactionally so assignment changes cannot race a write.
-
-Actual RED/GREEN/REFACTOR results and the complete changed-file list: [Issue04 verification](docs/verification-log.md). No database migration or new role was required.
-
-## Customer queues and public board (F-03/F-04)
-
-After customer login, `/queues` loads OPEN queues. Enter a party size from 1 through 8, then select `Join queue`. The server creates a WAITING entry and returns its number, starting at `R-0001` for the seeded queue. `View my queue` opens `/my-queue`; refreshing the page restores the saved entry. Active WAITING/CALLED/SERVING entries block another join across all queues; completed entries permit a new join.
-
-Endpoints:
-
-- `GET /api/v1/queues` — CUSTOMER-only safe OPEN queue metadata.
-- `POST /api/v1/queues/:queueId/entries` — CUSTOMER-only JSON `{"partySize":4}`, returning 201 with the saved entry.
-- `GET /api/v1/customer/entries/latest` — owned latest entry, including completed, or `data:null`.
-- `GET /api/v1/customer/entries/:entryId` — owned entry; foreign/missing IDs share a generic 404.
-- `GET /api/v1/public/queues/:queueId/board` — anonymous, strictly queueCode/calledNumber/serviceState/waitingCount.
-
-Joining locks the customer and queue rows, validates role/activity and OPEN state, increments the persisted counter, inserts the entry and appends JOINED in one PostgreSQL transaction. Existing unique/partial indexes are retained. Rejected or failed transactions do not consume a number or leave an event. No migration or new dependency is needed.
-
-The my-queue and public board screens poll every 10 seconds while visible, stop after unmount, expose accessible loading/error/empty states, and use server-authoritative data. The public board reads slot and aggregate count in one database snapshot and never serializes private records. Cancellation, no-show and operator transitions remain unimplemented.
-
-Fresh test evidence after the reset, exact commands, changed files and limitations: [F-03/F-04 verification](docs/f03-f04-verification.md). No previous implementation's results are reused.
-
-## Public display board (Issue07)
-
-Open `/board/:queueId` with a queue UUID; no login is required. The page displays only public queue code, called number/state and WAITING entry count. It refreshes every 10 seconds while visible, pauses when hidden, and provides safe loading/empty/not-found/retry states. Desktop typography scales for distance viewing; narrow layouts retain all digits without horizontal overflow. The backend uses a dedicated four-field public DTO and one consistent PostgreSQL read snapshot. No customer information or private records are included.
-
-Issue07 changes, recursive privacy checks, actual RED/GREEN/REFACTOR counts and limitations: [public board verification](docs/public-board-verification.md). Existing endpoint behavior already passed the strengthened API tests before this issue; fresh failing evidence covers the dedicated DTO boundary and remaining display/accessibility gaps.
-
-The home and sign-in pages now include a **View public board** link below the app heading. It opens `/board/R` anonymously; `R` is resolved from the seeded database queue, and existing `/board/:queueId` UUID links still work. Both forms return the same four-field public DTO.
+Environment files, dependencies, bundler caches, build outputs and runner output directories are ignored. Curated evidence is intentionally retained under `artifacts/evidence/sprint1`; it contains synthetic workflow data, no credentials. Registration, cancellation, no-shows, notifications, multiple counters per queue, administration and later-sprint features remain outside this implementation.

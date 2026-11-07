@@ -27,7 +27,7 @@ test('TEST-030 customer status loading, empty and all four lifecycle states use 
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Refresh status' })); });
     expect(screen.getByText('R-10000')).toBeTruthy();
     expect(screen.getByText(status).classList.contains(`status-${status.toLowerCase()}`)).toBe(true);
-    expect(screen.getByText('Party size: 4')).toBeTruthy();
+    expect(screen.getByText('Party size').nextElementSibling?.textContent).toBe('4');
   }
 });
 
@@ -95,4 +95,19 @@ test('TEST-030 pending initial request, visibility changes and late unmounted re
   await act(async () => { finish(response(200, { data: entry })); await vi.advanceTimersByTimeAsync(10000); });
   expect(screen.queryByText('R-10000')).toBeNull();
   expect(mock).toHaveBeenCalledTimes(1);
+});
+
+
+test('customer details use only the owned entry fields, Bangkok formatting and receipt time', async () => {
+  mock.mockResolvedValue(response(200, { data: { ...entry, customer: { email: 'other-customer@example.test', displayName: 'Other private customer' }, passwordHash: 'private-hash' } }));
+  await mount();
+  expect(screen.getByRole('heading', { level: 1, name: 'My queue' })).toBeTruthy();
+  expect(screen.getByText('Queue').nextElementSibling?.textContent).toBe('Queue R');
+  expect(screen.getByText('Party size').nextElementSibling?.textContent).toBe('4');
+  expect(screen.getByText('6 Nov 2026, 17:00')).toBeTruthy();
+  expect(screen.getByText('Bangkok time')).toBeTruthy();
+  expect(document.querySelector('.customer-queue-updated time')?.textContent).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+  expect(screen.getByRole('region', { name: 'Your queue entry' }).getAttribute('aria-live')).toBe('polite');
+  expect(screen.getByText('WAITING').querySelector('[aria-hidden=true]')).toBeTruthy();
+  for (const privateValue of ['other-customer@example.test', 'Other private customer', 'private-hash']) expect(screen.queryByText(privateValue)).toBeNull();
 });

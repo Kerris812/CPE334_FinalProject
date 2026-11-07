@@ -1,6 +1,6 @@
 # specification.md — Product and System Engineering Specification
 
-> **Status:** PROPOSED engineering baseline, 6 November 2026. Design and contracts only. No application code, test runs, GitHub releases or deployments are represented as complete. All examples use synthetic placeholders.
+> **Status:** Engineering baseline dated 6 November 2026, with approved Issue08 scope revision. F01–F05 are implemented and locally verified on the Issue09 working tree on 7 November 2026. See [release verification](release-verification.md) and [acceptance coverage](acceptance-coverage.md). Peer review, branch integration, security risk resolution and publication are not asserted complete. Examples use synthetic data.
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
@@ -789,7 +789,7 @@ This section holds the normative feature behavior, data implications and accepta
 
 **Contract status, requirement links, dependencies**
 
-**Sprint:** 1 | **Status:** SPECIFIED, NOT IMPLEMENTED  
+**Sprint:** 1 | **Status:** IMPLEMENTED; local acceptance verified, external release gates pending
 **Links:** FR-01; BR-13, BR-14; NFR-01, NFR-02, NFR-03, NFR-11; D-12, D-13, D-22, D-23.  
 **Dependencies:** CHORE-01 initial migration and seed; sessions/user schema; same-origin proxy. Account creation, password reset and admin UI are excluded.
 
@@ -824,13 +824,13 @@ This section holds the normative feature behavior, data implications and accepta
 
 ## Feature Definition of Done
 
-Schema/seed reviewed; auth endpoints and login UI implemented; all AC-001–008 linked to actual tests with executions; no plaintext or exposed role selector; teammate review records a specific security check; verified integration into `sprint-1-staging`; docs, README and safe demo handoff updated. Evidence: test run screenshot/text with commit, login/logout E2E or API output, session revocation assertion, PR review. **Current status: NOT DONE.**
+Schema/seed reviewed; auth endpoints and login UI implemented; all AC-001–008 linked to actual tests with executions; no plaintext or exposed role selector; teammate review records a specific security check; verified integration into `sprint-1-staging`; docs, README and safe demo handoff updated. Evidence: test run screenshot/text with commit, login/logout E2E or API output, session revocation assertion, PR review. **Current status:** local implementation/tests verified in [release verification](release-verification.md); required human review/integration/release evidence remains pending.
 
 ### F-02 Role and queue authorization
 
 **Contract status, requirement links, dependencies**
 
-**Sprint:** 1 | **Status:** SPECIFIED, NOT IMPLEMENTED  
+**Sprint:** 1 | **Status:** IMPLEMENTED; local acceptance verified, external release gates pending
 **Links:** FR-02, FR-03, FR-04, FR-23, FR-24; BR-09–BR-11, BR-27–BR-28; NFR-01, NFR-06, NFR-07, NFR-11; D-09, D-10, D-20, D-25.  
 **Dependencies:** F-01 current session, users, queue/assignment schema.
 
@@ -858,13 +858,13 @@ Seed R and S initially OPEN; Customer A/B; Operator A assigned only R; Operator 
 
 ## Feature Definition of Done
 
-PostgreSQL schema + migrations and seed documented; health endpoint and role guards work; assigned/unassigned operator fixtures verified; authorization API integration tests execute; persistence after restart checked; docs and README updated; reviewed PR merged to staging with evidence of teammate's substantive authorization review. **Current status: NOT DONE.**
+PostgreSQL schema + migrations and seed documented; health endpoint and role guards work; assigned/unassigned operator fixtures verified; authorization API integration tests execute; persistence after restart checked; docs and README updated; reviewed PR merged to staging with evidence of teammate's substantive authorization review. **Current status:** local implementation/tests verified in [release verification](release-verification.md); required human review/integration/release evidence remains pending.
 
 ### F-03 Join queue
 
 **Contract status, requirement links, dependencies**
 
-**Sprint:** 1 | **Status:** SPECIFIED, NOT IMPLEMENTED  
+**Sprint:** 1 | **Status:** IMPLEMENTED; local acceptance verified, external release gates pending
 **Links:** FR-05, FR-06; BR-03–BR-06, BR-15, BR-27; NFR-05, NFR-06, NFR-09, NFR-15; D-01–D-08, D-20, D-27.  
 **Dependencies:** F-01 authenticated Customer and F-02 seeded queue and database indexes. F-04 consumes the entry created by F-03; F-03 does not depend on F-04.
 
@@ -896,13 +896,13 @@ Writes `queues.last_sequence`, `queue_entries` and `queue_events` in one transac
 
 ## Feature Definition of Done
 
-UI and API integrated; migration uniqueness in place; joins valid/invalid/concurrent cases verified against real DB; own queue number visible at 360 px; JOINED audit and restart persistence verified; PR reviewed specifically for transactional uniqueness and auth; README/contract current; staging integration complete. **Current status: NOT DONE.**
+UI and API integrated; migration uniqueness in place; joins valid/invalid/concurrent cases verified against real DB; own queue number visible at 360 px; JOINED audit and restart persistence verified; PR reviewed specifically for transactional uniqueness and auth; README/contract current; staging integration complete. **Current status:** local implementation/tests verified in [release verification](release-verification.md); required human review/integration/release evidence remains pending.
 
 ### F-04 My queue and public board
 
 **Contract status, requirement links, dependencies**
 
-**Sprint:** 1 | **Status:** SPECIFIED, NOT IMPLEMENTED  
+**Sprint:** 1 | **Status:** IMPLEMENTED; local acceptance verified, external release gates pending
 **Links:** FR-07, FR-08, FR-22; BR-10, BR-12; NFR-01, NFR-04, NFR-09, NFR-10, NFR-15; D-10–D-11, D-24–D-25.  
 **Dependencies:** F-01 authentication, F-03 persisted entries, F-05 call/complete changes reflected on board.
 
@@ -932,13 +932,13 @@ No new Sprint 1 table. Read `queue_entries` by `(customer_id,joined_at,id)` for 
 
 ## Feature Definition of Done
 
-Private and public endpoints linked to actual DB; foreign ID 404 tested; board allowlist tested; 360 px customer page and anonymous display exercised; loading/empty/error states tested; correct status updates observed through API; substantive privacy review in PR; docs and staging integrated. **Current status: NOT DONE.**
+Private and public endpoints linked to actual DB; foreign ID 404 tested; board allowlist tested; 360 px customer page and anonymous display exercised; loading/empty/error states tested; correct status updates observed through API; substantive privacy review in PR; docs and staging integrated. **Current status:** local implementation/tests verified in [release verification](release-verification.md); required human review/integration/release evidence remains pending.
 
 ### F-05 Call next, start and complete
 
 **Contract status, requirement links, dependencies**
 
-**Sprint:** 1 | **Status:** SPECIFIED, NOT IMPLEMENTED  
+**Sprint:** 1 | **Status:** IMPLEMENTED; local acceptance verified, external release gates pending
 **Links:** FR-09–FR-12; BR-01, BR-02, BR-07–BR-09, BR-11, BR-16, BR-17, BR-26, BR-28; NFR-01, NFR-05, NFR-12, NFR-13, NFR-15; D-01, D-02, D-07–D-09, D-14, D-18, D-26.  
 **Dependencies:** F-01/02 session and assignment; F-03 persisted entries; F-04 customer/public read views.
 
@@ -974,7 +974,7 @@ Update existing `queue_entries.status` with `called_at`, `serving_at`, `complete
 
 ## Feature Definition of Done
 
-Call/start/complete API and desktop UI work with real DB; invalid paths and simultaneous calls proven by tests; audit timestamps/events verified; assigned and unassigned operator scope preserved; customer sees persisted terminal state; PR reviewed for FIFO, transition matrix and DB transaction; README and docs current; staging regression and release evidence collected. **Current status: NOT DONE.**
+Call/start/complete API and desktop UI work with real DB; invalid paths and simultaneous calls proven by tests; audit timestamps/events verified; assigned and unassigned operator scope preserved; customer sees persisted terminal state; PR reviewed for FIFO, transition matrix and DB transaction; README and docs current; staging regression and release evidence collected. **Current status:** local implementation/tests verified in [release verification](release-verification.md); required human review/integration/release evidence remains pending.
 
 ## GitHub Issues, branches and release plan
 

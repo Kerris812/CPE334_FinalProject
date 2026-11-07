@@ -1,0 +1,80 @@
+/* Frozen pre-migration typography. Layout/color rules live in shared.css. */
+:root {
+  font-family: system-ui, sans-serif; font-synthesis: none;
+}
+h1 { font-size: clamp(1.7rem, 5vw, 2.5rem); letter-spacing: -.035em; }
+h2 { font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.025em; }
+p { line-height: 1.5; }
+button, input, select { font: inherit; }
+button { font-weight: 650; }
+label { font-weight: 600; }
+form button[type=submit] { font-size: 1.125rem; }
+.error { font-size: .95rem; }
+.login-card .ui-card-title { font-size: 1.25rem; }
+.password-toggle { font-size: .9rem; }
+.board-link { font-weight: 650; }
+.queue-form h3 { font-size: 1.35rem; }
+.queue-form #party-help { font-size: .95rem; }
+.queue-number { font-size: clamp(2.5rem, 10vw, 4.5rem); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.queue-status { font-weight: 650; }
+.waiting-count { font-size: 2.5rem; font-variant-numeric: tabular-nums; }
+.availability { font-weight: 650; }
+.desk-card h3 { font-size: 1.35rem; }
+
+/* Public-board text pairs and measured contrast ratios are documented in ui-spec.md. */
+.app-shell--public .app-wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; letter-spacing: -.02em; }
+.board-navigation a { font-size: 14px; font-weight: 650; }
+.board-navigation > .board-back { font-size: 14px; }
+.public-display-title { font-size: 20px; font-weight: 600; }
+.public-board-header h2 { font-size: 20px; letter-spacing: 0; }
+.board-code { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.board-code-long { font-size: 10px; }
+.board-call-label { font-size: 14px; letter-spacing: .12em; }
+.public-called-number { font-size: clamp(72px, 6vw, 120px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.board-status { font-size: 14px; font-weight: 700; }
+.public-board .board-empty h3 { font-size: clamp(28px, 2.2vw, 32px); line-height: 1.3; font-weight: 600; }
+.public-board .board-empty p { font-size: 16px; }
+.public-waiting .waiting-count { font-size: 48px; line-height: 1.2; font-weight: 750; font-variant-numeric: tabular-nums; }
+.public-waiting span { font-size: 16px; }
+.public-board-actions small { font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.public-board button.board-secondary { font-size: 14px; }
+.board-error h3 { font-size: 24px; }
+.board-error p { font-size: 16px; }
+
+/* Contrast pairs and ratios: see ui-spec.md, Customer status visual refinement. */
+.customer-wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 3.5vw, 28px); line-height: 1.2; font-weight: 700; }
+.customer-initials { font-size: 14px; font-weight: 700; }
+.customer-user-details strong { font-size: 14px; font-weight: 650; }
+.customer-user-role { font-size: 13px; line-height: 1.4; text-transform: uppercase; letter-spacing: .08em; }
+.customer-header-actions a, .customer-queue-actions a { font-size: 14px; }
+.customer-status-page button { font-size: 14px; }
+.customer-status h1 { font-size: 24px; line-height: 1.3; letter-spacing: 0; }
+.customer-status .queue-ticket > p { font-size: 14px; }
+.customer-status .queue-number { font-size: clamp(40px, 7vw, 72px); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.customer-status .queue-status { font-size: 14px; line-height: 1.2; font-weight: 650; text-transform: uppercase; }
+.queue-details dt { font-size: 14px; }
+.queue-details dd { font-size: 16px; font-weight: 650; }
+.queue-details dd small { font-size: 13px; font-weight: 400; }
+.customer-status .customer-queue-updated { font-size: 13px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.customer-status .queue-load-error h3, .customer-status .queue-empty h3 { font-size: 18px; }
+.customer-status .queue-load-error p, .customer-status .queue-empty p { font-size: 14px; }
+.customer-status .queue-loading { font-size: 14px; }
+@media (min-width: 600px) { .customer-status .queue-number { font-size: clamp(56px, 7vw, 72px); } }
+
+
+/* New shared header keeps each pre-existing route's identity typography. */
+.header-account .customer-user-role { font-size: 16px; font-weight: 400; }
+.app-shell--customer-status .customer-user-role { font-size: 13px; }
+.app-shell--customer-status .header-logout { font-size: 14px; }
+.app-shell--customer-status .app-wordmark { font-size: clamp(24px, 3.5vw, 28px); font-family: Georgia, 'Times New Roman', serif; font-weight: 700; }
+.ui-card-badge { font-size: 16px; }
+.operator-desk .ui-stat > span { font-size: 16px; }
+.operator-desk .queue-ticket > p { font-size: 16px; }
+
+.public-board .ui-button { font-size: 14px; }
+.customer-status .customer-queue-updated small { font-size: 13px; }
+
+.app-shell:not(.app-shell--customer-status) .customer-user-details strong { font-size: 16px; font-weight: 700; }
+.operator-desk .ui-state h3 { font-size: 16px; font-weight: 400; }
+
+.app-shell--customer-status .board-link { font-size: 14px; font-weight: 400; }

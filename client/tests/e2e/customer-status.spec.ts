@@ -35,12 +35,15 @@ test('TEST-030 360px private status supports loading, empty, retry, all persiste
   await page.route('**/api/v1/customer/entries/latest', async route => { await gate; await route.continue(); });
   await page.goto('/my-queue');
   await expect(page.getByText('Loading queue information…')).toBeVisible();
+  await page.screenshot({ path: '/tmp/cpe334-customer-loading-360.png', fullPage: true });
   release();
   await expect(page.getByText('You have no queue entry.')).toBeVisible();
+  await page.screenshot({ path: '/tmp/cpe334-customer-empty-360.png', fullPage: true });
   await page.unroute('**/api/v1/customer/entries/latest');
   await page.route('**/api/v1/customer/entries/latest', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
   await page.getByRole('button', { name: 'Refresh status' }).click();
   await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
+  await page.screenshot({ path: '/tmp/cpe334-customer-error-360.png', fullPage: true });
   await page.unroute('**/api/v1/customer/entries/latest');
   await page.getByRole('button', { name: 'Retry' }).click();
   await expect(page.getByText('You have no queue entry.')).toBeVisible();
@@ -57,12 +60,29 @@ test('TEST-030 360px private status supports loading, empty, retry, all persiste
     await page.getByRole('button', { name: 'Refresh status' }).click();
     await expect(page.getByText(saved.displayNumber, { exact: true })).toBeVisible();
     await expect(page.getByText(status, { exact: true })).toBeVisible();
-    await expect(page.getByText('Party size: 4')).toBeVisible();
+    await expect(page.locator('.queue-details > div').filter({ has: page.getByText('Party size', { exact: true }) }).locator('dd')).toHaveText('4');
     await page.reload();
     await expect(page.getByText(saved.displayNumber, { exact: true })).toBeVisible();
     await expect(page.getByText(status, { exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
+  for (const width of [360, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(page.getByText(saved.displayNumber, { exact: true })).toBeVisible();
+    const main = (await page.locator('main').boundingBox())!; expect(main.width).toBeLessThanOrEqual(560); expect(main.y).toBeGreaterThanOrEqual(0);
+    const wordmark = (await page.locator('.customer-wordmark').boundingBox())!; expect(wordmark.y).toBeGreaterThanOrEqual(16);
+    await expect(page.locator('h1')).toHaveText('My queue');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const control of await page.locator('main button, main a').all()) { const box = (await control.boundingBox())!; expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(44); }
+    const number = page.getByText(saved.displayNumber, { exact: true });
+    const bounds = (await number.boundingBox())!; const panel = (await page.locator('.queue-ticket').boundingBox())!;
+    expect(bounds.x).toBeGreaterThanOrEqual(panel.x); expect(bounds.x + bounds.width).toBeLessThanOrEqual(panel.x + panel.width);
+    await expect(number).toHaveCSS('color', 'rgb(111, 14, 34)');
+    await expect(page.locator('.queue-ticket')).toHaveCSS('background-color', 'rgb(255, 252, 247)');
+    await expect(page.getByText('Bangkok time', { exact: true })).toBeVisible();
+    await page.screenshot({ path: `/tmp/cpe334-customer-status-${width}.png`, fullPage: true });
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' }); await expect(page.locator('.queue-ticket-content')).toHaveCSS('animation-name', 'none');
   const historicalRead = await page.request.get(`/api/v1/customer/entries/${historical.id}`);
   expect(historicalRead.status()).toBe(200);
   expect((await historicalRead.json()).data.status).toBe('COMPLETED');
@@ -83,4 +103,38 @@ test('TEST-030 a revoked private session returns the status page to login', asyn
   await page.getByRole('button', { name: 'Refresh status' }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByLabel('Email')).toBeVisible();
+});
+
+
+test('customer status keeps R-10000 intact with palette badges and quiet actions at every width', async ({ page }) => {
+  // Owned, deterministic read-only UI fixture; no queue allocation or operator action is simulated.
+  const restaurant = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
+  const saved = await db.queueEntry.create({ data: { customerId: customer.id, queueId: restaurant.id, sequence: 10000n, displayNumber: 'R-10000', partySize: 4, joinedAt: new Date('2026-11-07T04:55:00Z') } });
+  await page.goto('/login'); await page.getByLabel('Email').fill(customer.email);
+  await page.getByLabel('Password', { exact: true }).fill(process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOMER_PASSWORD);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click(); await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
+  await page.goto('/my-queue');
+  const colors = { WAITING: ['rgb(47, 38, 38)', 'rgb(255, 252, 247)'], CALLED: ['rgb(251, 243, 230)', 'rgb(111, 14, 34)'], SERVING: ['rgb(47, 38, 38)', 'rgb(215, 177, 93)'], COMPLETED: ['rgb(251, 243, 230)', 'rgb(46, 107, 79)'] } as const;
+  for (const status of ['WAITING', 'CALLED', 'SERVING', 'COMPLETED'] as const) {
+    await db.queueEntry.update({ where: { id: saved.id }, data: { status } });
+    await page.getByRole('button', { name: 'Refresh status' }).click();
+    const badge = page.locator('.queue-status'); await expect(badge).toHaveText(status);
+    await expect(badge).toHaveCSS('color', colors[status][0]); await expect(badge).toHaveCSS('background-color', colors[status][1]);
+    await expect(badge.locator('.status-marker')).toHaveAttribute('aria-hidden', 'true');
+    for (const width of [360, 768, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const number = page.getByText('R-10000', { exact: true }); await expect(number).toBeVisible();
+      expect(await number.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const size = await number.evaluate(element => parseFloat(getComputedStyle(element).fontSize)); expect(size).toBeGreaterThanOrEqual(width === 360 ? 40 : 56); expect(size).toBeLessThanOrEqual(72);
+      await expect(page.getByText('7 Nov 2026, 11:55', { exact: true })).toBeVisible();
+      if (status === 'WAITING' || width === 360) await page.screenshot({ path: `/tmp/cpe334-customer-${status.toLowerCase()}-${width}.png`, fullPage: true, animations: 'disabled' });
+    }
+  }
+  await expect(page.getByRole('region', { name: 'Your queue entry' })).toHaveAttribute('aria-live', 'polite');
+  await expect(page.locator('.queue-ticket-content')).toHaveCSS('animation-duration', '0.15s');
+  await page.emulateMedia({ reducedMotion: 'reduce' }); await expect(page.locator('.queue-ticket-content')).toHaveCSS('animation-name', 'none');
+  const refresh = page.getByRole('button', { name: 'Refresh status' }); await refresh.focus();
+  await page.keyboard.press('Tab'); await page.keyboard.press('Shift+Tab');
+  await expect(refresh).toBeFocused(); await expect(refresh).toHaveCSS('outline-width', '2px');
 });

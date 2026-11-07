@@ -1,0 +1,13 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+
+ Test Files  9 passed (9)
+      Tests  55 passed (55)
+   Start at  16:58:44
+   Duration  1.68s (environment 46%, tests 39%, import 12%, transform 3%)
+

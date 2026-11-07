@@ -1,0 +1,73 @@
+:root {
+  --burgundy: #6F0E22; --gold: #D7B15D; --cream: #FBF3E6;
+  --espresso: #2F2626; --taupe: #8A6F5B; --surface: #FFFFFF; --card-border: #dedbd7;
+  font-family: system-ui, sans-serif; color: var(--espresso); background: var(--cream); font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 58rem; margin: 2rem auto; padding: 1.5rem; }
+h1 { margin: .5rem 0; font-size: clamp(1.7rem, 5vw, 2.5rem); letter-spacing: -.035em; }
+h2 { margin-top: 0; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.025em; }
+h3 { margin: 0 0 .75rem; }
+p { line-height: 1.5; }
+.app-subtitle { margin: .5rem 0 1.5rem; color: #625857; }
+a { color: var(--burgundy); }
+button, input, select { font: inherit; min-height: 48px; border-radius: .65rem; }
+button { padding: .75rem 1.2rem; border: 1px solid var(--burgundy); background: var(--burgundy); color: var(--cream); font-weight: 650; cursor: pointer; }
+button.secondary { background: transparent; color: var(--burgundy); }
+button:disabled { background: #efedeb; color: #746c68; border-color: #dedbd7; cursor: not-allowed; }
+input, select { max-width: 100%; padding: .8rem 1rem; border: 1px solid var(--taupe); background: #faf9f7; color: var(--espresso); }
+input { width: 100%; }
+label { font-weight: 600; }
+form { display: grid; gap: .85rem; }
+form button[type=submit] { width: 100%; font-size: 1.125rem; }
+:focus-visible { outline: 3px solid var(--burgundy); outline-offset: 4px; }
+.error, [role=alert] { color: var(--burgundy); }
+.error { margin: 0; font-size: .95rem; }
+[aria-invalid=true] { border: 2px solid var(--burgundy); }
+.card, .customer-queues, .customer-status, .operator-desk { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--card-border); border-radius: 1.4rem; background: #fff; }
+.card { max-width: 32rem; margin: 1.5rem auto; }
+.auth-shell { max-width: 36rem; width: calc(100% - 2rem); padding: clamp(1.25rem, 4vw, 2rem); margin: 2.5rem auto; border: 1px solid var(--card-border); border-radius: 1.5rem; background: #fff; }
+.auth-shell > h1, .auth-shell > p, .auth-shell > nav { text-align: center; }
+.brand-mark { display: block; width: 2.5rem; height: 2.5rem; margin: .5rem auto 1rem; }
+.login-card { max-width: none; border: 0; padding: 0; margin-bottom: 0; background: transparent; }
+.login-card > h2, .login-card > p { text-align: center; }
+.login-card > h2 { font-size: 1.25rem; }
+.password-toggle { justify-self: end; font-size: .9rem; }
+.account { display: flex; flex-direction: column; gap: 1rem; margin: 1rem 0 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--card-border); }
+.account-identity { align-self: flex-start; max-width: 100%; text-align: left; overflow-wrap: anywhere; }
+.account-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.account-actions nav { flex: 1; min-width: 0; }
+.account-actions .board-link { width: 100%; margin: 0; min-height: 48px; justify-content: flex-start; background: var(--burgundy); color: #fff; }
+.account-actions > button { flex-shrink: 0; }
+.account p { margin: .3rem 0; }
+.board-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin: .5rem 0; padding: .65rem 1rem; border: 1px solid var(--burgundy); border-radius: .6rem; color: var(--burgundy); font-weight: 650; text-decoration: none; }
+.auth-shell .board-link { border: 0; text-decoration: underline; text-underline-offset: .2em; }
+.queue-form { max-width: none; margin: 1.5rem 0 0; border-radius: 1rem; }
+.queue-form h3 { font-size: 1.35rem; }
+.queue-form #party-help { margin: .1rem 0; font-size: .95rem; }
+.queue-ticket { margin: 1.5rem 0; padding: 2rem 1rem; text-align: center; border-radius: 1rem; background: #faf9f7; }
+.queue-number { display: block; font-size: clamp(2.5rem, 10vw, 4.5rem); font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.15; }
+.queue-status { display: inline-block; padding: .4rem .9rem; border-radius: 999px; background: #efedeb; color: var(--espresso); font-weight: 650; }
+.status-called { background: var(--burgundy); color: var(--cream); }
+.status-serving { background: var(--gold); color: var(--espresso); }
+.status-completed { background: var(--espresso); color: var(--cream); }
+.queue-times dd { margin: .5rem 0; }
+.waiting-count { display: block; font-size: 2.5rem; font-variant-numeric: tabular-nums; }
+.customer-status > a, .customer-queues > a { display: inline-flex; align-items: center; min-height: 44px; }
+main:has(.operator-desk) { max-width: 84rem; }
+.operator-desk { margin-top: 1rem; }
+.desk-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.25rem 0; }
+.desk-heading h3 { margin: 0; }
+.availability { display: inline-block; padding: .3rem .8rem; border-radius: 999px; font-weight: 650; background: #efedeb; }
+.availability-open { color: #166534; background: #e6f4ea; }
+.desk-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.desk-card { min-width: 0; padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid var(--card-border); border-radius: 1rem; }
+.desk-card h3 { font-size: 1.35rem; }
+.desk-card > button { width: 100%; }
+.desk-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.desk-actions button { flex: 1 1 12rem; }
+.service-actions { grid-column: 1 / -1; }
+.desk-refresh { margin-top: 1rem; }
+@media (min-width: 1280px) { .desk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 400px) { main { margin: .75rem auto; padding: 1rem; } .auth-shell { padding: 1.25rem; margin: 1.25rem auto; } .desk-actions button { flex-basis: 100%; } }

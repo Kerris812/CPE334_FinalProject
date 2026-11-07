@@ -1,0 +1,35 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test
+
+[WebServer] (node:18339) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 1 worker
+
+(node:18371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/auth.spec.ts:14:3 › TEST-001 customer real login, reload identity and logout (667ms)
+  ✓   2 tests/e2e/auth.spec.ts:14:3 › TEST-001 operator real login, reload identity and logout (402ms)
+  ✓   3 tests/e2e/auth.spec.ts:41:1 › anonymous public display URL does not become an authenticated role (97ms)
+  ✓   4 tests/e2e/board-navigation.spec.ts:3:1 › public board Back is keyboard accessible and returns to the in-app source (175ms)
+  ✓   5 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses OPERATOR fallback (145ms)
+  ✓   6 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses CUSTOMER fallback (142ms)
+  ✓   7 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses anonymous fallback (143ms)
+  ✓   8 tests/e2e/customer-status.spec.ts:26:1 › TEST-030 360px private status supports loading, empty, retry, all persisted stages and reload (864ms)
+  ✓   9 tests/e2e/customer-status.spec.ts:74:1 › TEST-030 a revoked private session returns the status page to login (362ms)
+  ✓  10 tests/e2e/foundation.spec.ts:2:1 › foundation loads and Vite proxies the real health endpoint (156ms)
+  ✓  11 tests/e2e/operator-workflow.spec.ts:28:1 › TEST-043 real customer and operator workflow reflects on my-queue and public board (1.3s)
+  ✓  12 tests/e2e/party-routing.spec.ts:9:1 › TEST-057 both assigned operators independently complete real R/S workflows (2.0s)
+  ✓  13 tests/e2e/public-board.spec.ts:36:1 › TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors (278ms)
+  ✓  14 tests/e2e/public-board.spec.ts:57:1 › public number is readable at a distance on desktop and fits narrow viewports (217ms)
+  ✓  15 tests/e2e/public-board.spec.ts:69:1 › home public board navigation is visible and opens the seeded board without login (166ms)
+  ✓  16 tests/e2e/queue-journey.spec.ts:23:1 › TEST-030 mobile empty, slow/error states, join and persisted my-queue reload (679ms)
+  ✓  17 tests/e2e/queue-journey.spec.ts:43:1 › anonymous public board renders only fixture public values without login (183ms)
+  ✓  18 tests/e2e/sprint1-journey.spec.ts:23:1 › TEST-043 complete seeded R-0001 release journey with five isolated browser identities (2.0s)
+
+  18 passed (11.8s)

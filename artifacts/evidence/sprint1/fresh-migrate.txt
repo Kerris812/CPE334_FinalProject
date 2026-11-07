@@ -1,0 +1,22 @@
+
+> restaurant-queue-server@0.1.0 db:migrate
+> prisma migrate deploy
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "cpe334_release_1794042405885_dev", schema "public" at "127.0.0.1:55432"
+
+2 migrations found in prisma/migrations
+
+Applying migration `0001_foundation`
+Applying migration `0002_immutable_queue_sequence`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 0001_foundation/
+    └─ migration.sql
+  └─ 0002_immutable_queue_sequence/
+    └─ migration.sql
+      
+All migrations have been successfully applied.

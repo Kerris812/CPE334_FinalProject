@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, MouseEvent } from 'react';
 import { AuthError, authRequest, home, isUnauthenticated, isPublicBoard, routeAccess } from './auth-api';
 import { OperatorDesk } from './OperatorDesk';
+import { AppHeader } from './AppHeader';
 import { CustomerQueues } from './CustomerQueues';
-import { PublicQueueBoard, PublicQueueOverview } from './PublicQueueBoard';
+import { PublicQueueDisplay } from './PublicQueueBoard';
 import type { User } from './auth-api';
 import { boardBackPath } from './board-navigation';
+import { AppShell, BackLink, Button, Card, ErrorState, FormField, InlineNotice } from './components/ui';
 
 function navigate(path: string) { window.history.replaceState({}, '', path); }
 
@@ -39,25 +41,24 @@ function Login({ onLogin }: { onLogin: (user: User) => void }) {
       else setMessage(isUnauthenticated(error) ? 'Invalid email or password.' : 'Unable to sign in. Please try again.');
     } finally { submitting.current = false; setPending(false); }
   }
-  return <section className="card" aria-labelledby="login-title">
-    <h2 id="login-title">Sign in</h2>
-    <p>Use your restaurant account to continue.</p>
+  return <Card className="card login-card" aria-labelledby="login-title" title="Sign in" titleId="login-title" badge="R">
+    <p className="ui-card-description">Use your restaurant account to continue.</p>
     <form onSubmit={submit} noValidate aria-busy={pending}>
-      <label htmlFor="email">Email</label>
-      <input id="email" name="email" type="email" autoComplete="username" required maxLength={254} value={email}
+      <FormField id="email" label="Email" error={fields.email}>
+      <input id="email" name="email" type="email" placeholder="customer@example.com" autoComplete="username" required maxLength={254} value={email}
         onChange={event => setEmail(event.target.value)} disabled={pending} aria-invalid={Boolean(fields.email)} aria-describedby={fields.email ? 'email-error' : undefined} />
-      {fields.email && <p className="error" id="email-error">{fields.email}</p>}
-      <label htmlFor="password">Password</label>
-      <input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" required maxLength={256} value={password}
+      </FormField>
+      <FormField id="password" label="Password" error={fields.password}>
+      <input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" autoComplete="current-password" required maxLength={256} value={password}
         onChange={event => setPassword(event.target.value)} disabled={pending} aria-invalid={Boolean(fields.password)} aria-describedby={fields.password ? 'password-error' : undefined} />
-      {fields.password && <p className="error" id="password-error">{fields.password}</p>}
-      <button type="button" className="secondary" disabled={pending} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? 'Hide password' : 'Show password'}</button>
-      {fields.form && <p role="alert">{fields.form}</p>}
-      {message && <p role="alert">{message}</p>}
-      <button type="submit" disabled={pending}>{pending ? 'Signing in…' : 'Sign in'}</button>
+      </FormField>
+      <Button variant="secondary" type="button" className="secondary password-toggle" disabled={pending} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? 'Hide password' : 'Show password'}</Button>
+      {fields.form && <InlineNotice>{fields.form}</InlineNotice>}
+      {message && <InlineNotice>{message}</InlineNotice>}
+      <Button type="submit" disabled={pending} pending={pending}>{pending ? 'Signing in…' : 'Sign in'}</Button>
       <span role="status">{pending ? 'Signing in. Please wait.' : ''}</span>
     </form>
-  </section>;
+  </Card>;
 }
 
 export function App() {
@@ -122,25 +123,19 @@ export function App() {
     const destination = boardBackPath(user);
     navigate(destination); setPath(destination);
   }
-  return <main>
-    {publicBoard && <button type="button" className="secondary board-back" onClick={backFromBoard} disabled={loading}>
-      <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 5-7 7 7 7M5 12h14" /></svg>
-      Back
-    </button>}
-    <h1>Restaurant Queue</h1>
-    <p>Queue and service management</p>
-    {!publicBoard && <nav aria-label="Public display"><a className="board-link" href="/board" onClick={openBoard}>View public board</a></nav>}
-    {publicBoard ? (path.split('/')[2] ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : <PublicQueueOverview />) : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
-      <p role="alert">Unable to restore your session. Please try again.</p>
-      <button onClick={() => setAttempt(value => value + 1)}>Retry</button>
-    </section> : user ? <>
-      <header className="account">
-        <div><strong>{user.displayName}</strong><p>{user.role === 'CUSTOMER' ? 'Customer' : 'Operator'}</p></div>
-        <button onClick={logout} disabled={loggingOut}>{loggingOut ? 'Logging out…' : 'Log out'}</button>
-      </header>
-      {logoutError && <p role="alert">{logoutError}</p>}
+  const signInScreen = !publicBoard && !user && !loading && !restoreError;
+  const customerStatusPage = !publicBoard && user?.role === 'CUSTOMER' && path === '/my-queue';
+  const boardNavigation = <nav aria-label="Public display"><a className="board-link" href="/board" onClick={openBoard}>View public board</a></nav>;
+  const backButton = <Button variant="ghost" type="button" className="secondary board-back" onClick={backFromBoard} disabled={loading}>
+      <BackLink>Back</BackLink>
+    </Button>;
+  const variant = publicBoard ? 'public' : customerStatusPage ? 'customer-status' : user?.role === 'CUSTOMER' ? 'customer' : user?.role === 'OPERATOR' ? 'operator' : signInScreen ? 'login' : 'default';
+  return <AppShell variant={variant} className={publicBoard ? 'public-display-page' : customerStatusPage ? 'customer-status-page' : signInScreen ? 'auth-shell' : undefined} header={<AppHeader user={user} publicPage={publicBoard} statusPage={customerStatusPage} loggingOut={loggingOut} onLogout={logout} />}>
+    {!publicBoard && boardNavigation}
+    {publicBoard ? <PublicQueueDisplay key={path} queueId={path.split('/')[2] || undefined} backButton={backButton} /> : loading ? <Card><p role="status">Restoring your session…</p></Card> : restoreError ? <ErrorState title="Unable to restore your session. Please try again." onRetry={() => setAttempt(value => value + 1)} /> : user ? <>
+      {logoutError && <InlineNotice>{logoutError}</InlineNotice>}
       {loggingOut && <p role="status">Logging out…</p>}
-      {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <OperatorDesk onUnauthenticated={signedOut} />}
+      {access === 'forbidden' ? <Card title="Access denied"><p>You do not have permission to view this page.</p><a className="ui-ghost-link" href={home(user)}>Back to your account</a></Card> : access === 'missing' ? <Card title="Page not found"><a className="ui-ghost-link" href={home(user)}>Back to your account</a></Card> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <OperatorDesk onUnauthenticated={signedOut} />}
     </> : <Login onLogin={signedIn} />}
-  </main>;
+  </AppShell>;
 }

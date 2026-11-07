@@ -1,0 +1,52 @@
+{
+  "recordedAt": "2026-11-07T10:54:56.063Z",
+  "baseCommit": "4055a963b345dc1182b90ee8ab93e74145dbcaa1",
+  "uncommittedChangesIncluded": true,
+  "commands": [
+    {
+      "command": "npm --prefix client run test:ui",
+      "passed": 74,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "command": "node .local/run-verification.mjs test npm --prefix client run test:e2e",
+      "passed": 30,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "command": "npm --prefix client run build",
+      "exitCode": 0
+    }
+  ],
+  "screenshots": 56,
+  "viewportChecks": [
+    360,
+    768,
+    1024,
+    1440
+  ],
+  "typography": "Computed family/size/weight of migrated pages compared with preserved original CSS resolved against representative original markup. The first local runtime metrics probe was overwritten; the saved CSS reference was used instead.",
+  "scope": "UI only. API client, auth API, queue API, board-navigation helper, shared polling and server/src are unchanged.",
+  "gitActions": "No commit, push, merge or tag",
+  "sourceSha256": {
+    "docs/ui-spec.md": "a795001f7507db78e17fc4585f536049bdfb626d77795e340d93885ea22f1c94",
+    "client/src/styles/tokens.css": "f362f85b8f3ef86c535c8059c82ac64efadd14be29ed9762b47ecaefb2a49dfe",
+    "client/src/styles/typography.css": "e3c3e00d50e507b4609fdb25d54a6b351e72017fffac761dcc1426e57043eba0",
+    "client/src/styles/shared.css": "e24f081551dc6666822d3d31dad1e674a3a7b9ad81e4b3aac771b1031bfbed79",
+    "client/src/components/ui.tsx": "2be07e83659550f05e6b5c44258077b2302d8e067826d814b74740f7ecbb86e7",
+    "client/src/AppHeader.tsx": "71605586fc9de862c96c885eec93110b6aa265c1878c8893402197b70e689837",
+    "client/src/App.tsx": "9f6983ee435a0c4519b49052b8f7760c390d32252746171521b166dbdb809ce7",
+    "client/src/CustomerQueues.tsx": "1eebfe2f08bbbbfbdd6b3d418363fbb3a7b88eb0aca891bfe225a28f2b3a5aa6",
+    "client/src/PublicQueueBoard.tsx": "983dfd2b477562c273feff9e9a1043bcbfedbc455252fc49f67ba4431ac8852e",
+    "client/src/OperatorDesk.tsx": "d0f1bf11d24e2d907d497946204be114140128f60d0ad346add5362c1b7a0930",
+    "client/src/QueueNumberDisplay.tsx": "679efa6b2642ab5a7897c5209fb78bbca9e452e39b7a0f4085eaa5eef6cbbd3f",
+    "client/src/style.css": "88050a424ec61b3bb24cd93a4a42ada982b9281fb2fa15f455cba53695f6e1a7",
+    "client/tests/ui/contrast.test.ts": "bdbddea714b3ed60acbc8a9eb13f21628324951fafb585b7cce59ca2c1366350",
+    "client/tests/e2e/visual-system.spec.ts": "c7f60a3d724b792865a0fd9fe27defcdff59202f34b5302d9ee5aeb74ce07e4f",
+    "client/tests/e2e/typography-baseline.ts": "46985d13fe7e382108969b52e0737ed563e7a24b3f46458c9af8f2118e6c9389"
+  }
+}

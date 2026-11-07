@@ -1,0 +1,47 @@
+/* Contrast pairs and ratios: see ui-spec.md, Customer status visual refinement. */
+main.customer-status-page { max-width: 560px; margin: 0 auto; padding: 24px 16px; color: var(--espresso); }
+.customer-status-page :focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
+.customer-app-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--gold); }
+.customer-header-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.customer-wordmark { color: var(--burgundy); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 3.5vw, 28px); line-height: 1.2; font-weight: 700; }
+.customer-user-chip { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; margin-left: auto; }
+.customer-initials { display: inline-grid; flex-shrink: 0; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--burgundy); color: var(--cream); font-size: 14px; font-weight: 700; }
+.customer-user-details { min-width: 0; color: var(--espresso); overflow-wrap: anywhere; }
+.customer-user-details strong { font-size: 14px; font-weight: 650; }
+.customer-user-role { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; text-transform: uppercase; letter-spacing: .08em; }
+.customer-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.customer-header-actions a, .customer-queue-actions a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; min-width: 44px; color: var(--burgundy); font-size: 14px; text-underline-offset: 4px; }
+.customer-status-page button { min-height: 44px; min-width: 44px; padding: 8px 16px; border: 1px solid var(--burgundy); border-radius: 8px; background: transparent; color: var(--burgundy); font-size: 14px; }
+.customer-status-page button:disabled { border-color: var(--taupe); background: var(--cream); color: var(--espresso); }
+.customer-status-page .customer-status { padding: 24px; border: 1px solid var(--taupe); border-top: 4px solid var(--burgundy); border-radius: 16px; background: var(--surface); color: var(--espresso); box-shadow: 0 1px 3px color-mix(in srgb, var(--espresso) 10%, transparent); }
+.customer-status > h1 { margin: 0 0 24px; color: var(--espresso); font-size: 24px; line-height: 1.3; letter-spacing: 0; }
+.customer-status .queue-ticket { margin: 0 0 24px; padding: 24px 16px; border: 1px solid var(--taupe); border-radius: 12px; background: var(--cream); color: var(--espresso); text-align: center; }
+.customer-status .queue-ticket > p { margin: 0 0 16px; color: var(--espresso); font-size: 14px; }
+.customer-status .queue-number { margin: 0; padding-bottom: 16px; border-bottom: 1px solid var(--gold); color: var(--burgundy); font-size: clamp(40px, 7vw, 72px); line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.customer-status .queue-ticket-content { animation: customer-status-fade 150ms ease-out; }
+.customer-status .queue-status { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 0 0; padding: 8px 16px; border: 1px solid transparent; border-radius: 999px; background: var(--cream); color: var(--espresso); font-size: 14px; line-height: 1.2; font-weight: 650; text-transform: uppercase; }
+.customer-status .status-marker { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.customer-status .status-waiting { border-color: var(--taupe); background: var(--cream); color: var(--espresso); }
+.customer-status .status-called { background: var(--burgundy); color: var(--cream); }
+.customer-status .status-serving { background: var(--gold); color: var(--espresso); }
+.customer-status .status-completed { background: var(--espresso); color: var(--cream); }
+.customer-status .queue-details { margin: 0 0 24px; }
+.queue-details > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); align-items: start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--taupe); }
+.queue-details > div:first-child { padding-top: 0; }
+.queue-details dt { color: var(--espresso); font-size: 14px; }
+.queue-details dd { margin: 0; color: var(--espresso); font-size: 16px; font-weight: 650; text-align: right; overflow-wrap: anywhere; }
+.queue-details dd small { display: block; margin-top: 4px; font-size: 13px; font-weight: 400; }
+.customer-queue-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.customer-queue-actions button { width: 100%; }
+.customer-status .customer-queue-updated { margin: 16px 0 0; color: var(--espresso); font-size: 13px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.customer-status .queue-load-error, .customer-status .queue-empty { padding: 16px; margin-bottom: 24px; border: 1px solid var(--taupe); border-radius: 12px; background: var(--cream); color: var(--espresso); }
+.customer-status .queue-load-error h3, .customer-status .queue-empty h3 { margin: 0 0 8px; font-size: 18px; }
+.customer-status .queue-load-error p, .customer-status .queue-empty p { margin: 0 0 16px; color: var(--espresso); font-size: 14px; }
+.customer-status .queue-loading { color: var(--espresso); font-size: 14px; }
+.queue-skeleton { display: grid; gap: 16px; padding-bottom: 24px; }
+.queue-skeleton span { display: block; height: 16px; border: 1px solid var(--taupe); border-radius: 8px; background: var(--cream); }
+.queue-skeleton span:nth-child(2) { height: 112px; }
+@keyframes customer-status-fade { from { opacity: .8; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .customer-status .queue-ticket-content { animation: none; } }
+@media (min-width: 600px) { .customer-queue-actions button { width: auto; } .customer-status .queue-number { font-size: clamp(56px, 7vw, 72px); } }
+@media (max-width: 400px) { .customer-status-page .customer-status { padding: 24px 16px; } }

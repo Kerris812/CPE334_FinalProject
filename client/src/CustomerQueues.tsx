@@ -46,7 +46,7 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
     <h2 id="queues-title">{myQueue ? 'My queue' : 'Queues'}</h2>
     {message && <p role="alert">{message}</p>}
     {resource.loading ? <p role="status">Loading queue information…</p> : <>
-      {Boolean(resource.error) && <><p role="alert">{resource.error instanceof QueueError && resource.error.status === 403 ? 'Access denied.' : 'Unable to load your queue information. Please try again.'}</p><button onClick={resource.retry}>Retry</button></>}
+      {Boolean(resource.error) && <><p role="alert">{resource.error instanceof QueueError && resource.error.status === 403 ? 'Access denied.' : myQueue && resource.error instanceof QueueError && resource.error.status === 404 ? 'Queue entry not found.' : 'Unable to load your queue information. Please try again.'}</p><button onClick={resource.retry} disabled={resource.refreshing}>Retry</button></>}
       {!resource.error && <>
         {entry && <>
           <QueueNumberDisplay number={entry.displayNumber} status={entry.status} />
@@ -56,7 +56,7 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
         </>}
         {myQueue ? <>
           {!entry && <p>You have no queue entry.</p>}
-          <p><button className="secondary" onClick={resource.retry}>Refresh status</button></p><a href="/queues">Back to queues</a>
+          <p><button className="secondary" onClick={resource.retry} disabled={resource.refreshing}>Refresh status</button></p><a href="/queues">Back to queues</a>
         </> : !active && <>
           {!queue ? <p>No open queues are available.</p> : <div className="card queue-form">
             {queues.length > 1 && <><label htmlFor="queue">Restaurant queue</label><select id="queue" value={queue.id} onChange={event => setSelected(event.target.value)} disabled={pending}>{queues.map(value => <option key={value.id} value={value.id}>{value.code} — {value.name}</option>)}</select></>}

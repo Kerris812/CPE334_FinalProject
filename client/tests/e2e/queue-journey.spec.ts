@@ -36,12 +36,12 @@ test('TEST-030 mobile empty, slow/error states, join and persisted my-queue relo
   await page.getByRole('link', { name: 'View my queue' }).click(); await page.reload(); await expect(page.getByText(`${queue.code}-0001`, { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const entry = await db.queueEntry.findFirstOrThrow({ where: { customerId: customer.id } }); expect(await db.queueEvent.count({ where: { entryId: entry.id, eventType: 'JOINED', actorId: customer.id } })).toBe(1);
-  await page.screenshot({ path: '../docs/evidence/f03-f04/my-queue-mobile.png', fullPage: true });
+  await page.screenshot({ path: '../artifacts/evidence/f03-f04/my-queue-mobile.png', fullPage: true });
 });
 test('anonymous public board renders only fixture public values without login', async ({ page }) => {
   await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED' } });
   await page.setViewportSize({ width: 360, height: 780 }); await page.goto(`/board/${queue.id}`);
   await expect(page.getByText(`${queue.code}-10000`, { exact: true })).toBeVisible(); await expect(page.getByText('CALLED', { exact: true })).toBeVisible(); expect(await page.getByLabel('Password').count()).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.screenshot({ path: '../docs/evidence/f03-f04/public-board-mobile.png', fullPage: true });
+  await page.screenshot({ path: '../artifacts/evidence/f03-f04/public-board-mobile.png', fullPage: true });
 });

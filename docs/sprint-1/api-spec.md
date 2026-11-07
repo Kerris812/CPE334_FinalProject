@@ -229,6 +229,8 @@ Anonymous `401 UNAUTHENTICATED`, wrong role `403 FORBIDDEN`.
 
 ### `GET /api/v1/public/queues/:queueId/board` — Anonymous
 
+The seeded restaurant also accepts the stable public code `R` as `queueId`, so `/board/R` can be linked from the home/sign-in screen without embedding a database UUID. UUID-based requests remain supported and return the identical four-field DTO.
+
 `200` with a **strictly four-field** `data` object:
 
 ```json

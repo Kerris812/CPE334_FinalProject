@@ -80,3 +80,10 @@ test('failed logout keeps identity with retry; unauthenticated logout clears ide
   fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
   await waitFor(() => expect(window.location.pathname).toBe('/login'));
 });
+test('home and sign-in expose a visible public board link without logging in', async () => {
+  window.history.replaceState({}, '', '/');
+  await form();
+  const link = screen.getByRole('link', { name: 'View public board' });
+  expect(link.getAttribute('href')).toBe('/board/R');
+  expect(fetchMock.mock.calls.some(call => String(call[0]).includes('/auth/login'))).toBe(false);
+});

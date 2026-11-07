@@ -1,0 +1,13 @@
+
+> restaurant-queue-server@0.1.0 test:unit
+> vitest run tests/unit
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+
+ Test Files  3 passed (3)
+      Tests  5 passed (5)
+   Start at  11:21:32
+   Duration  88ms (import 37%, tests 27%, transform 21%, worker 16%)
+

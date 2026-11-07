@@ -1,0 +1,36 @@
+{
+  "reference": {
+    "wordmark": {
+      "family": "Georgia, \"Times New Roman\", serif",
+      "size": "48px",
+      "weight": "700"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "20px",
+      "weight": "600"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    }
+  },
+  "actual": {
+    "wordmark": {
+      "family": "Georgia, \"Times New Roman\", serif",
+      "size": "48px",
+      "weight": "700"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "20px",
+      "weight": "600"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    }
+  }
+}

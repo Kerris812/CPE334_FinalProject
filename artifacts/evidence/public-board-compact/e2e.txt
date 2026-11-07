@@ -1,0 +1,24 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test tests/e2e/public-board.spec.ts tests/e2e/board-navigation.spec.ts
+
+[WebServer] (node:20284) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:20285) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:20311) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:20331) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/board-navigation.spec.ts:3:1 › public board Back is keyboard accessible and returns to the in-app source (461ms)
+  ✓  2 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses OPERATOR fallback (181ms)
+  ✓  3 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses CUSTOMER fallback (157ms)
+  ✓  4 tests/e2e/board-navigation.spec.ts:18:3 › direct public board Back uses anonymous fallback (176ms)
+  ✓  5 tests/e2e/public-board.spec.ts:36:1 › TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors (328ms)
+  ✓  6 tests/e2e/public-board.spec.ts:57:1 › public board uses compact text, solid controls and header-only color across viewports (203ms)
+  ✓  7 tests/e2e/public-board.spec.ts:77:1 › home public board navigation is visible and opens the seeded board without login (269ms)
+
+  7 passed (4.0s)

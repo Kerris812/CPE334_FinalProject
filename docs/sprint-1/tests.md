@@ -1,6 +1,6 @@
 # tests.md — Sprint 1 Software Test Specification and Verification Plan
 
-> **Status:** PROPOSED engineering baseline, 6 November 2026. Design and contracts only. No application code, test runs, GitHub releases or deployments are represented as complete. All examples use synthetic placeholders.
+> **Status:** Engineering baseline dated 6 November 2026, with approved Issue08 scope revision. F01–F05 are implemented and locally verified on the Issue09 working tree on 7 November 2026. See [release verification](release-verification.md) and [acceptance coverage](acceptance-coverage.md). Peer review, branch integration, security risk resolution and publication are not asserted complete. Examples use synthetic data.
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
@@ -31,15 +31,11 @@ Each queue has independent immutable sequence allocation, FIFO and queue-row loc
 
 ## Coverage and execution status
 
-AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../verification-log.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../verification-log.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
-
-Actual F-03/F-04 execution after the reset (TEST-016–031 and TEST-047–048) is recorded in [F-03/F-04 verification](../f03-f04-verification.md), with fresh RED/GREEN output, commands and counts. Historical baseline status below is not a claim about current execution.
-
-Issue07 TEST-028/029/031 recursive public privacy and state checks, anonymous browser verification, and honest initial/final test results are recorded in [public board verification](../public-board-verification.md).
+AC-001 through AC-044 and TEST-001 through TEST-049 retain their stable identifiers. All required IDs executed in successful local runs: 10 unit, 80 API/PostgreSQL, 53 UI and 18 E2E cases, zero failures/skips; both builds passed. See [acceptance coverage](acceptance-coverage.md), [executed titles](../../artifacts/evidence/sprint1/coverage.json) and [release verification](release-verification.md) for actual commands, working-tree provenance, privacy evidence and unresolved release risks. Earlier feature verification documents are not present in this checkout; this report does not reconstruct their TDD or review history.
 
 ## Software Test Specification
 
-**Status:** TESTS PLANNED; NOT IMPLEMENTED OR RUN.  
+**Status:** REQUIRED TESTS IMPLEMENTED AND LOCALLY EXECUTED; external release gates pending.
 **Test IDs:** TEST-001 through TEST-044 correspond to AC-001 through AC-044; supplementary unit TEST-045–TEST-049 map to existing AC IDs without renumbering them.  
 **Test naming convention:** `TEST-xxx short descriptive behavior` in runner output so result mapping is direct. **Failing-first** column identifies a meaningful TDD RED commit requirement, not a claim a red test has already been captured.
 
@@ -331,71 +327,30 @@ Before implementing, every AC-001–044 is `NOT RUN` in [Part F evidence matrix]
 
 ## AC-to-test execution matrix
 
-| AC | Planned TEST | Actual test file and name | Level | Execution command | Actual result | SHA / evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| AC-001 | TEST-001 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-002 | TEST-002 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-003 | TEST-003 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-004 | TEST-004 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-005 | TEST-005 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-006 | TEST-006 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-007 | TEST-007 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-008 | TEST-008 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-009 | TEST-009 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-010 | TEST-010 | Not yet implemented | Planned | Not run | **PASS** for the assigned-operator queue listing. **PARTIAL** for "R desk authorized 200": the desk handler is not implemented, so an authorized request falls through to 404. Re-run in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
-| AC-011 | TEST-011 | Not yet implemented | Planned | Not run | **PASS** for 403 on desk/call/start/complete and the empty listing for Operator B. Re-run downstream checks in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
-| AC-012 | TEST-012 | Not yet implemented | Planned | Not run | **PASS** for customer 403 on call/start/complete and the operator listing. Re-run in Issue 8. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
-| AC-013 | TEST-013 | Not yet implemented | Planned | Not run | **PASS** for forged role and identity in headers and body. | docs/verification-log.md, Issue 4 section: 24 server API tests passed, 0 failed, 0 skipped, 6 files; 10 UI tests passed |
-| AC-014 | TEST-014 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-015 | TEST-015 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-016 | TEST-016 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-017 | TEST-017 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-018 | TEST-018, TEST-048 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-019 | TEST-019 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-020 | TEST-020 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-021 | TEST-021 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-022 | TEST-022 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-023 | TEST-023 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-024 | TEST-024, TEST-047 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-025 | TEST-025 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-026 | TEST-026 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-027 | TEST-027 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-028 | TEST-028 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-029 | TEST-029 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-030 | TEST-030 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-031 | TEST-031 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-032 | TEST-032, TEST-045 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-033 | TEST-033 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-034 | TEST-034 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-035 | TEST-035 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-036 | TEST-036 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-037 | TEST-037, TEST-046 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-038 | TEST-038 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-039 | TEST-039 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-040 | TEST-040 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-041 | TEST-041 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-042 | TEST-042, TEST-049 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-043 | TEST-043 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
-| AC-044 | TEST-044 | Not yet implemented | Planned | Not run | **NOT RUN** | — |
+The current [44-row acceptance matrix](acceptance-coverage.md) links each criterion to executed source files and test levels. [coverage.json](../../artifacts/evidence/sprint1/coverage.json) additionally records every actual passing title, including supplementary unit TEST-045–049. Generate these from runner output using `node scripts/sprint1-coverage.mjs`; missing required IDs, failures, skips and inconsistent case counts fail the audit.
 
 ## Required real build and test run results
 
-| Command | Actual status (pass/fail/skip) | Test count | Tested SHA | Evidence path |
-| --- | --- | --- | --- | --- |
-| `npm --prefix server run test:unit` | NOT RUN | — | — | — |
-| `npm --prefix server run test:api` | NOT RUN | — | — | — |
-| `npm --prefix client run test:ui` | NOT RUN | — | — | — |
-| `npm --prefix client run test:e2e` | NOT RUN | — | — | — |
-| `npm --prefix server run build` | NOT RUN | — | — | — |
-| `npm --prefix client run build` | NOT RUN | — | — | — |
+Tested base SHA: `4055a963b345dc1182b90ee8ab93e74145dbcaa1` **plus uncommitted Issue09 changes**. Database-dependent commands ran with isolated database overrides through an ignored local launcher; exact arguments are in [commands.json](../../artifacts/evidence/sprint1/commands.json). See the [README](../../README.md#tests) for reproducible environment preparation.
+
+| Command | Passed | Failed | Skipped | Evidence |
+| --- | ---: | ---: | ---: | --- |
+| `npm --prefix server run test:unit -- --reporter=verbose` | 10 | 0 | 0 | [Unit](../../artifacts/evidence/sprint1/unit.txt) |
+| `npm --prefix server run test:api -- --reporter=verbose` | 80 | 0 | 0 | [API](../../artifacts/evidence/sprint1/api.txt) |
+| `npm --prefix client run test:ui -- --reporter=verbose` | 53 | 0 | 0 | [UI](../../artifacts/evidence/sprint1/ui.txt) |
+| `npm --prefix client run test:e2e` | 18 | 0 | 0 | [Browser](../../artifacts/evidence/sprint1/e2e.txt) |
+| `npm --prefix server run build` | Build pass | — | — | [Server build](../../artifacts/evidence/sprint1/server-build.txt) |
+| `npm --prefix client run build` | Build pass | — | — | [Client build](../../artifacts/evidence/sprint1/client-build.txt) |
 
 ## Required test excerpts
 
-**Domain rule:** actual implementation excerpt (e.g. TEST-020 or TEST-037); include the genuine setup, assertion, source path, tested SHA, and execution output. **Not yet available.**
+Actual domain-rule source: [operator workflow tests](../../server/tests/api/operator-workflow.test.ts), TEST-037: snapshots and compares the persisted fixture after invalid lifecycle actions. Actual role/ownership source: [queue view tests](../../server/tests/api/queue-views.test.ts), TEST-026: foreign/missing/malformed IDs return safe indistinguishable 404s. Both names and successful outputs appear in [api.txt](../../artifacts/evidence/sprint1/api.txt), with revision provenance above.
 
-**Role/ownership:** actual implementation excerpt (e.g. TEST-026 or TEST-039); include distinct principals, request/assertion, source path, tested SHA and output. **Not yet available.**
+The new [release journey](../../client/tests/e2e/sprint1-journey.spec.ts) uses the actual assertion `expect(foreign.status()).toBe(404)` and compares the completed entry/events before and after denied operator requests. [Persistence test](../../server/tests/api/release-persistence.test.ts) checks the exact completed DTO and database rows across two real API processes and two intervening seeds.
 
-## Failing-first TDD evidence
+## Failing-first TDD evidence (historical template, not current test results)
+
+Issue09 adds integration assertions to existing behavior; they passed on first execution. No RED result or past RED/GREEN commit was fabricated. The historical feature TDD record below remains unpopulated in this checkout and is not established by this verification. Current GREEN evidence is above.
 
 | Feature / rule | RED test commit | Actual failing output file/screenshot | GREEN implementation commit | Actual passing output |
 | --- | --- | --- | --- | --- |
@@ -421,9 +376,9 @@ Before implementing, every AC-001–044 is `NOT RUN` in [Part F evidence matrix]
 
 ## Demo, limits and disclosure
 
-Demo scenario captures: reference DEMO-01–14 in `implementation-roadmap.md`, select clear readable captures, and label scenario, role, starting state, steps, expected versus **actual** outcome, AC/TEST and release SHA.
+Current genuine demo screenshots, role-separated journey, expected/actual assertions and base SHA are recorded in [release verification](release-verification.md). No deployment or GitHub review capture is claimed.
 
-Known limitations/bugs/failed/skipped tests: TODO; do not state “none” without checking.
+Current limitations: four high-severity affected server dependency packages need review; production hosting and non-Chromium browsers are unverified; human release gates remain outstanding. Local regression has zero failed/skipped cases. See the release report for details.
 
 AI-use declaration (fill truthfully): tool, tasks assisted, human review and verification. No transcript is required.
 

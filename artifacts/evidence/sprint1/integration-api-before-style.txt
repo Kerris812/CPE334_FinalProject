@@ -1,0 +1,104 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts --reporter=verbose
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "cpe334_release_1794042405885_test", schema "public" at "127.0.0.1:55432"
+
+2 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ✓ tests/api/database.test.ts > TEST-009 migrations and seed repeat without duplicate records or resetting state 1342ms
+ ✓ tests/api/database.test.ts > database constraints enforce active customer, service slot, party size and foreign keys 12ms
+ ✓ tests/api/queue-join.test.ts > TEST-016 customer discovers R and joins with one WAITING entry and JOINED event 29ms
+ ✓ tests/api/queue-join.test.ts > TEST-017 boundaries 1/4 on R and 5/8 on S are accepted 17ms
+ ✓ tests/api/queue-join.test.ts > TEST-018 invalid sizes create no entries, events or counter increments 19ms
+ ✓ tests/api/queue-join.test.ts > TEST-019 active entries block same and other queues; COMPLETED permits joining 20ms
+ ✓ tests/api/queue-join.test.ts > TEST-020 twenty concurrent same-customer requests create exactly one entry and event 37ms
+ ✓ tests/api/queue-join.test.ts > TEST-021 twenty different customers get distinct gap-free queue numbers 43ms
+ ✓ tests/api/queue-join.test.ts > TEST-022 PAUSED and CLOSED fixtures reject joining and disappear from discovery 9ms
+ ✓ tests/api/queue-join.test.ts > TEST-023 body identity is rejected and forged headers cannot impersonate another customer 10ms
+ ✓ tests/api/queue-join.test.ts > TEST-024 entry/event and numbers beyond 9999 survive actual process restart and reseed 331ms
+ ✓ tests/api/queue-join.test.ts > join authentication, role, origin and unknown queue denials preserve data 9ms
+ ✓ tests/api/queue-join.test.ts > cross-queue simultaneous same-customer joining commits only one increment 8ms
+ ✓ tests/api/queue-join.test.ts > number collision returns NUMBER_CONFLICT and rolls back all writes 8ms
+ ✓ tests/api/queue-join.test.ts > real PostgreSQL audit insert failure rolls back entry and counter 13ms
+ ✓ tests/api/queue-join.test.ts > transaction revalidates persisted customer role and activity before any queue write 7ms
+ ✓ tests/api/authorization.test.ts > TEST-010 assigned operator receives only assigned queue public metadata 50ms
+ ✓ tests/api/authorization.test.ts > TEST-011 operator B lists S and cannot inspect or mutate R 40ms
+ ✓ tests/api/authorization.test.ts > TEST-012 customers cannot list operator queues or call/start/complete 36ms
+ ✓ tests/api/authorization.test.ts > TEST-013 forged role and identities cannot override the authenticated customer 33ms
+ ✓ tests/api/authorization.test.ts > operator cannot use customer discovery, join or private entry routes 35ms
+ ✓ tests/api/authorization.test.ts > missing, expired, revoked and inactive sessions fail closed on operator routes 64ms
+ ✓ tests/api/authorization.test.ts > private namespace authentication and role checks precede malformed bodies and content checks 66ms
+ ✓ tests/api/authorization.test.ts > invalid queue and entry IDs produce safe denials and cannot change state 70ms
+ ✓ tests/api/authorization.test.ts > missing and invalidated sessions cannot reach private mutation guards 70ms
+ ✓ tests/api/authorization.test.ts > protected auth routes reject invalid sessions before malformed JSON without revoking a valid session 101ms
+ ✓ tests/api/auth.test.ts > TEST-001 valid customer and operator login use server identity 115ms
+ ✓ tests/api/auth.test.ts > TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions 421ms
+ ✓ tests/api/auth.test.ts > TEST-003 me returns only current identity and reads account activity from DB 36ms
+ ✓ tests/api/auth.test.ts > TEST-004 logout revokes only this session before 204 and prevents replay 70ms
+ ✓ tests/api/auth.test.ts > TEST-005 missing, malformed and unknown sessions cannot access protected requests 13ms
+ ✓ tests/api/auth.test.ts > TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal 35ms
+ ✓ tests/api/auth.test.ts > TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence 9ms
+ ✓ tests/api/auth.test.ts > TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets 95ms
+ ✓ tests/api/auth.test.ts > TEST-050 origin and JSON protection reject unsafe requests without revoking session 37ms
+ ✓ tests/api/auth.test.ts > TEST-051 repository failures return safe 500 JSON without credential logging or cookies 31ms
+ ✓ tests/api/party-routing.test.ts > TEST-053 seed adds both designated queues and assignments without changing existing records 139ms
+ ✓ tests/api/party-routing.test.ts > TEST-054 R rejects large parties and unsupported queues reject new joins without writes 25ms
+ ✓ tests/api/party-routing.test.ts > TEST-054 sizes 1/4 join R and 5/8 join S; both queue mismatches and invalid sizes preserve state 35ms
+ ✓ tests/api/party-routing.test.ts > TEST-054 both queues reject joins while unavailable and a customer race across R/S commits once 22ms
+ ✓ tests/api/party-routing.test.ts > TEST-055 A lists and manages only R; B only S, including forged identities 30ms
+ ✓ tests/api/party-routing.test.ts > TEST-056 independent FIFO and forty simultaneous calls create one active slot and audit per queue 68ms
+ ✓ tests/api/party-routing.test.ts > TEST-056 holding R row lock does not prevent S from calling 8ms
+ ✓ tests/api/party-routing.test.ts > TEST-053 seed preserves paused states and counters; contradictory assignment fails atomically 133ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-032 FIFO uses immutable sequence rather than insertion or joined time 33ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-033 empty queue rejects without writes 10ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-034 CALLED and SERVING occupy the only service slot 13ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-035 successful CALLED to SERVING records server timestamp and one event 7ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-036 successful SERVING to COMPLETED records server timestamp and one event 6ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-037 invalid lifecycle actions leave all database fields unchanged 14ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-038 customers cannot use any operator endpoint 12ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-039 unassigned operator cannot inspect or mutate queue 13ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-040 twenty simultaneous calls activate only FIFO head with one audit event 43ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-041 full workflow has four correctly attributed atomic events 16ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-042 COMPLETED cannot reopen or change timestamps 18ms
+ ✓ tests/api/operator-workflow.test.ts > TEST-044 PAUSED and CLOSED reject calls without writes 7ms
+ ✓ tests/api/operator-workflow.test.ts > audit insert failure rolls back each real PostgreSQL transition 16ms
+ ✓ tests/api/operator-workflow.test.ts > desk returns a consistent waiting summary and active entry 8ms
+ ✓ tests/api/operator-workflow.test.ts > repeated simultaneous start and complete each produce one event 9ms
+ ✓ tests/api/restart.test.ts > foundation seed identities and counter survive an actual API process restart 242ms
+ ✓ tests/api/queue-views.test.ts > TEST-025 latest and own detail expose only persisted private DTO including COMPLETED 26ms
+ ✓ tests/api/queue-views.test.ts > TEST-026 foreign, missing and malformed entry IDs return indistinguishable safe 404s 8ms
+ ✓ tests/api/queue-views.test.ts > TEST-027 anonymous and operator requests cannot read private customer routes 6ms
+ ✓ tests/api/queue-views.test.ts > TEST-028 anonymous board returns exact four-field allowlist and WAITING-only count 7ms
+ ✓ tests/api/queue-views.test.ts > TEST-029 board reflects CALLED/SERVING fixtures and nulls the completed service slot 9ms
+ ✓ tests/api/queue-views.test.ts > TEST-031 public board never serializes nested private account, entry or event fields 4ms
+ ✓ tests/api/queue-views.test.ts > unknown and malformed public queue IDs return safe QUEUE_NOT_FOUND 3ms
+ ✓ tests/api/queue-views.test.ts > TEST-025 latest uses joinedAt then id deterministically while older COMPLETED entries remain readable 10ms
+ ✓ tests/api/queue-views.test.ts > TEST-026 spoofed identities cannot change latest scope; denied reads do not mutate persisted records 10ms
+ ✓ tests/api/public-board.test.ts > TEST-028 anonymous board recursively exposes exactly four approved primitive fields 24ms
+ ✓ tests/api/public-board.test.ts > TEST-029 CALLED to SERVING, waiting changes, completion and empty queues reflect PostgreSQL 17ms
+ ✓ tests/api/public-board.test.ts > TEST-031 deeply related customer, session, entry and audit data cannot leak through public JSON 8ms
+ ✓ tests/api/public-board.test.ts > public board unknown IDs share safe 404s and do not reveal private resource values 6ms
+ ✓ tests/api/public-board.test.ts > seeded public code R resolves to the same safe board as its database ID without login 5ms
+ ✓ tests/api/permission-guards.test.ts > ownership guard allows owner and gives identical foreign/missing/invalid 404s despite forged identity 20ms
+ ✓ tests/api/permission-guards.test.ts > assignment guards permit assigned operator and block writes by customers and unassigned operators 8ms
+ ✓ tests/api/permission-guards.test.ts > existing sessions reflect assignment removal, changed database roles and disabled users immediately 12ms
+ ✓ tests/api/permission-guards.test.ts > authorized workflow reaches real desk and lifecycle conflict handlers 11ms
+ ✓ tests/api/release-persistence.test.ts > TEST-015 completed entry and four audit events survive actual API restart and idempotent seed 524ms
+ ✓ tests/api/health.test.ts > TEST-014 anonymous health returns only safe status and service 11ms
+
+ Test Files  12 passed (12)
+      Tests  80 passed (80)
+   Start at  16:09:56
+   Duration  6.86s (tests 89%, import 10%, transform 1%)
+
+    Isolate  12 workers spawned · ~47ms startup each (spawn + environment, per file)
+             at least ~520ms faster with isolate: false — reuses workers across files instead of one per file
+

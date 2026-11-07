@@ -1,0 +1,32 @@
+[
+  {
+    "name": "unit",
+    "command": "npm --prefix server run test:unit -- --reporter=verbose",
+    "exitCode": 0
+  },
+  {
+    "name": "api",
+    "command": "node .local/run-verification.mjs test npm --prefix server run test:api -- --reporter=verbose",
+    "exitCode": 0
+  },
+  {
+    "name": "ui",
+    "command": "npm --prefix client run test:ui -- --reporter=verbose",
+    "exitCode": 0
+  },
+  {
+    "name": "e2e",
+    "command": "node .local/run-verification.mjs test npm --prefix client run test:e2e",
+    "exitCode": 0
+  },
+  {
+    "name": "server-build",
+    "command": "npm --prefix server run build",
+    "exitCode": 0
+  },
+  {
+    "name": "client-build",
+    "command": "npm --prefix client run build",
+    "exitCode": 0
+  }
+]

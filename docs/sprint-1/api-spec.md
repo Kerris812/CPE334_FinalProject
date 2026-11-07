@@ -1,6 +1,6 @@
 # api-spec.md — Restaurant Queue REST API Contract
 
-> **Status:** PROPOSED engineering baseline, 6 November 2026. Design and contracts only. No application code, test runs, GitHub releases or deployments are represented as complete. All examples use synthetic placeholders.
+> **Status:** Engineering baseline dated 6 November 2026, with approved Issue08 scope revision. F01–F05 are implemented and locally verified on the Issue09 working tree on 7 November 2026. See [release verification](release-verification.md) and [acceptance coverage](acceptance-coverage.md). Peer review, branch integration, security risk resolution and publication are not asserted complete. Examples use synthetic data.
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 

@@ -56,10 +56,10 @@ test('public board stays anonymous and displays only public number, state and co
 test('public board distinguishes loading, empty, missing and retryable errors', async () => {
   window.history.replaceState({}, '', '/board/queue-id');
   mock.mockImplementation(async (path: string) => path.includes('/public/') ? response(404, { error: { code: 'QUEUE_NOT_FOUND' } }) : response(401, {}));
-  render(<App />); await screen.findByText('Queue not found.'); cleanup();
+  render(<App />); await screen.findByText("This queue isn't available"); cleanup();
   mock.mockImplementation(async (path: string) => path.includes('/public/') ? response(500, {}) : response(401, {}));
   render(<App />); await screen.findByRole('button', { name: 'Retry' });
-  mock.mockImplementation(async () => response(200, { data: { queueCode: 'R', calledNumber: null, serviceState: null, waitingCount: 0 } })); fireEvent.click(screen.getByRole('button', { name: 'Retry' })); await screen.findByText('No one called');
+  mock.mockImplementation(async () => response(200, { data: { queueCode: 'R', calledNumber: null, serviceState: null, waitingCount: 0 } })); fireEvent.click(screen.getByRole('button', { name: 'Retry' })); await screen.findByText('No one is being called yet');
 });
 
 test('my-queue polls while visible and stops polling after unmount', async () => {

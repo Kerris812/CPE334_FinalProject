@@ -1,0 +1,23 @@
+
+> restaurant-queue-server@0.1.0 test:unit
+> vitest run tests/unit --reporter=verbose
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ✓ tests/unit/queue-rules.test.ts > TEST-047 format queue numbers without a four-digit maximum 4ms
+ ✓ tests/unit/queue-rules.test.ts > TEST-048 party size accepts only integers one through eight 2ms
+ ✓ tests/unit/public-board-dto.test.ts > TEST-031 dedicated public DTO drops nested private properties instead of spreading records 3ms
+ ✓ tests/unit/public-board-dto.test.ts > TEST-029 dedicated public DTO uses null for an empty current slot 1ms
+ ✓ tests/unit/operator-rules.test.ts > TEST-045 FIFO selector ignores input ordering and nonwaiting entries 1ms
+ ✓ tests/unit/operator-rules.test.ts > TEST-046 only SERVING may transition to COMPLETED 0ms
+ ✓ tests/unit/operator-rules.test.ts > TEST-049 terminal states have no outgoing transitions 0ms
+ ✓ tests/unit/test-database.test.ts > requires explicit disposable database and rejects the development database 1ms
+ ✓ tests/unit/party-routing.test.ts > TEST-052 party boundaries map to the designated queue 1ms
+ ✓ tests/unit/party-routing.test.ts > TEST-052 invalid party sizes cannot be routed 1ms
+
+ Test Files  5 passed (5)
+      Tests  10 passed (10)
+   Start at  16:15:57
+   Duration  99ms (import 38%, transform 27%, tests 22%, worker 13%, environment 1%)
+

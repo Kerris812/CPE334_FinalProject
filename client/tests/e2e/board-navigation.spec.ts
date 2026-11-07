@@ -25,5 +25,24 @@ for (const [role, fallback] of [['OPERATOR', '/operator/desk'], ['CUSTOMER', '/m
     await expect(back).toBeEnabled();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await back.click(); await expect(page).toHaveURL(new RegExp(`${fallback}$`));
+    if (role === 'CUSTOMER') {
+      for (const width of [360, 768, 1440]) {
+        await page.setViewportSize({ width, height: 780 });
+        const identity = (await page.locator('.customer-user-chip').boundingBox())!;
+        const boardLink = (await page.getByRole('link', { name: 'View public board' }).boundingBox())!;
+        const logout = (await page.getByRole('button', { name: 'Log out' }).boundingBox())!;
+        expect(identity.y).toBeLessThan(boardLink.y);
+        expect(identity.x + identity.width).toBeGreaterThanOrEqual(logout.x + logout.width);
+        await expect(page.locator('.customer-user-role')).toHaveText('CUSTOMER');
+        await expect(page.locator('h1')).toHaveText('My queue');
+        await expect(page.getByRole('link', { name: 'View public board' })).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+        await expect(page.getByRole('button', { name: 'Log out' })).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+        await expect(page.getByText('Queue and service management', { exact: true })).toHaveCount(0);
+        expect(logout.y).toBeLessThan(boardLink.y);
+        await expect(page.locator('.app-header')).toContainText('Restaurant Queue');
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        await page.screenshot({ path: `/tmp/cpe334-account-header-${width}.png`, fullPage: true });
+      }
+    }
   });
 }

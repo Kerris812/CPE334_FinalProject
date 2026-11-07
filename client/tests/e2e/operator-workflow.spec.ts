@@ -34,6 +34,23 @@ test('TEST-043 real customer and operator workflow reflects on my-queue and publ
     const host = await hostContext.newPage(); const board = await boardContext.newPage();
     await host.setViewportSize({ width: 1440, height: 1000 }); await login(host, operator.email, process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD);
     await expect(host.getByLabel('Assigned queue')).toBeVisible(); await host.getByLabel('Assigned queue').selectOption(queue.id);
+    await expect(host.getByRole('button', { name: 'Refresh', exact: true })).toBeEnabled();
+    for (const width of [1440, 360]) {
+      await host.setViewportSize({ width, height: 1000 });
+      const label = (await host.getByText('Assigned queue', { exact: true }).boundingBox())!;
+      const select = (await host.getByLabel('Assigned queue').boundingBox())!;
+      if (width === 1440) expect(select.x - label.x - label.width).toBeGreaterThanOrEqual(16);
+      const arrow = (await host.locator('.assigned-queue-chevron').boundingBox())!;
+      expect(select.x + select.width - arrow.x - arrow.width).toBeGreaterThanOrEqual(16);
+      const offset = await host.getByRole('button', { name: 'Refresh', exact: true }).evaluate(button => {
+        const range = document.createRange(); range.selectNodeContents(button.querySelector('.ui-button-label')!);
+        const text = range.getBoundingClientRect(); const box = button.getBoundingClientRect();
+        return Math.abs(text.x + text.width / 2 - box.x - box.width / 2);
+      });
+      expect(offset).toBeLessThan(1);
+      expect(await host.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+    await host.setViewportSize({ width: 1440, height: 1000 });
     await host.getByRole('button', { name: 'Call Next', exact: true }).click(); await expect(host.getByText('CALLED', { exact: true })).toBeVisible();
     await board.goto(`/board/${queue.id}`); await expect(board.getByText(`${queue.code}-0001`, { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('CALLED', { exact: true })).toBeVisible();
@@ -45,7 +62,7 @@ test('TEST-043 real customer and operator workflow reflects on my-queue and publ
     await host.screenshot({ path: '../artifacts/evidence/f05-routing/workflow-regression-desk-mobile.png', fullPage: true });
     await host.getByRole('button', { name: 'Complete Service', exact: true }).click(); await expect(host.getByText('Service completed.')).toBeVisible();
     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible(); await page.reload(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible();
-    await board.reload(); await expect(board.getByText('No one called', { exact: true })).toBeVisible();
+    await board.reload(); await expect(board.getByText('No one is being called yet', { exact: true })).toBeVisible();
     const response = await board.request.get(`/api/v1/public/queues/${queue.id}/board`); expect(Object.keys((await response.json()).data).sort()).toEqual(['calledNumber', 'queueCode', 'serviceState', 'waitingCount']);
     const entry = await db.queueEntry.findFirstOrThrow({ where: { customerId: customer.id } }); expect(entry.status).toBe('COMPLETED'); expect(await db.queueEvent.count({ where: { entryId: entry.id } })).toBe(4);
   } finally { await hostContext.close(); await boardContext.close(); }

@@ -1,0 +1,1600 @@
+{
+  "baseCommit": "4055a963b345dc1182b90ee8ab93e74145dbcaa1",
+  "uncommittedChangesIncluded": true,
+  "requiredTestIds": [
+    "TEST-001",
+    "TEST-002",
+    "TEST-003",
+    "TEST-004",
+    "TEST-005",
+    "TEST-006",
+    "TEST-007",
+    "TEST-008",
+    "TEST-009",
+    "TEST-010",
+    "TEST-011",
+    "TEST-012",
+    "TEST-013",
+    "TEST-014",
+    "TEST-015",
+    "TEST-016",
+    "TEST-017",
+    "TEST-018",
+    "TEST-019",
+    "TEST-020",
+    "TEST-021",
+    "TEST-022",
+    "TEST-023",
+    "TEST-024",
+    "TEST-025",
+    "TEST-026",
+    "TEST-027",
+    "TEST-028",
+    "TEST-029",
+    "TEST-030",
+    "TEST-031",
+    "TEST-032",
+    "TEST-033",
+    "TEST-034",
+    "TEST-035",
+    "TEST-036",
+    "TEST-037",
+    "TEST-038",
+    "TEST-039",
+    "TEST-040",
+    "TEST-041",
+    "TEST-042",
+    "TEST-043",
+    "TEST-044",
+    "TEST-045",
+    "TEST-046",
+    "TEST-047",
+    "TEST-048",
+    "TEST-049"
+  ],
+  "missing": [],
+  "suites": [
+    {
+      "name": "unit",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "id": "TEST-047",
+          "file": "server/tests/unit/queue-rules.test.ts",
+          "title": "TEST-047 format queue numbers without a four-digit maximum"
+        },
+        {
+          "id": "TEST-048",
+          "file": "server/tests/unit/queue-rules.test.ts",
+          "title": "TEST-048 party size accepts only integers one through eight"
+        },
+        {
+          "id": "TEST-031",
+          "file": "server/tests/unit/public-board-dto.test.ts",
+          "title": "TEST-031 dedicated public DTO drops nested private properties instead of spreading records"
+        },
+        {
+          "id": "TEST-029",
+          "file": "server/tests/unit/public-board-dto.test.ts",
+          "title": "TEST-029 dedicated public DTO uses null for an empty current slot"
+        },
+        {
+          "id": "TEST-045",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-045 FIFO selector ignores input ordering and nonwaiting entries"
+        },
+        {
+          "id": "TEST-046",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-046 only SERVING may transition to COMPLETED"
+        },
+        {
+          "id": "TEST-049",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-049 terminal states have no outgoing transitions"
+        },
+        {
+          "file": "server/tests/unit/test-database.test.ts",
+          "title": "requires explicit disposable database and rejects the development database"
+        },
+        {
+          "id": "TEST-052",
+          "file": "server/tests/unit/party-routing.test.ts",
+          "title": "TEST-052 party boundaries map to the designated queue"
+        },
+        {
+          "id": "TEST-052",
+          "file": "server/tests/unit/party-routing.test.ts",
+          "title": "TEST-052 invalid party sizes cannot be routed"
+        }
+      ]
+    },
+    {
+      "name": "api",
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "id": "TEST-009",
+          "file": "server/tests/api/database.test.ts",
+          "title": "TEST-009 migrations and seed repeat without duplicate records or resetting state"
+        },
+        {
+          "file": "server/tests/api/database.test.ts",
+          "title": "database constraints enforce active customer, service slot, party size and foreign keys"
+        },
+        {
+          "id": "TEST-001",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-001 valid customer and operator login use server identity"
+        },
+        {
+          "id": "TEST-002",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions"
+        },
+        {
+          "id": "TEST-003",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-003 me returns only current identity and reads account activity from DB"
+        },
+        {
+          "id": "TEST-004",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-004 logout revokes only this session before 204 and prevents replay"
+        },
+        {
+          "id": "TEST-005",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-005 missing, malformed and unknown sessions cannot access protected requests"
+        },
+        {
+          "id": "TEST-006",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal"
+        },
+        {
+          "id": "TEST-007",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence"
+        },
+        {
+          "id": "TEST-008",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets"
+        },
+        {
+          "id": "TEST-050",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-050 origin and JSON protection reject unsafe requests without revoking session"
+        },
+        {
+          "id": "TEST-051",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-051 repository failures return safe 500 JSON without credential logging or cookies"
+        },
+        {
+          "id": "TEST-010",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-010 assigned operator receives only assigned queue public metadata"
+        },
+        {
+          "id": "TEST-011",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-011 operator B lists S and cannot inspect or mutate R"
+        },
+        {
+          "id": "TEST-012",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-012 customers cannot list operator queues or call/start/complete"
+        },
+        {
+          "id": "TEST-013",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-013 forged role and identities cannot override the authenticated customer"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "operator cannot use customer discovery, join or private entry routes"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "missing, expired, revoked and inactive sessions fail closed on operator routes"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "private namespace authentication and role checks precede malformed bodies and content checks"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "invalid queue and entry IDs produce safe denials and cannot change state"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "missing and invalidated sessions cannot reach private mutation guards"
+        },
+        {
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "protected auth routes reject invalid sessions before malformed JSON without revoking a valid session"
+        },
+        {
+          "id": "TEST-016",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-016 customer discovers R and joins with one WAITING entry and JOINED event"
+        },
+        {
+          "id": "TEST-017",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-017 boundaries 1/4 on R and 5/8 on S are accepted"
+        },
+        {
+          "id": "TEST-018",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-018 invalid sizes create no entries, events or counter increments"
+        },
+        {
+          "id": "TEST-019",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-019 active entries block same and other queues; COMPLETED permits joining"
+        },
+        {
+          "id": "TEST-020",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-020 twenty concurrent same-customer requests create exactly one entry and event"
+        },
+        {
+          "id": "TEST-021",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-021 twenty different customers get distinct gap-free queue numbers"
+        },
+        {
+          "id": "TEST-022",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-022 PAUSED and CLOSED fixtures reject joining and disappear from discovery"
+        },
+        {
+          "id": "TEST-023",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-023 body identity is rejected and forged headers cannot impersonate another customer"
+        },
+        {
+          "id": "TEST-024",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-024 entry/event and numbers beyond 9999 survive actual process restart and reseed"
+        },
+        {
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "join authentication, role, origin and unknown queue denials preserve data"
+        },
+        {
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "cross-queue simultaneous same-customer joining commits only one increment"
+        },
+        {
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "number collision returns NUMBER_CONFLICT and rolls back all writes"
+        },
+        {
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "real PostgreSQL audit insert failure rolls back entry and counter"
+        },
+        {
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "transaction revalidates persisted customer role and activity before any queue write"
+        },
+        {
+          "id": "TEST-053",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-053 seed adds both designated queues and assignments without changing existing records"
+        },
+        {
+          "id": "TEST-054",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-054 R rejects large parties and unsupported queues reject new joins without writes"
+        },
+        {
+          "id": "TEST-054",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-054 sizes 1/4 join R and 5/8 join S; both queue mismatches and invalid sizes preserve state"
+        },
+        {
+          "id": "TEST-054",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-054 both queues reject joins while unavailable and a customer race across R/S commits once"
+        },
+        {
+          "id": "TEST-055",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-055 A lists and manages only R; B only S, including forged identities"
+        },
+        {
+          "id": "TEST-056",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-056 independent FIFO and forty simultaneous calls create one active slot and audit per queue"
+        },
+        {
+          "id": "TEST-056",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-056 holding R row lock does not prevent S from calling"
+        },
+        {
+          "id": "TEST-053",
+          "file": "server/tests/api/party-routing.test.ts",
+          "title": "TEST-053 seed preserves paused states and counters; contradictory assignment fails atomically"
+        },
+        {
+          "id": "TEST-015",
+          "file": "server/tests/api/release-persistence.test.ts",
+          "title": "TEST-015 completed entry and four audit events survive actual API restart and idempotent seed"
+        },
+        {
+          "id": "TEST-032",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-032 FIFO uses immutable sequence rather than insertion or joined time"
+        },
+        {
+          "id": "TEST-033",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-033 empty queue rejects without writes"
+        },
+        {
+          "id": "TEST-034",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-034 CALLED and SERVING occupy the only service slot"
+        },
+        {
+          "id": "TEST-035",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-035 successful CALLED to SERVING records server timestamp and one event"
+        },
+        {
+          "id": "TEST-036",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-036 successful SERVING to COMPLETED records server timestamp and one event"
+        },
+        {
+          "id": "TEST-037",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-037 invalid lifecycle actions leave all database fields unchanged"
+        },
+        {
+          "id": "TEST-038",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-038 customers cannot use any operator endpoint"
+        },
+        {
+          "id": "TEST-039",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-039 unassigned operator cannot inspect or mutate queue"
+        },
+        {
+          "id": "TEST-040",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-040 twenty simultaneous calls activate only FIFO head with one audit event"
+        },
+        {
+          "id": "TEST-041",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-041 full workflow has four correctly attributed atomic events"
+        },
+        {
+          "id": "TEST-042",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-042 COMPLETED cannot reopen or change timestamps"
+        },
+        {
+          "id": "TEST-044",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-044 PAUSED and CLOSED reject calls without writes"
+        },
+        {
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "audit insert failure rolls back each real PostgreSQL transition"
+        },
+        {
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "desk returns a consistent waiting summary and active entry"
+        },
+        {
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "repeated simultaneous start and complete each produce one event"
+        },
+        {
+          "file": "server/tests/api/restart.test.ts",
+          "title": "foundation seed identities and counter survive an actual API process restart"
+        },
+        {
+          "id": "TEST-025",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-025 latest and own detail expose only persisted private DTO including COMPLETED"
+        },
+        {
+          "id": "TEST-026",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-026 foreign, missing and malformed entry IDs return indistinguishable safe 404s"
+        },
+        {
+          "id": "TEST-027",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-027 anonymous and operator requests cannot read private customer routes"
+        },
+        {
+          "id": "TEST-028",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-028 anonymous board returns exact four-field allowlist and WAITING-only count"
+        },
+        {
+          "id": "TEST-029",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-029 board reflects CALLED/SERVING fixtures and nulls the completed service slot"
+        },
+        {
+          "id": "TEST-031",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-031 public board never serializes nested private account, entry or event fields"
+        },
+        {
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "unknown and malformed public queue IDs return safe QUEUE_NOT_FOUND"
+        },
+        {
+          "id": "TEST-025",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-025 latest uses joinedAt then id deterministically while older COMPLETED entries remain readable"
+        },
+        {
+          "id": "TEST-026",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-026 spoofed identities cannot change latest scope; denied reads do not mutate persisted records"
+        },
+        {
+          "id": "TEST-028",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-028 anonymous board recursively exposes exactly four approved primitive fields"
+        },
+        {
+          "id": "TEST-029",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-029 CALLED to SERVING, waiting changes, completion and empty queues reflect PostgreSQL"
+        },
+        {
+          "id": "TEST-031",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-031 deeply related customer, session, entry and audit data cannot leak through public JSON"
+        },
+        {
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "public board unknown IDs share safe 404s and do not reveal private resource values"
+        },
+        {
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "seeded public code R resolves to the same safe board as its database ID without login"
+        },
+        {
+          "file": "server/tests/api/permission-guards.test.ts",
+          "title": "ownership guard allows owner and gives identical foreign/missing/invalid 404s despite forged identity"
+        },
+        {
+          "file": "server/tests/api/permission-guards.test.ts",
+          "title": "assignment guards permit assigned operator and block writes by customers and unassigned operators"
+        },
+        {
+          "file": "server/tests/api/permission-guards.test.ts",
+          "title": "existing sessions reflect assignment removal, changed database roles and disabled users immediately"
+        },
+        {
+          "file": "server/tests/api/permission-guards.test.ts",
+          "title": "authorized workflow reaches real desk and lifecycle conflict handlers"
+        },
+        {
+          "id": "TEST-014",
+          "file": "server/tests/api/health.test.ts",
+          "title": "TEST-014 anonymous health returns only safe status and service"
+        }
+      ]
+    },
+    {
+      "name": "ui",
+      "passed": 53,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "direct board entry falls back safely for CUSTOMER"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "direct board entry falls back safely for OPERATOR"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "direct board entry falls back safely for anonymous"
+        },
+        {
+          "id": "TEST-028",
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "TEST-028 anonymous board labels all four public values without showing extra private response data"
+        },
+        {
+          "id": "TEST-029",
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "TEST-029 visible polling updates number, service state and waiting count then clears completed slot"
+        },
+        {
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "board handles slow loading, network failure, safe retry and unknown queue states"
+        },
+        {
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "hidden board stops timers, resumes immediately and cleans up on unmount"
+        },
+        {
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "slow board poll never overlaps visibility refresh or retry and late responses do not render"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "login has accessible fields, password toggle, no role selector and associated validation"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "login submits once, announces loading, and redirects customer from trusted response"
+        },
+        {
+          "id": "TEST-057",
+          "file": "client/tests/ui/party-routing.test.tsx",
+          "title": "TEST-057 party size derives queue, explains ranges and submits matching ID"
+        },
+        {
+          "id": "TEST-057",
+          "file": "client/tests/ui/party-routing.test.tsx",
+          "title": "TEST-057 missing matching queue disables joining instead of falling back"
+        },
+        {
+          "id": "TEST-057",
+          "file": "client/tests/ui/party-routing.test.tsx",
+          "title": "TEST-057 public overview fetches independent privacy-safe R/S responses"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 customer status loading, empty and all four lifecycle states use server values"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 a missing private entry shows a safe not-found state and can retry"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 network/backend errors are retryable and expired identity invokes login redirect"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 manual refresh cannot overlap an in-flight automatic poll"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 hides stop the polling timer, visibility resumes one refresh, and unmount cleans up"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 pending initial request, visibility changes and late unmounted responses never overlap"
+        },
+        {
+          "id": "TEST-057",
+          "file": "client/tests/ui/party-routing.test.tsx",
+          "title": "TEST-057 rejected action refreshes capacity and prevents further invalid calls"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "Back returns to the safe same-origin source page"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "recorded in-app navigation takes precedence over an external referrer"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "unsafe source https://outside.example/queues uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "unsafe source //outside.example/queues uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "unsafe source javascript:alert(1) uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "unsafe source /api/v1/auth/logout uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "unsafe source /unknown uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "queue form displays server metadata and associated party-size validation"
+        },
+        {
+          "file": "client/tests/ui/operator-desk.test.tsx",
+          "title": "operator desk drives valid actions from API state and refreshes"
+        },
+        {
+          "file": "client/tests/ui/operator-desk.test.tsx",
+          "title": "operator with no assignments sees an empty state"
+        },
+        {
+          "file": "client/tests/ui/operator-desk.test.tsx",
+          "title": "operator desk handles 403 safely"
+        },
+        {
+          "file": "client/tests/ui/operator-desk.test.tsx",
+          "title": "operator desk handles 500 safely"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "restores operator identity via me on reload and logs out to login"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "shows generic credentials errors and server field validation with safe retry"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "connection failures during identity restore are retryable and do not show private content"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "failed logout keeps identity with retry; unauthenticated logout clears identity"
+        },
+        {
+          "file": "client/tests/ui/login.test.tsx",
+          "title": "home and sign-in expose a visible public board link without logging in"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "same-origin referrer without usable history uses the role fallback"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "Back is a focusable native button with a decorative left arrow"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "opening the board inside the app records the source and Back restores it"
+        },
+        {
+          "file": "client/tests/ui/board-navigation.test.tsx",
+          "title": "authenticated landing referrer resolves to the role home rather than a missing page"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "pending join disables double submission and displays authoritative number with my-queue link"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "duplicate conflict refreshes own latest entry and shows actionable message"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "queue discovery recovers from connection errors and supports empty state"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "my-queue reload reads saved entry and completed entries allow a new join"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "join handles server field validation, unavailable queues and expired identity"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "public board stays anonymous and displays only public number, state and count"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "public board distinguishes loading, empty, missing and retryable errors"
+        },
+        {
+          "file": "client/tests/ui/queues.test.tsx",
+          "title": "my-queue polls while visible and stops polling after unmount"
+        },
+        {
+          "file": "client/tests/ui/app.test.tsx",
+          "title": "foundation page identifies the application"
+        },
+        {
+          "file": "client/tests/ui/permissions.test.tsx",
+          "title": "operator cannot access the customer private queue page"
+        },
+        {
+          "file": "client/tests/ui/permissions.test.tsx",
+          "title": "customer cannot access operator routes by a direct URL"
+        },
+        {
+          "file": "client/tests/ui/permissions.test.tsx",
+          "title": "anonymous public board stays public without inventing a display role"
+        }
+      ]
+    },
+    {
+      "name": "e2e",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "id": "TEST-001",
+          "file": "client/tests/e2e/auth.spec.ts",
+          "title": "TEST-001 customer real login, reload identity and logout"
+        },
+        {
+          "id": "TEST-001",
+          "file": "client/tests/e2e/auth.spec.ts",
+          "title": "TEST-001 operator real login, reload identity and logout"
+        },
+        {
+          "file": "client/tests/e2e/auth.spec.ts",
+          "title": "anonymous public display URL does not become an authenticated role"
+        },
+        {
+          "file": "client/tests/e2e/board-navigation.spec.ts",
+          "title": "public board Back is keyboard accessible and returns to the in-app source"
+        },
+        {
+          "file": "client/tests/e2e/board-navigation.spec.ts",
+          "title": "direct public board Back uses OPERATOR fallback"
+        },
+        {
+          "file": "client/tests/e2e/board-navigation.spec.ts",
+          "title": "direct public board Back uses CUSTOMER fallback"
+        },
+        {
+          "file": "client/tests/e2e/board-navigation.spec.ts",
+          "title": "direct public board Back uses anonymous fallback"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/customer-status.spec.ts",
+          "title": "TEST-030 360px private status supports loading, empty, retry, all persisted stages and reload"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/customer-status.spec.ts",
+          "title": "TEST-030 a revoked private session returns the status page to login"
+        },
+        {
+          "file": "client/tests/e2e/foundation.spec.ts",
+          "title": "foundation loads and Vite proxies the real health endpoint"
+        },
+        {
+          "id": "TEST-043",
+          "file": "client/tests/e2e/operator-workflow.spec.ts",
+          "title": "TEST-043 real customer and operator workflow reflects on my-queue and public board"
+        },
+        {
+          "id": "TEST-057",
+          "file": "client/tests/e2e/party-routing.spec.ts",
+          "title": "TEST-057 both assigned operators independently complete real R/S workflows"
+        },
+        {
+          "id": "TEST-029",
+          "file": "client/tests/e2e/public-board.spec.ts",
+          "title": "TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors"
+        },
+        {
+          "file": "client/tests/e2e/public-board.spec.ts",
+          "title": "public number is readable at a distance on desktop and fits narrow viewports"
+        },
+        {
+          "file": "client/tests/e2e/public-board.spec.ts",
+          "title": "home public board navigation is visible and opens the seeded board without login"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/queue-journey.spec.ts",
+          "title": "TEST-030 mobile empty, slow/error states, join and persisted my-queue reload"
+        },
+        {
+          "file": "client/tests/e2e/queue-journey.spec.ts",
+          "title": "anonymous public board renders only fixture public values without login"
+        },
+        {
+          "id": "TEST-043",
+          "file": "client/tests/e2e/sprint1-journey.spec.ts",
+          "title": "TEST-043 complete seeded R-0001 release journey with five isolated browser identities"
+        }
+      ]
+    }
+  ],
+  "criteria": [
+    {
+      "ac": "AC-001",
+      "tests": [
+        "TEST-001"
+      ],
+      "cases": [
+        {
+          "id": "TEST-001",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-001 valid customer and operator login use server identity",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-001",
+          "file": "client/tests/e2e/auth.spec.ts",
+          "title": "TEST-001 customer real login, reload identity and logout",
+          "suite": "e2e"
+        },
+        {
+          "id": "TEST-001",
+          "file": "client/tests/e2e/auth.spec.ts",
+          "title": "TEST-001 operator real login, reload identity and logout",
+          "suite": "e2e"
+        }
+      ]
+    },
+    {
+      "ac": "AC-002",
+      "tests": [
+        "TEST-002"
+      ],
+      "cases": [
+        {
+          "id": "TEST-002",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-003",
+      "tests": [
+        "TEST-003"
+      ],
+      "cases": [
+        {
+          "id": "TEST-003",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-003 me returns only current identity and reads account activity from DB",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-004",
+      "tests": [
+        "TEST-004"
+      ],
+      "cases": [
+        {
+          "id": "TEST-004",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-004 logout revokes only this session before 204 and prevents replay",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-005",
+      "tests": [
+        "TEST-005"
+      ],
+      "cases": [
+        {
+          "id": "TEST-005",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-005 missing, malformed and unknown sessions cannot access protected requests",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-006",
+      "tests": [
+        "TEST-006"
+      ],
+      "cases": [
+        {
+          "id": "TEST-006",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-007",
+      "tests": [
+        "TEST-007"
+      ],
+      "cases": [
+        {
+          "id": "TEST-007",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-008",
+      "tests": [
+        "TEST-008"
+      ],
+      "cases": [
+        {
+          "id": "TEST-008",
+          "file": "server/tests/api/auth.test.ts",
+          "title": "TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-009",
+      "tests": [
+        "TEST-009"
+      ],
+      "cases": [
+        {
+          "id": "TEST-009",
+          "file": "server/tests/api/database.test.ts",
+          "title": "TEST-009 migrations and seed repeat without duplicate records or resetting state",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-010",
+      "tests": [
+        "TEST-010"
+      ],
+      "cases": [
+        {
+          "id": "TEST-010",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-010 assigned operator receives only assigned queue public metadata",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-011",
+      "tests": [
+        "TEST-011"
+      ],
+      "cases": [
+        {
+          "id": "TEST-011",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-011 operator B lists S and cannot inspect or mutate R",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-012",
+      "tests": [
+        "TEST-012"
+      ],
+      "cases": [
+        {
+          "id": "TEST-012",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-012 customers cannot list operator queues or call/start/complete",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-013",
+      "tests": [
+        "TEST-013"
+      ],
+      "cases": [
+        {
+          "id": "TEST-013",
+          "file": "server/tests/api/authorization.test.ts",
+          "title": "TEST-013 forged role and identities cannot override the authenticated customer",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-014",
+      "tests": [
+        "TEST-014"
+      ],
+      "cases": [
+        {
+          "id": "TEST-014",
+          "file": "server/tests/api/health.test.ts",
+          "title": "TEST-014 anonymous health returns only safe status and service",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-015",
+      "tests": [
+        "TEST-015"
+      ],
+      "cases": [
+        {
+          "id": "TEST-015",
+          "file": "server/tests/api/release-persistence.test.ts",
+          "title": "TEST-015 completed entry and four audit events survive actual API restart and idempotent seed",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-016",
+      "tests": [
+        "TEST-016"
+      ],
+      "cases": [
+        {
+          "id": "TEST-016",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-016 customer discovers R and joins with one WAITING entry and JOINED event",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-017",
+      "tests": [
+        "TEST-017"
+      ],
+      "cases": [
+        {
+          "id": "TEST-017",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-017 boundaries 1/4 on R and 5/8 on S are accepted",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-018",
+      "tests": [
+        "TEST-018",
+        "TEST-048"
+      ],
+      "cases": [
+        {
+          "id": "TEST-048",
+          "file": "server/tests/unit/queue-rules.test.ts",
+          "title": "TEST-048 party size accepts only integers one through eight",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-018",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-018 invalid sizes create no entries, events or counter increments",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-019",
+      "tests": [
+        "TEST-019"
+      ],
+      "cases": [
+        {
+          "id": "TEST-019",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-019 active entries block same and other queues; COMPLETED permits joining",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-020",
+      "tests": [
+        "TEST-020"
+      ],
+      "cases": [
+        {
+          "id": "TEST-020",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-020 twenty concurrent same-customer requests create exactly one entry and event",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-021",
+      "tests": [
+        "TEST-021"
+      ],
+      "cases": [
+        {
+          "id": "TEST-021",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-021 twenty different customers get distinct gap-free queue numbers",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-022",
+      "tests": [
+        "TEST-022"
+      ],
+      "cases": [
+        {
+          "id": "TEST-022",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-022 PAUSED and CLOSED fixtures reject joining and disappear from discovery",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-023",
+      "tests": [
+        "TEST-023"
+      ],
+      "cases": [
+        {
+          "id": "TEST-023",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-023 body identity is rejected and forged headers cannot impersonate another customer",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-024",
+      "tests": [
+        "TEST-024",
+        "TEST-047"
+      ],
+      "cases": [
+        {
+          "id": "TEST-047",
+          "file": "server/tests/unit/queue-rules.test.ts",
+          "title": "TEST-047 format queue numbers without a four-digit maximum",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-024",
+          "file": "server/tests/api/queue-join.test.ts",
+          "title": "TEST-024 entry/event and numbers beyond 9999 survive actual process restart and reseed",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-025",
+      "tests": [
+        "TEST-025"
+      ],
+      "cases": [
+        {
+          "id": "TEST-025",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-025 latest and own detail expose only persisted private DTO including COMPLETED",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-025",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-025 latest uses joinedAt then id deterministically while older COMPLETED entries remain readable",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-026",
+      "tests": [
+        "TEST-026"
+      ],
+      "cases": [
+        {
+          "id": "TEST-026",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-026 foreign, missing and malformed entry IDs return indistinguishable safe 404s",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-026",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-026 spoofed identities cannot change latest scope; denied reads do not mutate persisted records",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-027",
+      "tests": [
+        "TEST-027"
+      ],
+      "cases": [
+        {
+          "id": "TEST-027",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-027 anonymous and operator requests cannot read private customer routes",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-028",
+      "tests": [
+        "TEST-028"
+      ],
+      "cases": [
+        {
+          "id": "TEST-028",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-028 anonymous board returns exact four-field allowlist and WAITING-only count",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-028",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-028 anonymous board recursively exposes exactly four approved primitive fields",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-028",
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "TEST-028 anonymous board labels all four public values without showing extra private response data",
+          "suite": "ui"
+        }
+      ]
+    },
+    {
+      "ac": "AC-029",
+      "tests": [
+        "TEST-029"
+      ],
+      "cases": [
+        {
+          "id": "TEST-029",
+          "file": "server/tests/unit/public-board-dto.test.ts",
+          "title": "TEST-029 dedicated public DTO uses null for an empty current slot",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-029",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-029 board reflects CALLED/SERVING fixtures and nulls the completed service slot",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-029",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-029 CALLED to SERVING, waiting changes, completion and empty queues reflect PostgreSQL",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-029",
+          "file": "client/tests/ui/public-board.test.tsx",
+          "title": "TEST-029 visible polling updates number, service state and waiting count then clears completed slot",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-029",
+          "file": "client/tests/e2e/public-board.spec.ts",
+          "title": "TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors",
+          "suite": "e2e"
+        }
+      ]
+    },
+    {
+      "ac": "AC-030",
+      "tests": [
+        "TEST-030"
+      ],
+      "cases": [
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 customer status loading, empty and all four lifecycle states use server values",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 a missing private entry shows a safe not-found state and can retry",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 network/backend errors are retryable and expired identity invokes login redirect",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 manual refresh cannot overlap an in-flight automatic poll",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 hides stop the polling timer, visibility resumes one refresh, and unmount cleans up",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/ui/customer-status.test.tsx",
+          "title": "TEST-030 pending initial request, visibility changes and late unmounted responses never overlap",
+          "suite": "ui"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/customer-status.spec.ts",
+          "title": "TEST-030 360px private status supports loading, empty, retry, all persisted stages and reload",
+          "suite": "e2e"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/customer-status.spec.ts",
+          "title": "TEST-030 a revoked private session returns the status page to login",
+          "suite": "e2e"
+        },
+        {
+          "id": "TEST-030",
+          "file": "client/tests/e2e/queue-journey.spec.ts",
+          "title": "TEST-030 mobile empty, slow/error states, join and persisted my-queue reload",
+          "suite": "e2e"
+        }
+      ]
+    },
+    {
+      "ac": "AC-031",
+      "tests": [
+        "TEST-031"
+      ],
+      "cases": [
+        {
+          "id": "TEST-031",
+          "file": "server/tests/unit/public-board-dto.test.ts",
+          "title": "TEST-031 dedicated public DTO drops nested private properties instead of spreading records",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-031",
+          "file": "server/tests/api/queue-views.test.ts",
+          "title": "TEST-031 public board never serializes nested private account, entry or event fields",
+          "suite": "api"
+        },
+        {
+          "id": "TEST-031",
+          "file": "server/tests/api/public-board.test.ts",
+          "title": "TEST-031 deeply related customer, session, entry and audit data cannot leak through public JSON",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-032",
+      "tests": [
+        "TEST-032",
+        "TEST-045"
+      ],
+      "cases": [
+        {
+          "id": "TEST-045",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-045 FIFO selector ignores input ordering and nonwaiting entries",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-032",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-032 FIFO uses immutable sequence rather than insertion or joined time",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-033",
+      "tests": [
+        "TEST-033"
+      ],
+      "cases": [
+        {
+          "id": "TEST-033",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-033 empty queue rejects without writes",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-034",
+      "tests": [
+        "TEST-034"
+      ],
+      "cases": [
+        {
+          "id": "TEST-034",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-034 CALLED and SERVING occupy the only service slot",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-035",
+      "tests": [
+        "TEST-035"
+      ],
+      "cases": [
+        {
+          "id": "TEST-035",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-035 successful CALLED to SERVING records server timestamp and one event",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-036",
+      "tests": [
+        "TEST-036"
+      ],
+      "cases": [
+        {
+          "id": "TEST-036",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-036 successful SERVING to COMPLETED records server timestamp and one event",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-037",
+      "tests": [
+        "TEST-037",
+        "TEST-046"
+      ],
+      "cases": [
+        {
+          "id": "TEST-046",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-046 only SERVING may transition to COMPLETED",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-037",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-037 invalid lifecycle actions leave all database fields unchanged",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-038",
+      "tests": [
+        "TEST-038"
+      ],
+      "cases": [
+        {
+          "id": "TEST-038",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-038 customers cannot use any operator endpoint",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-039",
+      "tests": [
+        "TEST-039"
+      ],
+      "cases": [
+        {
+          "id": "TEST-039",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-039 unassigned operator cannot inspect or mutate queue",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-040",
+      "tests": [
+        "TEST-040"
+      ],
+      "cases": [
+        {
+          "id": "TEST-040",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-040 twenty simultaneous calls activate only FIFO head with one audit event",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-041",
+      "tests": [
+        "TEST-041"
+      ],
+      "cases": [
+        {
+          "id": "TEST-041",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-041 full workflow has four correctly attributed atomic events",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-042",
+      "tests": [
+        "TEST-042",
+        "TEST-049"
+      ],
+      "cases": [
+        {
+          "id": "TEST-049",
+          "file": "server/tests/unit/operator-rules.test.ts",
+          "title": "TEST-049 terminal states have no outgoing transitions",
+          "suite": "unit"
+        },
+        {
+          "id": "TEST-042",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-042 COMPLETED cannot reopen or change timestamps",
+          "suite": "api"
+        }
+      ]
+    },
+    {
+      "ac": "AC-043",
+      "tests": [
+        "TEST-043"
+      ],
+      "cases": [
+        {
+          "id": "TEST-043",
+          "file": "client/tests/e2e/operator-workflow.spec.ts",
+          "title": "TEST-043 real customer and operator workflow reflects on my-queue and public board",
+          "suite": "e2e"
+        },
+        {
+          "id": "TEST-043",
+          "file": "client/tests/e2e/sprint1-journey.spec.ts",
+          "title": "TEST-043 complete seeded R-0001 release journey with five isolated browser identities",
+          "suite": "e2e"
+        }
+      ]
+    },
+    {
+      "ac": "AC-044",
+      "tests": [
+        "TEST-044"
+      ],
+      "cases": [
+        {
+          "id": "TEST-044",
+          "file": "server/tests/api/operator-workflow.test.ts",
+          "title": "TEST-044 PAUSED and CLOSED reject calls without writes",
+          "suite": "api"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "node": "v24.14.0",
+  "postgresql": "PostgreSQL 17.11 (Homebrew) on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.1.1.101), 64-bit",
+  "users": 4,
+  "queues": [
+    {
+      "code": "R",
+      "state": "OPEN",
+      "lastSequence": "0"
+    },
+    {
+      "code": "S",
+      "state": "OPEN",
+      "lastSequence": "0"
+    }
+  ],
+  "assignments": 2,
+  "entries": 0,
+  "events": 0,
+  "note": "New development database migrated once and seeded twice; original local databases were not used for fixture writes."
+}

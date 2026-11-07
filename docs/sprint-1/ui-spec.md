@@ -1,6 +1,10 @@
 # ui-spec.md — Restaurant Queue User Interface Specification
 
-> **Status:** PROPOSED engineering baseline, 6 November 2026. Design and contracts only. No application code, test runs, GitHub releases or deployments are represented as complete. All examples use synthetic placeholders.
+> **Current app-wide visual system:** [docs/ui-spec.md](../ui-spec.md) supersedes the historical visual refinements below. API, authorization, ownership and workflow contracts remain unchanged; existing typography is frozen.
+
+> **Status:** Engineering baseline dated 6 November 2026, with approved Issue08 scope revision. F01–F05 are implemented and locally verified on the Issue09 working tree on 7 November 2026. See [release verification](release-verification.md) and [acceptance coverage](acceptance-coverage.md). Peer review, branch integration, security risk resolution and publication are not asserted complete. Examples use synthetic data.
+
+> **Current public-board presentation:** The public display uses cream page surfaces, a burgundy serif wordmark with a thin gold divider, white cards with burgundy top borders, segmented active navigation and quiet Back/Refresh controls. This supersedes the earlier full burgundy headers and compact 32–48px real-number presentation. Only actual called numbers use large type; empty/error states use descriptive text. Customer/operator workflows and their presentation remain unchanged by this revision.
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
@@ -188,3 +192,47 @@ Customer party-size help always explains both ranges. Render the form even when 
 The primary public-display navigation opens `/board`, a responsive overview of R and S using the existing per-queue boards. Individual `/board/R`, `/board/S` and UUID routes remain usable and provide links to both queues. Each board retains its own ten-second visibility-aware polling, error/empty state and manual refresh. At narrow widths stack cards without overflow; desktop may show them side by side. No operator controls or private fields are added.
 
 The operator desk retains the assigned queue selector and lifecycle controls, with capacity visibly stated as Active: 0/1 or Active: 1/1. One queue being busy must not disable the other operator's queue. Preserve ≥44px controls, visible focus, accessible live feedback and existing status colors.
+
+
+## Public board visual refinement — 7 November 2026
+
+This UI-only revision preserves anonymous endpoints, the exact four-field public DTO, ten-second visibility-aware polling, refresh gating, and customer/operator workflows. `--surface: #FFFFFF` is the optional derived white card token; all public CSS colors reference the existing palette variables or this token. The shadow derives from Espresso at 10% opacity. Taupe is used only for 1px borders; gold only for divider/ring ornaments and the SERVING badge background. Status always includes CALLED or SERVING as text.
+
+| Text / background | Contrast ratio | Usage |
+| --- | ---: | --- |
+| Espresso / Cream | 13.37:1 | Page headings, local update text outside cards when present, quiet disabled Back text |
+| Espresso / Surface (white) | 14.73:1 | Card headings, empty/helper/error copy, waiting count/label and receipt time |
+| Burgundy / Cream | 10.82:1 | Wordmark, inactive tabs and Back |
+| Burgundy / Surface | 11.92:1 | Real called number, outline Refresh/Retry |
+| Cream / Burgundy | 10.82:1 | Active tab, queue-code badge and CALLED status |
+| Espresso / Gold | 7.25:1 | SERVING status |
+
+Ratios use WCAG relative luminance calculated from the token sRGB values; every normal-text pair exceeds 4.5:1. Disabled outline controls use Espresso on Cream. No gold text/icons appear on cream/white; no normal-size Taupe text is used. The subtle 150ms real-number fade is disabled for `prefers-reduced-motion: reduce`; empty copy does not animate or take the real-number font size.
+
+Layout: 1200px maximum page width, centered; 8px spacing scale with 24/32px primary gaps. Cards have a white surface, 16px radius, soft Espresso shadow and 4px Burgundy top border, without full-color header bars or an outer wrapper card. At 1024px and above, the overview has equal-height columns; smaller widths stack. Called numbers are 72–120px, tabular, within a polite live region. Empty titles are 28–32px. The waiting count is 48px, beside a 16px label below a 1px gold divider. Footer receipt time is 14px and Refresh is a 44px-minimum secondary outline control. Visible focus rings are 2px Burgundy with 4px offset. Navigation uses native links with `aria-current="page"`, styled as segmented tabs, plus a quiet Back action with its existing behavior.
+
+Privacy and discovery: the API has no anonymous queue-list/name endpoint. The UI confirms the approved R/S destinations through existing four-field anonymous board responses; unsuccessful probes do not create queue tabs. A successfully loaded direct queue URL can also confirm its own tab. Headings derive only from `queueCode` (for example “Queue R”); private queue names are not fetched. The displayed “Updated HH:mm:ss” is local successful-response receipt time, not an API/database timestamp. No customer names, email, IDs, party sizes, private entry IDs or nested API metadata are rendered. Both-mode missing queues retain an explicit friendly error card with Retry rather than advertising an unconfirmed queue tab.
+
+404 copy: “This queue isn't available”. Network/5xx copy: “We couldn't load this queue”. Both include a decorative icon, `role="alert"`, safe helper copy and Retry, without raw exception text. Successful retry restores normal content; shared polling/session/backend services are unchanged.
+
+## Customer status visual refinement — 7 November 2026
+
+This revision is scoped to the authenticated CUSTOMER `/my-queue` presentation. The existing latest-entry API, ownership restrictions, join validation, session/logout behavior, refresh gate and visibility-aware ten-second polling are unchanged. It uses only fields already returned by the current identity/owned-entry APIs. Queue details show the returned `queueCode` as “Queue R/S”; no queue-name metadata or other customer's records are fetched. No private entry ID, email, password/hash, or session value is displayed.
+
+`AppHeader` presents a 24–28px burgundy Georgia/system-serif wordmark (not a competing page H1), a compact initials/name/uppercase-role chip and quiet public-board/logout actions. On narrow screens the chip wraps below the wordmark and remains right-aligned. The page uses 24px top padding, 16px side padding, a centered 560px maximum column and a 2px gold divider. The main card's only large heading is “My queue” at 24px; the white `--surface` card has a 16px radius, 4px burgundy top border and a 10%-Espresso soft shadow.
+
+The number panel uses Cream, a 1px Taupe border, 12px radius, a 14px Espresso label, and a Burgundy tabular number (40px minimum at 360px; 56–72px on larger screens). Gold is a 1px line under the number. Status is a 14px uppercase word plus a decorative dot: WAITING Espresso/Cream with a Taupe border; CALLED Cream/Burgundy; SERVING Espresso/Gold; COMPLETED Cream/Espresso. Number and status share an atomic polite live region. Their 150ms fade respects reduced-motion preferences.
+
+Details use a definition list: 14px Espresso labels left, 16px semibold Espresso values right, Taupe 1px row dividers. Rows are Queue, Party size and Joined. Joined remains formatted in `Asia/Bangkok`, for example “7 Nov 2026, 11:55”, with an explicit “Bangkok time” note. The footer's “Updated HH:mm:ss” is local response receipt time, not an additional API/database field. Refresh status is secondary outline, full-width at 360px and auto-width on larger screens; Back to queues is a plain Burgundy arrow link. Tap targets are at least 44px and focus rings are 2px Burgundy with offset. Loading skeleton, empty, safe role-alert errors with Retry and current/historical statuses remain available.
+
+| Text / background | Contrast ratio | Customer usage |
+| --- | ---: | --- |
+| Espresso / Cream | 13.37:1 | Number label, WAITING, loading/empty/error copy, disabled controls and identity text |
+| Espresso / Surface | 14.73:1 | My queue heading, definition-list labels/values and update footer |
+| Burgundy / Cream | 10.82:1 | Serif wordmark, header text link, logout, number |
+| Burgundy / Surface | 11.92:1 | Outline Refresh/Retry and Back link |
+| Cream / Burgundy | 10.82:1 | Initials and CALLED |
+| Espresso / Gold | 7.25:1 | SERVING |
+| Cream / Espresso | 13.37:1 | COMPLETED |
+
+Ratios use WCAG relative luminance of the palette tokens; all normal-text pairs exceed 4.5:1. Taupe is only a 1px border/divider, never normal text. Gold is only a thin line or SERVING background, never text on white/cream. All customer-status colors reference CSS variables, including `--surface`; no off-palette panel/badge grey is used. Other pages retain their existing UI and behavior.

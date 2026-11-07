@@ -45,26 +45,46 @@ test('TEST-029 anonymous board polls real status/count changes, pauses when hidd
   const before = bodies.length; await page.clock.runFor(30000); expect(bodies.length).toBe(before);
   await db.queueEntry.update({ where: { id: current.id }, data: { status: 'COMPLETED' } });
   await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' }); document.dispatchEvent(new Event('visibilitychange')); });
-  await expect(page.getByText('No one called')).toBeVisible();
+  await expect(page.getByText('No one is being called yet')).toBeVisible();
   await page.route('**/api/v1/public/queues/*/board', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":{"code":"INTERNAL_ERROR"}}' }));
   await page.clock.runFor(10000); await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
-  await page.unroute('**/api/v1/public/queues/*/board'); await page.getByRole('button', { name: 'Retry' }).click(); await expect(page.getByText('No one called')).toBeVisible();
+  await page.unroute('**/api/v1/public/queues/*/board'); await page.getByRole('button', { name: 'Retry' }).click(); await expect(page.getByText('No one is being called yet')).toBeVisible();
   for (const body of await Promise.all(bodies)) assertPublic(body);
   const text = await page.locator('body').innerText();
   for (const value of customers.flatMap(customer => [customer.email, customer.displayName, customer.id]).concat([current.id, waiting.id, 'Private restaurant detail'])) expect(text.includes(value)).toBe(false);
   await expect(page.getByRole('button', { name: /sign in|log out/i })).toHaveCount(0); await expect(page.getByLabel('Password', { exact: true })).toHaveCount(0);
 });
-test('public number is readable at a distance on desktop and fits narrow viewports', async ({ page }) => {
+test('public board reserves large type for numbers and uses accessible quiet controls across viewports', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 }); await page.goto(`/board/${queue.id}`);
   const number = page.getByText(current.displayNumber, { exact: true }); await expect(number).toBeVisible();
-  const fontSize = await number.evaluate(element => parseFloat(getComputedStyle(element).fontSize));
-  expect(fontSize).toBeGreaterThanOrEqual(96);
-  await page.screenshot({ path: '../artifacts/evidence/f05-routing/board-regression-board-desktop.png', fullPage: true });
-  for (const width of [360, 768, 1920]) {
+  const board = page.locator('section.public-board');
+  await expect(page.getByRole('region', { name: 'Public queue status', exact: true })).toHaveAttribute('aria-live', 'polite');
+  await expect(page.locator('.queue-ticket-content')).toHaveCSS('animation-duration', '0.15s');
+  await expect(page.getByLabel('Waiting guests')).toHaveCSS('font-size', '48px');
+  const nav = page.getByRole('navigation', { name: 'Queue displays' });
+  expect(await nav.evaluate(element => element.closest('.public-board') === null)).toBe(true);
+  await expect(board).toHaveCSS('background-color', 'rgb(255, 252, 247)');
+  await expect(board.locator('.public-board-header')).toHaveCSS('background-color', 'rgb(246, 233, 234)');
+  await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toHaveCSS('background-color', 'rgb(111, 14, 34)');
+  await expect(page.getByRole('button', { name: 'Back', exact: true })).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(nav.locator('[aria-current="page"]')).toHaveText(`Queue ${queue.code}`);
+  await expect(nav.locator('[aria-current="page"]')).toHaveCSS('color', 'rgb(251, 243, 230)');
+  for (const width of [1440, 1024, 768, 360]) {
     await page.setViewportSize({ width, height: 900 }); await expect(number).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    if (width === 360) await page.screenshot({ path: '../artifacts/evidence/f05-routing/board-regression-board-mobile.png', fullPage: true });
+    const fontSize = await number.evaluate(element => parseFloat(getComputedStyle(element).fontSize));
+    expect(fontSize).toBeGreaterThanOrEqual(72); expect(fontSize).toBeLessThanOrEqual(120);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const control of await page.locator('.board-navigation a, .board-navigation button, .public-board button').all()) {
+      const box = (await control.boundingBox())!; expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+    await page.screenshot({ path: `/tmp/cpe334-refined-board-${width}.png`, fullPage: true });
   }
+  await page.emulateMedia({ reducedMotion: 'reduce' }); await expect(page.locator('.queue-ticket-content')).toHaveCSS('animation-name', 'none');
+  await db.queueEntry.update({ where: { id: current.id }, data: { status: 'COMPLETED' } });
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
+  const empty = page.getByText('No one is being called yet', { exact: true }); await expect(empty).toBeVisible();
+  const emptySize = await empty.evaluate(element => parseFloat(getComputedStyle(element).fontSize)); expect(emptySize).toBeGreaterThanOrEqual(28); expect(emptySize).toBeLessThanOrEqual(32);
+  await page.screenshot({ path: '/tmp/cpe334-refined-empty-360.png', fullPage: true });
 });
 test('home public board navigation is visible and opens the seeded board without login', async ({ page, context }) => {
   await page.goto('/');
@@ -74,6 +94,55 @@ test('home public board navigation is visible and opens the seeded board without
   await link.click(); await expect(page).toHaveURL(/\/board$/);
   await expect(page.getByRole('heading', { name: 'Queue R', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Queue S', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Both queues', exact: true })).toHaveAttribute('aria-current', 'page');
+  expect(await page.getByRole('navigation', { name: 'Queue displays' }).evaluate(element => element.closest('.public-board') === null)).toBe(true);
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveCount(0);
   expect((await context.cookies()).some(cookie => cookie.name === 'qs_session')).toBe(false);
+  for (const width of [1440, 1024, 768, 360]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const cards = await page.locator('.public-board-grid > .public-board').all();
+    const boxes = await Promise.all(cards.map(card => card.boundingBox()));
+    if (width >= 1024) { expect(Math.abs(boxes[0]!.height - boxes[1]!.height)).toBeLessThan(1); expect(boxes[0]!.y).toBe(boxes[1]!.y); }
+    else expect(boxes[1]!.y).toBeGreaterThan(boxes[0]!.y);
+    await page.screenshot({ path: `/tmp/cpe334-refined-overview-${width}.png`, fullPage: true });
+  }
+});
+
+test('unavailable and failed queues retain approved queue labels and navigation with safe retry states', async ({ page }) => {
+  await page.route('**/api/v1/public/queues/S/board', route => route.fulfill({ status: 404, json: { error: { code: 'QUEUE_NOT_FOUND', message: 'Private database diagnostic' } } }));
+  await page.goto('/board');
+  const unavailable = page.getByRole('alert').filter({ hasText: "This queue isn't available" });
+  await expect(unavailable).toBeVisible(); await expect(unavailable.getByRole('button', { name: 'Retry' })).toBeVisible();
+  const retryTextOffset = await unavailable.getByRole('button', { name: 'Retry' }).evaluate(button => {
+    const range = document.createRange(); range.selectNodeContents(button.querySelector('.ui-button-label')!);
+    const text = range.getBoundingClientRect(); const box = button.getBoundingClientRect();
+    return Math.abs(text.x + text.width / 2 - box.x - box.width / 2);
+  });
+  expect(retryTextOffset).toBeLessThan(1);
+  await expect(page.getByRole('link', { name: 'Queue S', exact: true })).toHaveAttribute('href', '/board/S');
+  await expect(page.getByRole('heading', { name: 'Queue S', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Queue R', exact: true })).toBeVisible();
+  await page.route('**/api/v1/public/queues/R/board', route => route.fulfill({ status: 503, json: { error: { message: 'Private database diagnostic' } } }));
+  const r = page.locator('.public-board').filter({ has: page.getByRole('heading', { name: 'Queue R', exact: true }) });
+  await r.getByRole('button', { name: 'Refresh', exact: true }).click();
+  await expect(page.getByRole('heading', { name: "We couldn't load this. Please try again." })).toBeVisible();
+  await expect(page.getByText('Private database diagnostic')).toHaveCount(0);
+  for (const width of [1440, 1024, 768, 360]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    if (width >= 1024) {
+      const boxes = await Promise.all((await page.locator('.public-board').all()).map(card => card.boundingBox()));
+      expect(Math.abs(boxes[0]!.height - boxes[1]!.height)).toBeLessThan(1);
+    }
+    await page.screenshot({ path: `/tmp/cpe334-refined-errors-${width}.png`, fullPage: true });
+  }
+  await page.unroute('**/api/v1/public/queues/R/board');
+  await r.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(r.getByRole('heading', { name: 'No one is being called yet' })).toBeVisible();
+  await page.unroute('**/api/v1/public/queues/S/board');
+  await unavailable.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Queue S', exact: true })).toBeVisible();
+  await expect(page.locator('.public-board').filter({ has: page.getByRole('heading', { name: 'Queue S', exact: true }) }).getByRole('heading', { name: 'No one is being called yet' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Queue S', exact: true })).toBeVisible();
 });

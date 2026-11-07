@@ -1,0 +1,72 @@
+{
+  "journey": "TEST-043",
+  "join": {
+    "status": 201,
+    "number": "R-0001",
+    "partySize": 4
+  },
+  "duplicate": {
+    "status": 409,
+    "code": "DUPLICATE_ACTIVE_ENTRY"
+  },
+  "crossCustomer": {
+    "status": 404,
+    "code": "ENTRY_NOT_FOUND"
+  },
+  "unassignedOperatorOnR": [
+    {
+      "path": "/queues/ebfefba4-ca8a-4fb1-9375-99fccb3e4373/call-next",
+      "status": 403,
+      "code": "QUEUE_ACCESS_DENIED"
+    },
+    {
+      "path": "/entries/b966c0f8-7bcc-4aef-8eb3-5252c03f8e7e/start-service",
+      "status": 403,
+      "code": "QUEUE_ACCESS_DENIED"
+    },
+    {
+      "path": "/entries/b966c0f8-7bcc-4aef-8eb3-5252c03f8e7e/complete",
+      "status": 403,
+      "code": "QUEUE_ACCESS_DENIED"
+    }
+  ],
+  "persistedStatus": "COMPLETED",
+  "audit": [
+    {
+      "type": "JOINED",
+      "from": null,
+      "to": "WAITING",
+      "occurredAt": "2026-11-07T10:53:24.460Z",
+      "actorRole": "CUSTOMER"
+    },
+    {
+      "type": "CALLED",
+      "from": "WAITING",
+      "to": "CALLED",
+      "occurredAt": "2026-11-07T10:53:24.823Z",
+      "actorRole": "OPERATOR"
+    },
+    {
+      "type": "STARTED",
+      "from": "CALLED",
+      "to": "SERVING",
+      "occurredAt": "2026-11-07T10:53:25.056Z",
+      "actorRole": "OPERATOR"
+    },
+    {
+      "type": "COMPLETED",
+      "from": "SERVING",
+      "to": "COMPLETED",
+      "occurredAt": "2026-11-07T10:53:25.473Z",
+      "actorRole": "OPERATOR"
+    }
+  ],
+  "publicResponse": {
+    "data": {
+      "queueCode": "R",
+      "calledNumber": null,
+      "serviceState": null,
+      "waitingCount": 0
+    }
+  }
+}

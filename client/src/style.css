@@ -37,3 +37,19 @@ main:has(> .public-board) { max-width: 90rem; margin: clamp(1rem, 3vw, 3rem) aut
 .public-board .queue-ticket > p:first-child { font-size: clamp(1rem, 2vw, 1.5rem); }
 .public-board .waiting-count { display: block; font-size: clamp(2rem, 5vw, 5rem); font-weight: 700; }
 .board-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin: .5rem 0; padding: .65rem 1rem; border: 1px solid #6F0E22; border-radius: .25rem; background: #6F0E22; color: #FBF3E6; font-weight: 650; text-decoration: none; }
+main:has(.operator-desk) { max-width: 90rem; }
+.desk-grid { display: grid; gap: 1.5rem; margin-top: 1rem; }
+.desk-card { min-width: 0; padding: clamp(1rem, 3vw, 2rem); border: 1px solid #8A6F5B; border-radius: .6rem; }
+.desk-card h3 { color: #6F0E22; font-size: 1.5rem; margin-top: 0; }
+.desk-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.desk-refresh { margin-top: 1rem; }
+@media (min-width: 1280px) { .desk-grid { grid-template-columns: 1fr 1.5fr; } }
+
+.public-board-grid { display: grid; gap: 1.5rem; }
+.public-board-grid > section { min-width: 0; padding: 1rem; border: 1px solid #8A6F5B; border-radius: .6rem; }
+.public-overview .queue-number { font-size: clamp(2.5rem, 6vw, 6rem); }
+.public-board nav { margin: 1rem 0; }
+.public-board nav a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (min-width: 1000px) { .public-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.board-back { display: inline-flex; align-items: center; gap: .5rem; margin-bottom: .5rem; min-width: 44px; }

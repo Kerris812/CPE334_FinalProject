@@ -19,8 +19,8 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
     await seed(db, env);
   }
   expect(await db.user.count()).toBe(4);
-  expect(await db.queue.count()).toBe(1);
-  expect(await db.operatorQueueAssignment.count()).toBe(1);
+  expect(await db.queue.count()).toBe(2);
+  expect(await db.operatorQueueAssignment.count()).toBe(2);
   const queue = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
   expect(queue.state).toBe('OPEN');
   const users = await db.user.findMany({ orderBy: { email: 'asc' } });
@@ -28,7 +28,7 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
     expect(user.passwordHash).toMatch(/^\$argon2id\$/);
     expect(await verify(user.passwordHash, user.role === 'CUSTOMER' ? env.DEMO_CUSTOMER_PASSWORD : env.DEMO_OPERATOR_PASSWORD)).toBe(true);
   }
-  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ include: { operator: true } });
+  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ where: { queueId: queue.id }, include: { operator: true } });
   expect(assignment.operator.email).toBe('operator.a@example.test');
   expect(assignment.queueId).toBe(queue.id);
   const before = users.map(u => [u.id, u.passwordHash]);

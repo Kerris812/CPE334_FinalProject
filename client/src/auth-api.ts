@@ -19,7 +19,7 @@ export const home = (user: User) => user.role === 'CUSTOMER' ? '/queues' : '/ope
 export const isUnauthenticated = (error: unknown) => error instanceof AuthError && error.status === 401;
 
 /** Navigation follows the server-authenticated identity; backend guards remain authoritative. */
-export const isPublicBoard = (path: string) => /^\/board\/[^/]+\/?$/.test(path);
+export const isPublicBoard = (path: string) => /^\/board(?:\/[^/]+)?\/?$/.test(path);
 export function routeAccess(user: User, path: string): 'allowed' | 'forbidden' | 'missing' {
   if (isPublicBoard(path)) return 'allowed';
   if (path === '/queues' || path === '/my-queue') return user.role === 'CUSTOMER' ? 'allowed' : 'forbidden';

@@ -116,10 +116,11 @@ test('existing sessions reflect assignment removal, changed database roles and d
   }
 });
 
-test('authorized production workflow requests remain unimplemented rather than returning fixture success', async () => {
+test('authorized workflow reaches real desk and lifecycle conflict handlers', async () => {
   const app = createApp({ db, webOrigin: 'http://127.0.0.1:5173' });
-  expect((await request(app).get(`/api/v1/operator/queues/${queueId}/desk`).set('Cookie', assignedCookie)).status).toBe(404);
-  for (const path of [`queues/${queueId}/call-next`, `entries/${entryId}/start-service`, `entries/${entryId}/complete`]) {
-    expect((await request(app).post(`/api/v1/operator/${path}`).set('Cookie', assignedCookie).set('Origin', 'http://127.0.0.1:5173').send({})).status).toBe(404);
+  expect((await request(app).get(`/api/v1/operator/queues/${queueId}/desk`).set('Cookie', assignedCookie)).status).toBe(200);
+  for (const [path, code] of [[`queues/${queueId}/call-next`, 'QUEUE_EMPTY'], [`entries/${entryId}/start-service`, 'INVALID_TRANSITION'], [`entries/${entryId}/complete`, 'INVALID_TRANSITION']]) {
+    const response = await request(app).post(`/api/v1/operator/${path}`).set('Cookie', assignedCookie).set('Origin', 'http://127.0.0.1:5173').send({});
+    expect(response.status).toBe(409); expect(response.body.error.code).toBe(code);
   }
 });

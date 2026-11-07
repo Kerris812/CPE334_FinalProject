@@ -4,6 +4,31 @@
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
+
+## Team-approved Issue 08 scope revision — 7 November 2026
+
+The team explicitly approved party-size routing and two independent queues in Sprint 1. This revision supersedes the original one-queue seed, Operator B's empty assignment list, and the exclusive Sprint 2 allocation of multiple queues. Other baseline decisions retain their existing status; this approval is not a claim that implementation or tests have passed.
+
+| Queue | Accepted party size for new joins | Seed assignment | Service capacity |
+| --- | --- | --- | --- |
+| R | 1–4 | Operator A only | One CALLED or SERVING entry |
+| S | 5–8 | Operator B only | One CALLED or SERVING entry |
+
+Each queue has independent immutable sequence allocation, FIFO and queue-row locking. One active entry per customer across all queues remains mandatory. Existing historical entries, including parties outside the new range for their historical queue, are preserved and may finish the existing lifecycle. No historical rerouting or renumbering is permitted. New queues start OPEN; rerunning seed preserves existing queue state and counters, users, password hashes, sessions, entries and events. Seed inserts missing approved assignments and fails safely on contradictory seeded-operator assignments instead of deleting existing assignments. Multiple counters within a queue remain Sprint 2; registration and administrator management remain excluded.
+
+### Affected requirements and regression map
+
+| Contract area | Affected identifiers/rules | Approved change / regression obligation |
+| --- | --- | --- |
+| Decisions and scope | D-03, D-20; FR-04–06, FR-08, FR-16; F-02–05 and F-09; Sprint 1/2 scope and traceability | R/S routing is Sprint 1; multiple counters remain Sprint 2. D-01/02/04–09/14/18/26/28 and BR-01–08/11/15–17/26–28 remain enforced per queue or across customers as originally specified. |
+| Acceptance and tests | AC/TEST-009–011, 015–024, 028–031, 032–044; TEST-045–049 | Seed two queues/two assignments; cover boundaries 1/4 on R and 5/8 on S; retain role, ownership, FIFO, terminal, audit and concurrency checks on both queues. TEST-039 still checks B forbidden from R and now also A forbidden from S. TEST-043 covers both operator journeys. Historical test evidence remains historical. |
+| HTTP | GET /queues; POST /queues/:queueId/entries; GET /operator/queues; desk and three service actions; GET /public/queues/:queueId/board | Preserve paths and envelopes. Validate party-size/queue match on backend; mismatch is 422 VALIDATION_ERROR with details.fields.partySize and no writes. Only R/S accept new joins. Existing queues/history remain stored. A lists R; B lists S; a separately unassigned operator lists []. |
+| Customer UI | /queues, QueueJoinForm, /my-queue | Party size determines displayed queue; remove arbitrary selection for new joins, explain both ranges, disable joining if the matching queue is unavailable, preserve status/history/refresh. |
+| Operator UI | /operator/desk, Assigned queues, ActiveServiceCard | Show server assignments only, Active: 0/1 or Active: 1/1, independent waiting and service states, existing actions and responsive behavior. |
+| Public UI | /board, /board/:queueId, PublicQueueBoard | /board shows R and S using two existing four-field board responses; /board/R and /board/S and UUID links remain supported. No private data or operator controls; independent loading/error/empty/refresh and visibility-aware polling. |
+| Verification | NFR-01/04–06/09–10/12–13/15 | Real PostgreSQL simultaneous calls: one winner per queue; R lock cannot block S; success exactly one event per transition, rejection leaves full DB state unchanged. Authentication and existing regression coverage retained. |
+
+
 ## Coverage and execution status
 
 AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifiers. The original baseline results below are planned. Actual F-01 executions (TEST-001–008, plus TEST-050–051), commands, RED/GREEN output and counts are recorded in [F-01 verification](../verification-log.md). Other planned Sprint 1 results remain unverified here; foundation executions are recorded separately in [foundation verification](../verification-log.md). `RED first` means a genuine intended-behavior test should be recorded failing before implementing the corresponding rule, then passing afterward. Actual file names, CI links, commit SHAs and counts must be populated only after execution.
@@ -30,7 +55,7 @@ Primary levels: `unit` uses service function with controlled input/clock, `API-i
 | TEST-006 | AC-006 | API-integration | Seed DB session clock before expiry and just after 8 h | GET `/me` with same cookie after expiry | 401; no renewed expiry | Yes |
 | TEST-007 | AC-007 | API-integration | Empty, non-string, malformed email/password | POST login per case | 422 validation; zero session rows created | No |
 | TEST-008 | AC-008 | API-integration | Valid login, stored session row | Inspect Set-Cookie, JSON, session row | HttpOnly/SameSite; production Secure mode; token DB field hashed, raw password absent | No |
-| TEST-009 | AC-009 | API-integration | Fresh disposable DB, seed env | Run migration and seed twice | One R queue, four users, one assignment; no duplicate seed rows | No |
+| TEST-009 | AC-009 | API-integration | Fresh disposable DB, seed env | Run migration and seed twice | Two R/S queues, four users, two designated assignments; no duplicate seed rows | No |
 | TEST-010 | AC-010 | API-integration | Operator A assigned R | GET assigned list and R desk | R listed, authorized 200 | No |
 | TEST-011 | AC-011 | API-integration | Operator B not assigned R | GET R desk; POST R call | 403; no private records or mutations | Yes |
 | TEST-012 | AC-012 | API-integration | Customer A, existing R entry | POST call/start/complete with A cookie | Each 403; entry status untouched | Yes |
@@ -38,7 +63,7 @@ Primary levels: `unit` uses service function with controlled input/clock, `API-i
 | TEST-014 | AC-014 | API-integration | API running without auth | GET `/health` | 200 safe status/service, no credentials or private data | No |
 | TEST-015 | AC-015 | API-integration | Persisted entry/event, existing database | Restart app process and rerun seed, re-fetch entry | Same entry/event persist; no counter reset | Yes |
 | TEST-016 | AC-016 | API-integration | Empty R, Customer A, `partySize:4` | POST join | 201 WAITING R-0001; one entry and JOINED event | No |
-| TEST-017 | AC-017 | API-integration | Separate clean fixtures, sizes 1 and 8 | POST join in each | Both 201 with correct party size | No |
+| TEST-017 | AC-017 | API-integration | Separate clean fixtures: sizes 1/4 on R and 5/8 on S | POST join in each | All 201 with correct queue and party size | No |
 | TEST-018 | AC-018 | API-integration | Sizes 0,9,-1,1.5,"3",null,missing | POST join for each | Every response 422; no entry/counter increment | Yes |
 | TEST-019 | AC-019 | API-integration | A has WAITING; separate CALLED/SERVING fixtures and second queue; then a COMPLETED fixture | POST another join for each case | Active cases return 409 with one active row; COMPLETED case permits a new 201 join | Yes |
 | TEST-020 | AC-020 | API-integration | 20 parallel HTTP calls with same A session | POST join simultaneously | Exactly one 201, rest 409; one row and JOINED event | Yes |
@@ -60,11 +85,11 @@ Primary levels: `unit` uses service function with controlled input/clock, `API-i
 | TEST-036 | AC-036 | API-integration | SERVING R entry, assigned Operator A | POST complete | 200 COMPLETED, timestamp + one COMPLETED event | No |
 | TEST-037 | AC-037 | API-integration | WAITING, then separate CALLED fixture | POST complete directly | 409 INVALID_TRANSITION, entry and event counts unchanged | Yes |
 | TEST-038 | AC-038 | API-integration | Customer A session, R entries | POST call-next/start-service/complete | All 403 and no mutation | Yes |
-| TEST-039 | AC-039 | API-integration | Unassigned Operator B, R entries | GET R desk and POST all actions | Every response 403, no entry leak/change | Yes |
-| TEST-040 | AC-040 | API-integration | One R with two WAITING; two simultaneous Operator A calls | POST call-next concurrently | Exactly one 200, other 409; one CALLED row/event, FIFO head selected | Yes |
+| TEST-039 | AC-039 | API-integration | B unassigned to R and A unassigned to S, entries in both | GET R desk and POST all actions | Every response 403, no entry leak/change | Yes |
+| TEST-040 | AC-040 | API-integration | Each R/S queue with two WAITING; simultaneous assigned-operator calls per queue | POST call-next concurrently | Exactly one 200, other 409; one CALLED row/event, FIFO head selected | Yes |
 | TEST-041 | AC-041 | API-integration | Fresh Customer A + Operator A | Join, call, start, complete; query events | Four ordered events with correct actors, old/new statuses and UTC times | Yes |
 | TEST-042 | AC-042 | API-integration | COMPLETED entry | POST start/complete repeatedly; call-next with no WAITING | Invalid transitions rejected; terminal state and events unchanged | Yes |
-| TEST-043 | AC-043 | E2E | Real UI/API/DB, two separate browser contexts | Customer join; operator call/start/complete; customer refresh; anonymous board | Customer sees COMPLETED after persistence; board reveals no private information | No |
+| TEST-043 | AC-043 | E2E | Real UI/API/DB, separate customer/operator browser contexts for R/S | Both customers join; both assigned operators call/start/complete; customers refresh; anonymous dual board | Customer sees COMPLETED after persistence; board reveals no private information | No |
 | TEST-044 | AC-044 | API-integration | Queue R PAUSED/CLOSED via fixture and a WAITING entry | Assigned Operator A call-next | 409 QUEUE_NOT_OPEN and no state/event mutation | Yes |
 
 ## Additional planned unit tests with stable IDs
@@ -153,7 +178,7 @@ All AC-001–AC-044 have runnable test evidence or explicit failed/blocked discl
 | 3 | Commit Parts A–D and all F-01–05 contracts + STS before implementation. | Versioned specification hash/PR review, AC-001–044 and TEST-001–044 mapped. |
 | 4 | CHORE-01: install dependencies, configure isolated PostgreSQL, migration, partial unique indexes, seed and health/test scripts. | Fresh migrate/seed twice successful when later executed; seed must not reset counters. |
 | 5 | F-01: write wrong-password, anonymous, expiry and logout replay **failing tests first**; implement auth; add UI. | Red output + green output tied to commit; no plaintext, genuine revocation. |
-| 6 | F-02: write unauthorized operator/role spoof/ownership guard **failing tests first**; implement guards/list/seed. | 401/403 tests from HTTP; Operator B has no queue access. |
+| 6 | F-02: write unauthorized operator/role spoof/ownership guard **failing tests first**; implement guards/list/seed. | 401/403 tests from HTTP; Operator B can access S only; A can access R only. |
 | 7 | F-03: write validation/duplicate/race **failing tests first**, then transaction and customer join UI. | Real PostgreSQL concurrency outputs, distinct numbers, partial unique constraint. |
 | 8 | F-04: write cross-customer and public allowlist **failing tests first**, then customer view + board + UI states. | Own-data 200, foreign 404, public four-key JSON, responsive check. |
 | 9 | F-05: write FIFO/invalid-transition/unauthorized/concurrent-call **failing tests first**, then lifecycle and operator desk. | Call/start/complete API and audit checks; one active service slot; normal E2E. |
@@ -250,7 +275,7 @@ The exact commands are a **contract** for the forthcoming project setup. None ha
 | DEMO-06 | Operator A, entry CALLED | Start service, then complete | SERVING → COMPLETED, new DB events/timestamps | AC-035–036, AC-041 |
 | DEMO-07 | Customer A after operator completion | Refresh `/my-queue` or restart API then retrieve | Same completed entry from DB, not browser-only storage | AC-025, AC-015, AC-043 |
 | DEMO-08 | Customer A | Attempt `call-next` using API test/direct request | 403 despite any hidden UI; unchanged DB | AC-038 / TEST-038 |
-| DEMO-09 | Operator B unassigned | Access R desk/call by direct URL/API | 403 and no sensitive R entry payload | AC-039 / TEST-039 |
+| DEMO-09 | Operator B unassigned to R | Access R desk/call by direct URL/API | 403 and no sensitive R entry payload | AC-039 / TEST-039 |
 | DEMO-10 | Customer A + B entries | A requests B entry ID | 404 with no B's details | AC-026 / TEST-026 |
 | DEMO-11 | Anonymous visitor | Open public board and inspect JSON | Four public fields only; no email/partySize/customer ID | AC-028, AC-031 |
 | DEMO-12 | Customer A logged in | Logout, replay former cookie through API test | Subsequent request 401, DB revoked session | AC-004 / TEST-004 |
@@ -264,7 +289,7 @@ Actual screenshot names, steps, starting DB fixtures, user/role, expected and ac
 * **A:** stakeholder/context, actors, exclusions, all FR/BR/NFR, D decisions.
 * **B:** features F-01–14, traceability, later coverage allocations, approved changes/gaps.
 * **C:** architecture/ER, ownership constraints, API/role matrix, auth, env/GCP plan, diagrams.
-* **D:** three-sprint goal/features/dependencies/outcome and why one queue slice is feasible.
+* **D:** three-sprint goal/features/dependencies/outcome and why two independent single-slot queues are feasible.
 * **E:** complete F-01–05 contracts, UI/API/data, AC-001–044, STS and Product DoD, dated spec-to-test-to-implementation history.
 * **F:** screenshots DEMO-01–14 (selected clear subset), actual run outputs, [Part F evidence matrix](tests.md), **two actual short test excerpts** (one domain rule and one role/ownership), red→green evidence, two Issue/PR/review samples, release main tag+SHA, both students' contribution table, AI-use declaration, limitations.
 
@@ -409,3 +434,36 @@ PDF navigation (actual pages only): A pages TODO; B pages TODO; C pages TODO; D 
 ## Coverage bookkeeping
 
 Sprint 1 tests must use isolated PostgreSQL fixtures, execute the backend authorization endpoints directly, and exercise a real UI→API→database E2E path. Tests for later sprints are allocated conceptually but have no executable IDs yet. Add new unique IDs rather than reusing AC/TEST values.
+
+## Issue 08 approved routing tests (new IDs)
+
+| ID | Layer | Required assertions |
+| --- | --- | --- |
+| TEST-052 | Unit | Route 1/4 to R, 5/8 to S; reject 0/9, decimals, strings/null. |
+| TEST-053 | API/PostgreSQL | Idempotent non-destructive seed creates R/S and A→R/B→S; snapshot users, sessions, counters, entries and events unchanged on rerun; fail safely on contradictory assignments. |
+| TEST-054 | API/PostgreSQL | Four join boundaries, all mismatches and unsupported queues; matching PAUSED/CLOSED queues reject; rejected requests preserve entire fixture state; same-customer R/S race permits one join. |
+| TEST-055 | API/PostgreSQL | Seeded A can inspect/mutate R only, B S only; forged queue/actor data cannot grant permission. |
+| TEST-056 | API/PostgreSQL | Both queues choose independent FIFO heads; 20 concurrent calls per queue produce one winner each; hold R row lock while S call commits; each transition exactly one correctly attributed event. |
+| TEST-057 | UI/E2E | Party-size routing, unavailable matching queue, safe conflicts, capacity labels, both public boards; both operators complete persisted workflows; customer refresh and anonymous privacy checks. |
+
+Existing TEST-009–011/015–024/028–044 remain regression requirements, with seed counts, boundary fixtures, B's assigned list and per-queue coverage revised above. Existing historical evidence describes its original scope and does not establish results for this revision. API and E2E suites sharing the disposable DB run sequentially; browser tests using seeded R/S also run sequentially and restore only their own fixture changes.
+
+## Issue 08 routing verification — 7 November 2026
+
+Executed against the uncommitted `feature/8-operator-workflow` working tree. Evidence and source hashes: [routing results](../../artifacts/evidence/f05-routing/results.json). Historical baseline results above remain unchanged.
+
+| Stage / suite | Actual result | Evidence |
+| --- | --- | --- |
+| RED unit | 2 failed, 8 passed | `artifacts/evidence/f05-routing/red-unit.log` |
+| RED selected API | 8 failed, 71 filtered out | `artifacts/evidence/f05-routing/red-api.log` |
+| RED UI | 4 failed, 35 passed | `artifacts/evidence/f05-routing/red-ui.log` |
+| RED selected E2E | 1 failed: missing S | `artifacts/evidence/f05-routing/red-e2e-isolated-ports.log` |
+| GREEN/refactor unit | 10 passed, 0 failed/skipped | `refactor-unit-final.log` in the same directory |
+| GREEN/refactor API/PostgreSQL | 79 passed, 0 failed/skipped | `refactor-api.log` |
+| GREEN/refactor UI | 39 passed, 0 failed/skipped | `refactor-ui.log` |
+| GREEN/refactor E2E | 13 passed, 0 failed/skipped | `refactor-e2e.log` |
+| Server and client builds | Both passed | `refactor-build-server.log`, `refactor-build-client.log` |
+
+Real PostgreSQL TEST-056: 20 simultaneous calls to each queue produced one success and 19 SERVICE_SLOT_BUSY responses per queue; both FIFO heads were selected, each with exactly one CALLED event. Holding R's queue-row lock did not prevent S from calling before that lock was released. Both seeded operators completed their own browser workflows with four events per joined entry; customer status persisted COMPLETED and the public boards cleared their active numbers. Existing audit-insert rollback, auth, ownership, immutable-number and queue-joining regressions passed.
+
+Development seed verification preserved 4 users, 24 existing sessions, 4 entries, 11 audit events, the existing queue/state/counter and assignment; it added S and B→S, and the second seed changed nothing. No routing migration was required; development migration deployment reported no pending migrations. No commit, push, merge or data reset was performed. The first E2E launch encountered the occupied development port; the genuine RED and final runs used isolated ports 3400/5473. API and browser suites ran sequentially.

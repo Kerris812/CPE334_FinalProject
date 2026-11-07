@@ -59,20 +59,21 @@ test('public number is readable at a distance on desktop and fits narrow viewpor
   const number = page.getByText(current.displayNumber, { exact: true }); await expect(number).toBeVisible();
   const fontSize = await number.evaluate(element => parseFloat(getComputedStyle(element).fontSize));
   expect(fontSize).toBeGreaterThanOrEqual(96);
-  await page.screenshot({ path: '../artifacts/evidence/issue07/board-desktop.png', fullPage: true });
+  await page.screenshot({ path: '../artifacts/evidence/f05-routing/board-regression-board-desktop.png', fullPage: true });
   for (const width of [360, 768, 1920]) {
     await page.setViewportSize({ width, height: 900 }); await expect(number).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    if (width === 360) await page.screenshot({ path: '../artifacts/evidence/issue07/board-mobile.png', fullPage: true });
+    if (width === 360) await page.screenshot({ path: '../artifacts/evidence/f05-routing/board-regression-board-mobile.png', fullPage: true });
   }
 });
 test('home public board navigation is visible and opens the seeded board without login', async ({ page, context }) => {
   await page.goto('/');
   const link = page.getByRole('link', { name: 'View public board' });
-  await expect(link).toBeVisible(); await expect(link).toHaveAttribute('href', '/board/R');
+  await expect(link).toBeVisible(); await expect(link).toHaveAttribute('href', '/board');
   await page.screenshot({ path: '/tmp/cpe334-home-public-board-link.png', fullPage: true });
-  await link.click(); await expect(page).toHaveURL(/\/board\/R$/);
+  await link.click(); await expect(page).toHaveURL(/\/board$/);
   await expect(page.getByRole('heading', { name: 'Queue R', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Queue S', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveCount(0);
   expect((await context.cookies()).some(cookie => cookie.name === 'qs_session')).toBe(false);
 });

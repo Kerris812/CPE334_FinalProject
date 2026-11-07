@@ -4,6 +4,31 @@
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
+
+## Team-approved Issue 08 scope revision — 7 November 2026
+
+The team explicitly approved party-size routing and two independent queues in Sprint 1. This revision supersedes the original one-queue seed, Operator B's empty assignment list, and the exclusive Sprint 2 allocation of multiple queues. Other baseline decisions retain their existing status; this approval is not a claim that implementation or tests have passed.
+
+| Queue | Accepted party size for new joins | Seed assignment | Service capacity |
+| --- | --- | --- | --- |
+| R | 1–4 | Operator A only | One CALLED or SERVING entry |
+| S | 5–8 | Operator B only | One CALLED or SERVING entry |
+
+Each queue has independent immutable sequence allocation, FIFO and queue-row locking. One active entry per customer across all queues remains mandatory. Existing historical entries, including parties outside the new range for their historical queue, are preserved and may finish the existing lifecycle. No historical rerouting or renumbering is permitted. New queues start OPEN; rerunning seed preserves existing queue state and counters, users, password hashes, sessions, entries and events. Seed inserts missing approved assignments and fails safely on contradictory seeded-operator assignments instead of deleting existing assignments. Multiple counters within a queue remain Sprint 2; registration and administrator management remain excluded.
+
+### Affected requirements and regression map
+
+| Contract area | Affected identifiers/rules | Approved change / regression obligation |
+| --- | --- | --- |
+| Decisions and scope | D-03, D-20; FR-04–06, FR-08, FR-16; F-02–05 and F-09; Sprint 1/2 scope and traceability | R/S routing is Sprint 1; multiple counters remain Sprint 2. D-01/02/04–09/14/18/26/28 and BR-01–08/11/15–17/26–28 remain enforced per queue or across customers as originally specified. |
+| Acceptance and tests | AC/TEST-009–011, 015–024, 028–031, 032–044; TEST-045–049 | Seed two queues/two assignments; cover boundaries 1/4 on R and 5/8 on S; retain role, ownership, FIFO, terminal, audit and concurrency checks on both queues. TEST-039 still checks B forbidden from R and now also A forbidden from S. TEST-043 covers both operator journeys. Historical test evidence remains historical. |
+| HTTP | GET /queues; POST /queues/:queueId/entries; GET /operator/queues; desk and three service actions; GET /public/queues/:queueId/board | Preserve paths and envelopes. Validate party-size/queue match on backend; mismatch is 422 VALIDATION_ERROR with details.fields.partySize and no writes. Only R/S accept new joins. Existing queues/history remain stored. A lists R; B lists S; a separately unassigned operator lists []. |
+| Customer UI | /queues, QueueJoinForm, /my-queue | Party size determines displayed queue; remove arbitrary selection for new joins, explain both ranges, disable joining if the matching queue is unavailable, preserve status/history/refresh. |
+| Operator UI | /operator/desk, Assigned queues, ActiveServiceCard | Show server assignments only, Active: 0/1 or Active: 1/1, independent waiting and service states, existing actions and responsive behavior. |
+| Public UI | /board, /board/:queueId, PublicQueueBoard | /board shows R and S using two existing four-field board responses; /board/R and /board/S and UUID links remain supported. No private data or operator controls; independent loading/error/empty/refresh and visibility-aware polling. |
+| Verification | NFR-01/04–06/09–10/12–13/15 | Real PostgreSQL simultaneous calls: one winner per queue; R lock cannot block S; success exactly one event per transition, rejection leaves full DB state unchanged. Authentication and existing regression coverage retained. |
+
+
 ## Scope and source of authority
 
 Sprint 1 F-01 through F-05 HTTP and persistence interfaces. All endpoints and examples below are specified, not implemented. Public board data is a separate privacy allowlist. The normative domain rules and relational model are in `specification.md`.
@@ -26,7 +51,7 @@ Sprint 1 F-01 through F-05 HTTP and persistence interfaces. All endpoints and ex
 | `POST /api/v1/auth/login` | Anonymous | Validate credentials; create session cookie. |
 | `GET /api/v1/auth/me` | Any authenticated role | Current identity, no credential/hash. |
 | `POST /api/v1/auth/logout` | Authenticated | Revoke current session and clear cookie. |
-| `GET /api/v1/queues` | Customer | Discover open restaurant queues (one seeded initially). |
+| `GET /api/v1/queues` | Customer | Discover open restaurant queues (R/S seeded initially). |
 | `POST /api/v1/queues/:queueId/entries` | Customer | Atomic join. |
 | `GET /api/v1/customer/entries/latest` | Customer | Latest personal entry, `data:null` when none. |
 | `GET /api/v1/customer/entries/:entryId` | Owning customer | Private entry detail; foreign ID returns 404. |
@@ -147,7 +172,7 @@ Missing/expired/revoked cookie `401 UNAUTHENTICATED`.
 {"data":[{"id":"22222222-2222-4222-8222-222222222222","code":"R","name":"Restaurant Waiting Queue","state":"OPEN"}]}
 ```
 
-Unassigned Operator B returns `200 {"data":[]}`. Customer returns `403 FORBIDDEN`.
+Operator B returns only S metadata; Operator A returns only R. A separately unassigned operator returns `200 {"data":[]}`. Customer returns `403 FORBIDDEN`.
 
 `GET /api/v1/queues` Customer → `200` with array of safe queue codes/IDs/names/states. No private entries included. This endpoint gives a queue ID for customer join. `GET /api/v1/operator/queues/:queueId/desk` is specified in F-05 and applies the same assignment guard.
 
@@ -229,7 +254,7 @@ Anonymous `401 UNAUTHENTICATED`, wrong role `403 FORBIDDEN`.
 
 ### `GET /api/v1/public/queues/:queueId/board` — Anonymous
 
-The seeded restaurant also accepts the stable public code `R` as `queueId`, so `/board/R` can be linked from the home/sign-in screen without embedding a database UUID. UUID-based requests remain supported and return the identical four-field DTO.
+The seeded restaurant also accepts stable public codes R and S as `queueId`, so `/board/R` and `/board/S` can be linked from the home/sign-in screen without embedding a database UUID. UUID-based requests remain supported and return the identical four-field DTO.
 
 `200` with a **strictly four-field** `data` object:
 
@@ -309,3 +334,9 @@ F-06 through F-14 have allocated responsibilities but no frozen endpoint paths y
 * Public board response is assembled from an explicit four-field public DTO.
 * Mutation errors never leave partial entries, numbers or events.
 * Passwords, raw tokens, hashes and SQL diagnostics never appear in JSON responses.
+
+## Approved routing details
+
+`GET /api/v1/queues` lists OPEN R/S queue metadata with the existing id/code/name/state fields. No new fields or identity inputs are needed. The client chooses the matching returned ID from party size. `POST /api/v1/queues/:queueId/entries` retains `{ "partySize": number }`. After role/input/identifier checks and locking the requested queue, validate its persisted code against R (1–4) or S (5–8). An existing but mismatched or unsupported queue returns 422 VALIDATION_ERROR, `details.fields.partySize: "Parties of 1–4 must join Queue R; parties of 5–8 must join Queue S."`. No automatic redirection. Invalid size remains 422; missing queue remains 404; matching PAUSED/CLOSED queue remains 409 QUEUE_NOT_OPEN. Check routing before availability/duplicate checks; all rejected requests leave counters, entries and audit events unchanged.
+
+The public overview `/board` makes separate GET requests to the existing board endpoint for R and S; no aggregate API or widened public DTO is introduced. Both operator workflows preserve existing response/error contracts and independent queue locks. Desk clients derive capacity (0/1 or 1/1) from activeEntry; no counter model is added.

@@ -4,6 +4,31 @@
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
+
+## Team-approved Issue 08 scope revision — 7 November 2026
+
+The team explicitly approved party-size routing and two independent queues in Sprint 1. This revision supersedes the original one-queue seed, Operator B's empty assignment list, and the exclusive Sprint 2 allocation of multiple queues. Other baseline decisions retain their existing status; this approval is not a claim that implementation or tests have passed.
+
+| Queue | Accepted party size for new joins | Seed assignment | Service capacity |
+| --- | --- | --- | --- |
+| R | 1–4 | Operator A only | One CALLED or SERVING entry |
+| S | 5–8 | Operator B only | One CALLED or SERVING entry |
+
+Each queue has independent immutable sequence allocation, FIFO and queue-row locking. One active entry per customer across all queues remains mandatory. Existing historical entries, including parties outside the new range for their historical queue, are preserved and may finish the existing lifecycle. No historical rerouting or renumbering is permitted. New queues start OPEN; rerunning seed preserves existing queue state and counters, users, password hashes, sessions, entries and events. Seed inserts missing approved assignments and fails safely on contradictory seeded-operator assignments instead of deleting existing assignments. Multiple counters within a queue remain Sprint 2; registration and administrator management remain excluded.
+
+### Affected requirements and regression map
+
+| Contract area | Affected identifiers/rules | Approved change / regression obligation |
+| --- | --- | --- |
+| Decisions and scope | D-03, D-20; FR-04–06, FR-08, FR-16; F-02–05 and F-09; Sprint 1/2 scope and traceability | R/S routing is Sprint 1; multiple counters remain Sprint 2. D-01/02/04–09/14/18/26/28 and BR-01–08/11/15–17/26–28 remain enforced per queue or across customers as originally specified. |
+| Acceptance and tests | AC/TEST-009–011, 015–024, 028–031, 032–044; TEST-045–049 | Seed two queues/two assignments; cover boundaries 1/4 on R and 5/8 on S; retain role, ownership, FIFO, terminal, audit and concurrency checks on both queues. TEST-039 still checks B forbidden from R and now also A forbidden from S. TEST-043 covers both operator journeys. Historical test evidence remains historical. |
+| HTTP | GET /queues; POST /queues/:queueId/entries; GET /operator/queues; desk and three service actions; GET /public/queues/:queueId/board | Preserve paths and envelopes. Validate party-size/queue match on backend; mismatch is 422 VALIDATION_ERROR with details.fields.partySize and no writes. Only R/S accept new joins. Existing queues/history remain stored. A lists R; B lists S; a separately unassigned operator lists []. |
+| Customer UI | /queues, QueueJoinForm, /my-queue | Party size determines displayed queue; remove arbitrary selection for new joins, explain both ranges, disable joining if the matching queue is unavailable, preserve status/history/refresh. |
+| Operator UI | /operator/desk, Assigned queues, ActiveServiceCard | Show server assignments only, Active: 0/1 or Active: 1/1, independent waiting and service states, existing actions and responsive behavior. |
+| Public UI | /board, /board/:queueId, PublicQueueBoard | /board shows R and S using two existing four-field board responses; /board/R and /board/S and UUID links remain supported. No private data or operator controls; independent loading/error/empty/refresh and visibility-aware polling. |
+| Verification | NFR-01/04–06/09–10/12–13/15 | Real PostgreSQL simultaneous calls: one winner per queue; R lock cannot block S; success exactly one event per transition, rejection leaves full DB state unchanged. Authentication and existing regression coverage retained. |
+
+
 ## Document coverage
 
 Phase 0 decisions; Part A SRS; Part B feature inventory and traceability; Part C architecture and data model; Part D sprint plan; Phase 4 diagrams; Part E per-feature behavior, acceptance criteria and DoD; Phase 6 GitHub workflow. Sprint 1 interface request/response details live in `api-spec.md`, test details in `tests.md`, and screen behavior in `ui-spec.md`.
@@ -16,7 +41,7 @@ Status: **PROPOSED baseline v0.1; subject to team and TA approval**. Review each
 | --- | --- | --- |
 | D-01 | FIFO per queue, ordered by immutable database sequence ascending. | Simple deterministic restaurant waiting line; later priority policy is a versioned change. |
 | D-02 | Eligible for `call-next` means status `WAITING` in a queue with state `OPEN`, with no entry already `CALLED` or `SERVING`. | Prevent skip and double calls. |
-| D-03 | `partySize` integer 1–8 inclusive. | Initial small restaurant demonstration; 1 and 8 are boundary cases. |
+| D-03 | `partySize` integer 1–8 inclusive; new joins of 1–4 use R, 5–8 use S; reject a mismatched requested queue. | Initial small restaurant demonstration; 1 and 8 are boundary cases. |
 | D-04 | At most one active entry (`WAITING`, `CALLED`, `SERVING`) per customer across the restaurant. | Enforce with a database partial unique index, not a UI check. |
 | D-05 | Display number format `QUEUECODE-NNNN` with minimum four digits, e.g. `R-0001`; unique queue code, no artificial maximum at 9999. | Human readable and globally unique when paired with unique queue code. |
 | D-06 | Sequence monotonically increases per queue; never resets in Sprint 1. | Avoid timezone and daily rollover races. |
@@ -33,7 +58,7 @@ Status: **PROPOSED baseline v0.1; subject to team and TA approval**. Review each
 | D-17 | F-11 later introduces priority only after documented rule and regression revision. | Existing FIFO remains authoritative until then. |
 | D-18 | Store timestamps in UTC; display in Asia/Bangkok; create a history record for each accepted join or transition. | Traceability and correct reports. |
 | D-19 | Queue starts `OPEN`; F-12 adds `PAUSED` and `CLOSED`. Pause/close block join and new calls; already active `SERVING` may finish. | Separate queue lifecycle from entry lifecycle. |
-| D-20 | Queue code `R` is a seeded restaurant waiting queue; two customers, one assigned and one unassigned operator are seeded. | Feasible Sprint 1 demonstration of ownership and assignment. |
+| D-20 | Seed OPEN queues R (1–4, Operator A) and S (5–8, Operator B), plus two customers; each operator is assigned only its designated queue. | Feasible Sprint 1 demonstration of ownership and assignment. |
 | D-21 | API uses `/api/v1`, JSON, UTC ISO timestamps, stable machine-readable error codes, and no raw stack traces. | Predictable client and tests. |
 | D-22 | Same-origin UI/API deployment; `SameSite=Lax`, `HttpOnly`, production `Secure` cookie; reject disallowed `Origin` for unsafe cookie-authenticated requests. | Practical cookie and CSRF baseline. |
 | D-23 | No customer self-registration in Sprint 1, no booking, table allocation, payments, real SMS/email, or push delivery. | Keep focus on queue workflow. |
@@ -75,7 +100,7 @@ Restaurant guests need a clear place in a waiting line without asking staff repe
 
 ## In scope
 
-Authentication, seeded users and assignment, joining, customer entry view, anonymous board, controlled call/start/complete workflow, immutable audit history and persistence in Sprint 1. Cancellation, no-show, dashboard, multiple queues/counters, ETA, priority, queue availability policy, reporting and simulated notifications are planned subsequently.
+Authentication, seeded users and assignment, joining, customer entry view, anonymous board, controlled call/start/complete workflow, immutable audit history and persistence in Sprint 1. Cancellation, no-show, dashboard, multiple counters per queue, ETA, priority, queue availability policy, reporting and simulated notifications are planned subsequently.
 
 ## Explicit exclusions
 
@@ -83,7 +108,7 @@ Advance table reservations/appointments, table map or table allocation, point-of
 
 ## Assumptions and decisions
 
-D-01 through D-28 in [Phase 0 decisions](specification.md) govern default rules. They must be discussed and versioned if changed. Initial data includes one `OPEN` queue `R`, two customers and two operators with opposite queue assignment states. The operational timezone is Asia/Bangkok; timestamps are stored UTC.
+D-01 through D-28 in [Phase 0 decisions](specification.md) govern default rules. They must be discussed and versioned if changed. Initial data includes OPEN queues R and S, two customers, Operator A assigned only R and Operator B assigned only S. The operational timezone is Asia/Bangkok; timestamps are stored UTC.
 
 ## Functional requirements
 
@@ -92,7 +117,7 @@ D-01 through D-28 in [Phase 0 decisions](specification.md) govern default rules.
 | FR-01 | Authenticate seeded users, return current identity, and revoke session on logout. | 1 |
 | FR-02 | Enforce `CUSTOMER` / `OPERATOR` permissions on backend for every protected route. | 1 |
 | FR-03 | Persist operator-to-queue assignments and restrict operations to assigned queues. | 1 |
-| FR-04 | Reproducibly seed demo accounts, one restaurant queue and assignments. | 1 |
+| FR-04 | Reproducibly seed demo accounts, two restaurant queues R/S and their designated assignments. | 1 |
 | FR-05 | Let an authenticated customer join an `OPEN` queue with a validated party size. | 1 |
 | FR-06 | Allocate a unique human-readable queue number and prevent a second active customer entry. | 1 |
 | FR-07 | Let a customer retrieve their own latest/current detailed queue entry and status. | 1 |
@@ -104,7 +129,7 @@ D-01 through D-28 in [Phase 0 decisions](specification.md) govern default rules.
 | FR-13 | Let a customer/operator cancel eligible entries, following role-specific rules. | 2 |
 | FR-14 | Let an assigned operator mark a sufficiently overdue `CALLED` entry as no-show. | 2 |
 | FR-15 | Provide a useful assigned-queue operator dashboard. | 2 |
-| FR-16 | Support multiple queues and service counters with correct scoped assignment. | 2 |
+| FR-16 | Support R/S independent queues in Sprint 1; multiple service counters with correct scoped assignment remain Sprint 2. | 1 (queues), 2 (counters) |
 | FR-17 | Display a labelled estimated wait time from documented historical/queue data. | 2 |
 | FR-18 | Allow a documented, configurable priority policy. | 3 |
 | FR-19 | Allow authorized pause/open/close of queues with enforced operations policy. | 3 |
@@ -120,7 +145,7 @@ D-01 through D-28 in [Phase 0 decisions](specification.md) govern default rules.
 | --- | --- | --- |
 | BR-01 | Ordinary queue service order is FIFO by assigned `sequence` ascending. | 1 |
 | BR-02 | Only `WAITING` entries are eligible to call and only when queue is `OPEN` and no active service exists. | 1 |
-| BR-03 | Party size must be an integer between 1 and 8 inclusive. | 1 |
+| BR-03 | Party size must be an integer between 1 and 8 inclusive; new joins require R for 1–4 and S for 5–8. | 1 |
 | BR-04 | Each customer has at most one `WAITING`, `CALLED`, or `SERVING` entry across all queues. | 1 |
 | BR-05 | Every entry has unique queue-scoped sequence and globally unique formatted `displayNumber`. | 1 |
 | BR-06 | Join and call are rejected when the queue is not `OPEN`. | 1 (OPEN only); 3 (other states) |
@@ -185,7 +210,7 @@ Sprint 1 is complete only when real UI → API → PostgreSQL behavior, authenti
 | F-06 | Customer/operator cancellation with reason and permission rules. | FR-13 | BR-18, 26 | NFR-01, 13 | F-05 | 2 |
 | F-07 | Timed manual no-show handling. | FR-14 | BR-19, 26 | NFR-01, 13 | F-05 | 2 |
 | F-08 | Operator dashboard for assigned queue statuses and safe controls. | FR-15, 22 | BR-11, 28 | NFR-09, 15 | F-05–07 | 2 |
-| F-09 | Multiple queues/counters with counter occupancy and scoped access. | FR-16 | BR-20, 28 | NFR-05, 06 | F-02, F-05 | 2 |
+| F-09 | Multiple counters per queue with counter occupancy and scoped access; independent R/S queues already exist in Sprint 1. | FR-16 | BR-20, 28 | NFR-05, 06 | F-02, F-05 | 2 |
 | F-10 | Approximate waiting time, explained and bounded. | FR-17 | BR-21 | NFR-08 | F-05, F-09 | 2 |
 | F-11 | Explicit priority queue policy and audited rule revision. | FR-18 | BR-22 | NFR-05, 12 | F-05, F-09 | 3 |
 | F-12 | Operator queue open, pause, close with state guards. | FR-19 | BR-06, 23 | NFR-01, 15 | F-09 | 3 |
@@ -228,7 +253,7 @@ Sprint 1 is complete only when real UI → API → PostgreSQL behavior, authenti
 | FR-13 | F-06 | Sprint 2 | Pending contract | Pending contract | Planned / not executed |
 | FR-14 | F-07 | Sprint 2 | Pending contract | Pending contract | Planned / not executed |
 | FR-15 | F-08 | Sprint 2 | Pending contract | Pending contract | Planned / not executed |
-| FR-16 | F-09 | Sprint 2 | Pending contract | Pending contract | Planned / not executed |
+| FR-16 | F-02–05 (R/S queues); F-09 (counters) | Sprint 1 queues; Sprint 2 counters | AC-009–011, 017, 040, 043 | TEST-009–011, 017, 040, 043; TEST-052–057 | Revised scope; verification required |
 | FR-17 | F-10 | Sprint 2 | Pending contract | Pending contract | Planned / not executed |
 | FR-18 | F-11 | Sprint 3 | Pending contract | Pending contract | Planned / not executed |
 | FR-19 | F-12 | Sprint 3 | Pending contract | Pending contract | Planned / not executed |
@@ -420,7 +445,7 @@ Prisma models may require a custom SQL migration for PostgreSQL partial indexes.
 
 ## Database migrations and seed
 
-Sprint 1 migration `0001_foundation`: tables, enum/check constraints, indexes and uniqueness. Migrations run as explicit setup step, not on every GET. Seed `R` queue and synthetic Customer A, Customer B, Operator A (assigned), Operator B (unassigned); idempotently upsert by deterministic unique fields; no entries by default. Test fixtures separately create waiting entries to exercise queue ordering. Never reset real data on app restart or seed rerun. For verification, create entry via API, stop/restart API, fetch same ID and event; then rerun seed and confirm entry not deleted.
+Sprint 1 migration `0001_foundation`: tables, enum/check constraints, indexes and uniqueness. Migrations run as explicit setup step, not on every GET. Seed R/S queues and synthetic Customer A, Customer B, Operator A (R only), Operator B (S only); idempotently upsert by deterministic unique fields; no entries by default. Test fixtures separately create waiting entries to exercise queue ordering. Never reset real data on app restart or seed rerun. For verification, create entry via API, stop/restart API, fetch same ID and event; then rerun seed and confirm entry not deleted.
 
 ## Configuration and future deployment
 
@@ -455,12 +480,12 @@ Commit `.env.example` with key names and placeholders only; `.env` is gitignored
 | Sprint | Goal and features | Dependencies | Observable exit outcome |
 | --- | --- | --- | --- |
 | Sprint 1, due 8 Nov 23:59 | F-01 through F-05: login, permissions/seed, join, own/public status, FIFO call/start/complete. | PostgreSQL, schema/migration, auth, assigned operator; contract-first Issues and PRs. | Real UI→API→DB normal workflow; validated duplicate and ordering rejections; access tests; reviewed release in `main` tagged `v0.1.0`; local reproducibility and Part F evidence. |
-| Sprint 2, due 29 Nov | F-06 cancellation, F-07 no show, F-08 operator dashboard, F-09 multiple queues/counters, F-10 ETA. | Stable Sprint 1 state machine/audit; counter capacity schema migration; updated transition tests. | Tested cancellation/no-show, improved authorized dashboard and multiple counters, estimated waits; reviewed release and complete Sprint 2 contracts. |
+| Sprint 2, due 29 Nov | F-06 cancellation, F-07 no show, F-08 operator dashboard, F-09 multiple counters per queue, F-10 ETA. | Stable Sprint 1 state machine/audit; counter capacity schema migration; updated transition tests. | Tested cancellation/no-show, improved authorized dashboard and multiple counters, estimated waits; reviewed release and complete Sprint 2 contracts. |
 | Sprint 3, progress by 29 Nov, final by 13 Dec | F-11 priority, F-12 queue open/pause/close, F-13 service summaries, F-14 simulated notifications; plus UX, failure handling, regression, accessibility and security hardening. | Complete service history, multi-counter integration and documented priority rule. | Completed scope, resolved/declared defects, tests and traceability tied to final release, GCP deployment, final report and ≤10 min joint demo. |
 
 ## Feasibility of Sprint 1
 
-Scope is one seeded restaurant queue and two roles, not restaurant administration, reservations or advanced queue management. F-01 establishes sessions; F-02 establishes assigned queue scope; F-03 creates a durable entry; F-04 retrieves it; F-05 advances it. The team reuses the Labs 1–4 stack and test tooling. Favor a simple, correct vertical slice over extra UI pages. Reserve explicit time for review/integration and Part F output; documentation alone does not satisfy the sprint.
+Scope is two independently served party-size queues and two roles, not restaurant administration, reservations or advanced queue management. F-01 establishes sessions; F-02 establishes assigned queue scope; F-03 creates a durable entry; F-04 retrieves it; F-05 advances it. The team reuses the Labs 1–4 stack and test tooling. Favor a simple, correct vertical slice over extra UI pages. Reserve explicit time for review/integration and Part F output; documentation alone does not satisfy the sprint.
 
 ## Work split for two students
 
@@ -479,7 +504,7 @@ Both members co-review decisions, write/review tests and implement/review bounde
 
 | Risk | Mitigation |
 | --- | --- |
-| Two-day Sprint 1 window | Keep a single queue, two roles, no account administration; sequence tasks and integration early. |
+| Two-day Sprint 1 window | Keep two independent single-slot queues, two roles, no account administration; sequence tasks and integration early. |
 | Race conditions | Real PostgreSQL concurrency API tests; partial unique indexes and queue row lock transaction. |
 | Cookie auth confusion | Same-origin dev proxy; safe cookie; real logout revocation; direct API tests. |
 | Overly broad diagram/feature requirements | Keep later feature contracts allocated only and move secondary complexity to Sprints 2–3. |
@@ -811,9 +836,9 @@ Schema/seed reviewed; auth endpoints and login UI implemented; all AC-001–008 
 
 ## Feature-level SDS
 
-Seed a restaurant queue `R` in `OPEN` state; Customer A/B; Operator A assigned to `R`; Operator B unassigned. User permissions and assignment are always verified on the API/backend. The operator queue list includes only assigned queues. Even a direct HTTP request using a guessed queue ID must fail for an unassigned operator. Do not authorize from a client role value. `GET /health` is public; migrations/seed are deterministic/idempotent and app restart does not remove entries.
+Seed R and S initially OPEN; Customer A/B; Operator A assigned only R; Operator B assigned only S. User permissions and assignment are always verified on the API/backend. The operator queue list includes only assigned queues. Even a direct HTTP request using a guessed queue ID must fail for an unassigned operator. Do not authorize from a client role value. `GET /health` is public; migrations/seed are deterministic/idempotent and app restart does not remove entries.
 
-**Failure and boundary cases:** assignment missing → 403 `QUEUE_ACCESS_DENIED`; wrong role → 403 `FORBIDDEN`; missing session → 401; missing queue identifier → 404 only when authorized query context permits; failure to access DB → safe 500 (health readiness may be separately reported). Operator B has no queues and the desk shows an empty assignment state, not a crash.
+**Failure and boundary cases:** assignment missing → 403 `QUEUE_ACCESS_DENIED`; wrong role → 403 `FORBIDDEN`; missing session → 401; missing queue identifier → 404 only when authorized query context permits; failure to access DB → safe 500 (health readiness may be separately reported). Operator B lists S only. A separate operator with no assignments sees the empty assignment state.
 
 ## Data contract / seed and migrations
 
@@ -823,8 +848,8 @@ Seed a restaurant queue `R` in `OPEN` state; Customer A/B; Operator A assigned t
 
 | AC | Given / when / then observable outcome |
 | --- | --- |
-| AC-009 | Given clean DB and configured synthetic passwords, when migrate and seed execute twice, then exactly one queue `R`, four demo accounts and correct assignments exist, with no destructive reset. |
-| AC-010 | Given Operator A logged in, when retrieving assigned queue list/desk for `R`, then `R` is visible and accessible. |
+| AC-009 | Given clean DB and configured synthetic passwords, when migrate and seed execute twice, then exactly two queues R/S, four demo accounts and two designated assignments exist, with no destructive reset. |
+| AC-010 | Given Operator A or B logged in, when retrieving assigned queue list/desk, then A sees/accesses only R and B only S. |
 | AC-011 | Given Operator B unassigned to `R`, when requesting `R` desk or actions directly, then 403 and no queue private data/mutation. |
 | AC-012 | Given Customer A, when directly posting operator call/start/complete, then 403 and unchanged entry state. |
 | AC-013 | Given Customer A with payload/header claiming `role=OPERATOR`, when submitting an operator request, then server still enforces Customer and returns 403. |
@@ -845,11 +870,11 @@ PostgreSQL schema + migrations and seed documented; health endpoint and role gua
 
 ## Feature-level SDS: workflow / rules
 
-Customer opens `/queues`, chooses seeded `R`, enters `partySize` and selects `Join queue`. API uses session customer ID, verifies Customer role, validates integer partySize between 1 and 8, checks queue OPEN, and executes the entire join transaction including sequence increment, entry creation and JOINED history event. On success display immutable number `R-0001` and WAITING. The `sequence` increments monotonically per queue with no daily reset; `displayNumber` uses min four-digit decimal with zero pad and may exceed four digits. A customer with any active status WAITING/CALLED/SERVING cannot join another queue. Terminal entries do not count active.
+Customer opens `/queues`, enters partySize, sees R for 1–4 or S for 5–8, and selects Join queue. The API verifies the requested queue matches that rule; mismatches return 422 VALIDATION_ERROR without writes. API uses session customer ID, verifies Customer role, validates integer partySize between 1 and 8, checks queue OPEN, and executes the entire join transaction including sequence increment, entry creation and JOINED history event. On success display immutable number `R-0001` and WAITING. The `sequence` increments monotonically per queue with no daily reset; `displayNumber` uses min four-digit decimal with zero pad and may exceed four digits. A customer with any active status WAITING/CALLED/SERVING cannot join another queue. Terminal entries do not count active.
 
 **Concurrency and rejection:** lock the `Queue` row in a database transaction; PostgreSQL partial unique index for `customer_id WHERE status IN (...)` is authoritative. Competing calls by one customer produce one 201 and remaining 409. Different customers receive distinct increasing sequence numbers, though network response order need not match allocation order. On DB unique conflict roll back the entry and event, map safely to 409. If queue not OPEN, 409 `QUEUE_NOT_OPEN`. Bad party size 422. Operators 403. Anonymous 401. Extra identity parameters such as `customerId` are rejected with 422 rather than silently impersonating another user.
 
-**Boundaries:** partySize=1 and 8 succeed; 0, 9, negative, decimal, string, NaN, null and missing fail. `R-9999` followed by `R-10000` remains unique. Active entry from another queue blocks join. No edits to party size after joining Sprint 1.
+**Boundaries:** sizes 1/4 succeed on R and 5/8 on S; mismatched queues fail with 422; 0, 9, negative, decimal, string, NaN, null and missing fail. `R-9999` followed by `R-10000` remains unique. Active entry from another queue blocks join. No edits to party size after joining Sprint 1.
 
 ## Data contract / migration
 
@@ -860,7 +885,7 @@ Writes `queues.last_sequence`, `queue_entries` and `queue_events` in one transac
 | AC | Given / when / then observable outcome |
 | --- | --- |
 | AC-016 | Given Customer A and OPEN queue R, when A joins with partySize 4, then API returns 201 and persisted WAITING entry `R-0001` (assuming empty reset test DB) with JOINED event. |
-| AC-017 | Given no active entry, when A joins using boundary party sizes 1 and 8 in separate isolated fixtures, then both are accepted. |
+| AC-017 | Given no active entry, when A joins sizes 1/4 on R and 5/8 on S in separate isolated fixtures, then all are accepted; each mismatched requested queue returns 422 with no database changes. |
 | AC-018 | Given 0, 9, negative, decimal, string, missing or null party size, when joining, then each returns 422 and creates no entry/sequence increment. |
 | AC-019 | Given A already has WAITING/CALLED/SERVING entry, when A joins again (including another queue), then 409 and exactly one active entry persists; after A reaches COMPLETED and queue service slot is clear, a new join succeeds. |
 | AC-020 | Given 20 concurrent join requests from Customer A, then at most one returns 201; the others return 409; there is one active entry and one JOINED event. |
@@ -940,7 +965,7 @@ Update existing `queue_entries.status` with `called_at`, `serving_at`, `complete
 | AC-036 | Given a SERVING entry and assigned operator, when completing, then entry is COMPLETED and exactly one COMPLETED event persists. |
 | AC-037 | Given WAITING or CALLED entry, when directly requesting complete, then 409 INVALID_TRANSITION and status/history unchanged. |
 | AC-038 | Given Customer A session, when calling/starting/completing by direct HTTP, then each returns 403 and no mutation. |
-| AC-039 | Given Operator B unassigned to R, when attempting R desk/call/start/complete, then 403 and no private data/mutation. |
+| AC-039 | Given Operator B requesting R or Operator A requesting S, when attempting desk/call/start/complete, then 403 and no private data/mutation. |
 | AC-040 | Given two simultaneous assigned operator call-next requests, then at most one 200; other returns 409 and only one CALLED entry/event exists. |
 | AC-041 | Given full valid join/call/start/complete workflow, then durable history contains JOINED→CALLED→SERVING→COMPLETED in order with correct actor and UTC timestamps. |
 | AC-042 | Given COMPLETED entry, when repeating start/complete or attempting to call that entry, then 409 or no eligible candidate; terminal state/history unchanged. |
@@ -1029,7 +1054,7 @@ Checklist: [ ] confirm F-01 contract; [ ] write RED wrong password/logout/expiry
 **Links:** FR-02–04, FR-23–24; BR-09–11, BR-27–28; NFR-01, 06–07, 11; AC-009–015; TEST-009–015  
 **Author:** Member A; **Reviewer:** Member B; pair tests unassigned operator.
 
-Checklist: [ ] confirm assignment schema; [ ] write RED unauthorized queue/customer action tests; [ ] implement server policy guards; [ ] assigned queue list; [ ] seed assigned/unassigned operators; [ ] health + restart checks; [ ] record results; [ ] PR review. **DoD:** role and ownership checks verified via direct API; no client role trust.
+Checklist: [ ] confirm assignment schema; [ ] write RED unauthorized queue/customer action tests; [ ] implement server policy guards; [ ] assigned queue list; [ ] seed A→R/B→S and test a separate unassigned operator; [ ] health + restart checks; [ ] record results; [ ] PR review. **DoD:** role and ownership checks verified via direct API; no client role trust.
 
 ### Issue F-03 — Join queue with atomic numbers and duplicate protection
 

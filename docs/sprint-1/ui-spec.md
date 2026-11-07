@@ -4,13 +4,38 @@
 
 > **Companion files:** [specification.md](specification.md) · [api-spec.md](api-spec.md) · [tests.md](tests.md) · [ui-spec.md](ui-spec.md).
 
+
+## Team-approved Issue 08 scope revision — 7 November 2026
+
+The team explicitly approved party-size routing and two independent queues in Sprint 1. This revision supersedes the original one-queue seed, Operator B's empty assignment list, and the exclusive Sprint 2 allocation of multiple queues. Other baseline decisions retain their existing status; this approval is not a claim that implementation or tests have passed.
+
+| Queue | Accepted party size for new joins | Seed assignment | Service capacity |
+| --- | --- | --- | --- |
+| R | 1–4 | Operator A only | One CALLED or SERVING entry |
+| S | 5–8 | Operator B only | One CALLED or SERVING entry |
+
+Each queue has independent immutable sequence allocation, FIFO and queue-row locking. One active entry per customer across all queues remains mandatory. Existing historical entries, including parties outside the new range for their historical queue, are preserved and may finish the existing lifecycle. No historical rerouting or renumbering is permitted. New queues start OPEN; rerunning seed preserves existing queue state and counters, users, password hashes, sessions, entries and events. Seed inserts missing approved assignments and fails safely on contradictory seeded-operator assignments instead of deleting existing assignments. Multiple counters within a queue remain Sprint 2; registration and administrator management remain excluded.
+
+### Affected requirements and regression map
+
+| Contract area | Affected identifiers/rules | Approved change / regression obligation |
+| --- | --- | --- |
+| Decisions and scope | D-03, D-20; FR-04–06, FR-08, FR-16; F-02–05 and F-09; Sprint 1/2 scope and traceability | R/S routing is Sprint 1; multiple counters remain Sprint 2. D-01/02/04–09/14/18/26/28 and BR-01–08/11/15–17/26–28 remain enforced per queue or across customers as originally specified. |
+| Acceptance and tests | AC/TEST-009–011, 015–024, 028–031, 032–044; TEST-045–049 | Seed two queues/two assignments; cover boundaries 1/4 on R and 5/8 on S; retain role, ownership, FIFO, terminal, audit and concurrency checks on both queues. TEST-039 still checks B forbidden from R and now also A forbidden from S. TEST-043 covers both operator journeys. Historical test evidence remains historical. |
+| HTTP | GET /queues; POST /queues/:queueId/entries; GET /operator/queues; desk and three service actions; GET /public/queues/:queueId/board | Preserve paths and envelopes. Validate party-size/queue match on backend; mismatch is 422 VALIDATION_ERROR with details.fields.partySize and no writes. Only R/S accept new joins. Existing queues/history remain stored. A lists R; B lists S; a separately unassigned operator lists []. |
+| Customer UI | /queues, QueueJoinForm, /my-queue | Party size determines displayed queue; remove arbitrary selection for new joins, explain both ranges, disable joining if the matching queue is unavailable, preserve status/history/refresh. |
+| Operator UI | /operator/desk, Assigned queues, ActiveServiceCard | Show server assignments only, Active: 0/1 or Active: 1/1, independent waiting and service states, existing actions and responsive behavior. |
+| Public UI | /board, /board/:queueId, PublicQueueBoard | /board shows R and S using two existing four-field board responses; /board/R and /board/S and UUID links remain supported. No private data or operator controls; independent loading/error/empty/refresh and visibility-aware polling. |
+| Verification | NFR-01/04–06/09–10/12–13/15 | Real PostgreSQL simultaneous calls: one winner per queue; R lock cannot block S; success exactly one event per transition, rejection leaves full DB state unchanged. Authentication and existing regression coverage retained. |
+
+
 ## Scope and design principles
 
 A mobile-first customer interface, an operator-oriented responsive desktop interface and a privacy-safe public queue display. Only the current server-authenticated role determines navigation. Screens and components here are contracts, not implemented screenshots.
 
 ## UI information architecture and shared behavior
 
-**Mobile first customer:** `/login` → `/queues` → `/my-queue`; persistent account/logout control. Show one visible queue, party-size numeric input (min 1 max 8), clear validation, and a **large queue-number** component (40–72 px responsive, tabular numbers). When latest entry is terminal, show status and permit new join; when active, disable/replace join button with `View my queue`.
+**Mobile first customer:** `/login` → `/queues` → `/my-queue`; persistent account/logout control. Show the queue derived from party size, party-size numeric input (min 1 max 8), clear validation, and a **large queue-number** component (40–72 px responsive, tabular numbers). When latest entry is terminal, show status and permit new join; when active, disable/replace join button with `View my queue`.
 
 **Operator desktop:** `/operator/desk` assigned queue dropdown (only authorized queues), oldest eligible waiting summary, active service card and buttons `Call next`, `Start service`, `Complete`. The current active entry and queue count update after every mutation. Operators on a queue they are not assigned see safe forbidden state. No role selector in login page.
 
@@ -77,9 +102,9 @@ Use Cream page, Burgundy primary action, Espresso text. Password field label and
 
 | Component | Behavior | Edge states |
 | --- | --- | --- |
-| Operator `Assigned queues` selector | Options from `GET /operator/queues`; only authorized queues shown; default single `R`. | Loading indicator; empty `No assigned queues`; 401 sign-in; 403 forbidden; 5xx retry. |
+| Operator `Assigned queues` selector | Options from `GET /operator/queues`; only authorized queues shown; A sees only R; B sees only S. | Loading indicator; empty `No assigned queues`; 401 sign-in; 403 forbidden; 5xx retry. |
 | `/operator/desk` scope guard | Shows only current operator's queues. | Typing another queue ID into URL cannot yield data; backend returns 403. |
-| Customer queue discovery | Customer sees public names of open queues from `/queues`; later multi-queue UI remains consistent. | Loading, empty, network retry; Operators cannot join via role spoof. |
+| Customer queue discovery | Customer sees public names of open queues from `/queues`; R/S selection is derived from party size. | Loading, empty, network retry; Operators cannot join via role spoof. |
 | Common error/access screen | Clear status message with `Back` link; focus goes to heading. | Does not repeat private entry identifiers/details. |
 
 ## F-03 Join queue UI contract
@@ -90,7 +115,7 @@ Use Cream page, Burgundy primary action, Espresso text. Password field label and
 
 | Screen/component | Fields/buttons | States |
 | --- | --- | --- |
-| `/queues` | Queue card with name/state, number input labelled `Party size` (1–8), `Join queue` button, `View my queue` link after success. | Loading queue list, no queues, invalid field, sending/disabled button, conflict banner with link to latest entry, network retry. |
+| `/queues` | Queue card derived from party size (1–4 → R; 5–8 → S), no arbitrary queue selector, number input labelled `Party size` (1–8), `Join queue` button, `View my queue` link after success. | Loading queue list, no queues, invalid field, sending/disabled button, conflict banner with link to latest entry, network retry. |
 | `QueueNumberDisplay` (shared with F-04) | Large text `R-0001`, label `Your queue number`, status WAITING, aria-live polite on update. | Reflows at 360 px without truncation or horizontal scroll; handles R-10000. |
 | Auth/role UI | Only Customer sees join page/button; backend still rejects Operator and anonymous direct POST. | 401 sign-in redirect; 403 forbidden route. |
 
@@ -118,7 +143,7 @@ Use Espresso small text on Cream, Burgundy highlights; do not use Taupe normal-s
 
 | Screen/component | Actions/fields | States |
 | --- | --- | --- |
-| `/operator/desk` | Assigned queue selector, count WAITING, current active number/state, `Call Next`, `Start Service`, `Complete Service`, refresh. | Loading/empty assigned list; no waiting entry; active slot busy explanation; action submitting/disabled; success toast/status; 401/403 safe access messages; retry on network failure. |
+| `/operator/desk` | Assigned queue selector, count WAITING, Active: 0/1 or Active: 1/1, current active number/state, `Call Next`, `Start Service`, `Complete Service`, refresh. | Loading/empty assigned list; no waiting entry; active slot busy explanation; action submitting/disabled; success toast/status; 401/403 safe access messages; retry on network failure. |
 | `ActiveServiceCard` | Large queue number in Espresso/Burgundy compliant contrast, party size (operator only), stage and action for exact allowed next transition. | CALLED shows `Start Service`, SERVING shows `Complete Service`, COMPLETED/empty shows no action. |
 | Public/customer reflection | F-04 boards show called number and updated own status on next poll or manual refresh. | Never leak internal operator IDs or customer private fields on public display. |
 
@@ -155,3 +180,11 @@ These are allocation notes, not frozen later-sprint feature contracts.
 ## UI acceptance and evidence
 
 Use AC-007, AC-016–018, AC-025, AC-028–031 and AC-043 for UI paths; verify full customer/operator journey with TEST-043 and small-screen usability with TEST-030. Capture actual 360px customer screenshots and 1280/1440px operator screenshots after implementation. Never claim pass from visual mockups.
+
+## Approved two-queue screen behavior
+
+Customer party-size help always explains both ranges. Render the form even when the selected range has no available queue; show “Queue R/S is not open for joining.” and disable Join queue. Do not offer the other queue as a fallback. Preserve retry/empty/session handling and show the authoritative returned number and queue code. Existing completed tickets remain readable and allow a new eligible join.
+
+The primary public-display navigation opens `/board`, a responsive overview of R and S using the existing per-queue boards. Individual `/board/R`, `/board/S` and UUID routes remain usable and provide links to both queues. Each board retains its own ten-second visibility-aware polling, error/empty state and manual refresh. At narrow widths stack cards without overflow; desktop may show them side by side. No operator controls or private fields are added.
+
+The operator desk retains the assigned queue selector and lifecycle controls, with capacity visibly stated as Active: 0/1 or Active: 1/1. One queue being busy must not disable the other operator's queue. Preserve ≥44px controls, visible focus, accessible live feedback and existing status colors.

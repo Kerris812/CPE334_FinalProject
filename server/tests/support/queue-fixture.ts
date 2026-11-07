@@ -18,24 +18,27 @@ export async function fixture() {
     const row = await db.queue.create({ data: { code: `T${randomUUID().replaceAll('-', '').slice(0, 7).toUpperCase()}`, name: 'Queue fixture restaurant' } }); queues.push(row.id); return row;
   }
   const customer = await actor();
-  const initial = await queue();
-  let seededSnapshot: Queue | undefined;
+  const initial = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
+  const snapshots = new Map<string, Queue>([[initial.id, initial]]);
+  async function seeded(code: string) { const row = await db.queue.findUniqueOrThrow({ where: { code } }); if (!snapshots.has(row.id)) snapshots.set(row.id, row); return row; }
   const f = {
     customer, queue: initial, actor, newQueue: queue,
-    async useR() { seededSnapshot = await db.queue.findUniqueOrThrow({ where: { code: 'R' } }); f.queue = seededSnapshot; },
+    async useR() { f.queue = await seeded('R'); },
+    async useS() { return seeded('S'); },
     async entry(status: EntryStatus = 'WAITING', who = customer, target = f.queue, sequence = 1n) {
       return db.queueEntry.create({ data: { customerId: who.id, queueId: target.id, partySize: 4, status, sequence, displayNumber: `${target.code}-${sequence.toString().padStart(4, '0')}` } });
     },
     async state() {
-      return { queues: await db.queue.findMany({ where: { id: { in: [f.queue.id, ...queues] } }, orderBy: { id: 'asc' } }), entries: await db.queueEntry.findMany({ where: { customerId: { in: users } }, orderBy: { id: 'asc' } }), events: await db.queueEvent.findMany({ where: { actorId: { in: users } }, orderBy: { id: 'asc' } }) };
+      return { queues: await db.queue.findMany({ where: { id: { in: [...snapshots.keys(), ...queues] } }, orderBy: { id: 'asc' } }), entries: await db.queueEntry.findMany({ where: { customerId: { in: users } }, orderBy: { id: 'asc' } }), events: await db.queueEvent.findMany({ where: { entry: { customerId: { in: users } } }, orderBy: { id: 'asc' } }) };
     },
     async clean() {
       await db.queueEvent.deleteMany({ where: { entry: { customerId: { in: users } } } });
       await db.queueEntry.deleteMany({ where: { customerId: { in: users } } });
       await db.session.deleteMany({ where: { userId: { in: users } } });
+      await db.operatorQueueAssignment.deleteMany({ where: { operatorId: { in: users } } });
       await db.user.deleteMany({ where: { id: { in: users } } });
       await db.queue.deleteMany({ where: { id: { in: queues } } });
-      if (seededSnapshot) await db.queue.update({ where: { id: seededSnapshot.id }, data: { lastSequence: seededSnapshot.lastSequence, state: seededSnapshot.state } });
+      for (const row of snapshots.values()) await db.queue.update({ where: { id: row.id }, data: { lastSequence: row.lastSequence, state: row.state } });
     },
   };
   return f;

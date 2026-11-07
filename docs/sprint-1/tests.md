@@ -10,6 +10,8 @@ AC-001 through AC-044 and TEST-001 through TEST-049 have stable, unique identifi
 
 Actual F-03/F-04 execution after the reset (TEST-016–031 and TEST-047–048) is recorded in [F-03/F-04 verification](../f03-f04-verification.md), with fresh RED/GREEN output, commands and counts. Historical baseline status below is not a claim about current execution.
 
+Issue07 TEST-028/029/031 recursive public privacy and state checks, anonymous browser verification, and honest initial/final test results are recorded in [public board verification](../public-board-verification.md).
+
 ## Software Test Specification
 
 **Status:** TESTS PLANNED; NOT IMPLEMENTED OR RUN.  

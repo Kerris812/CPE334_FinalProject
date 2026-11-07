@@ -1,0 +1,143 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ❯ tests/ui/public-board.test.tsx (5 tests | 2 failed) 157ms
+   × TEST-028 anonymous board labels all four public values without showing extra private response data 38ms
+   × TEST-029 visible polling updates number, service state and waiting count then clears completed slot 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/public-board.test.tsx > TEST-028 anonymous board labels all four public values without showing extra private response data
+TestingLibraryElementError: Unable to find a label with the text of: Waiting guests
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-labelledby[39m=[32m"board-title"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mid[39m=[32m"board-title"[39m
+      [36m>[39m
+        [0mPublic queue display[0m
+      [36m</h2>[39m
+      [36m<h3>[39m
+        [0mQueue [0m
+        [0mR[0m
+      [36m</h3>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Public queue status"[39m
+        [33maria-live[39m=[32m"polite"[39m
+        [33mclass[39m=[32m"queue-ticket"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mCurrently called number[0m
+        [36m</p>[39m
+        [36m<strong[39m
+          [33mclass[39m=[32m"queue-number"[39m
+        [36m>[39m
+          [0mR-10000[0m
+        [36m</strong>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"queue-status status-called"[39m
+        [36m>[39m
+          [0mCALLED[0m
+        [36m</p>[39m
+      [36m</section>[39m
+      [36m<p>[39m
+        [0mWaiting guests[0m
+      [36m</p>[39m
+      [36m<strong[39m
+        [33mclass[39m=[32m"waiting-count"[39m
+      [36m>[39m
+        [0m2[0m
+      [36m</strong>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getAllByLabelText node_modules/@testing-library/dom/dist/queries/label-text.js:111:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/ui/public-board.test.tsx:18:17
+     16|   await mount();
+     17|   expect(screen.getByText('Queue R')).toBeTruthy(); expect(screen.getB…
+     18|   expect(screen.getByLabelText('Waiting guests').textContent).toBe('2'…
+       |                 ^
+     19|   for (const text of ['Private guest', 'private@example.test', 'Party …
+     20|   expect(screen.queryByRole('button', { name: /sign in|log out/i })).t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/public-board.test.tsx > TEST-029 visible polling updates number, service state and waiting count then clears completed slot
+TestingLibraryElementError: Unable to find a label with the text of: Waiting guests
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-labelledby[39m=[32m"board-title"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mid[39m=[32m"board-title"[39m
+      [36m>[39m
+        [0mPublic queue display[0m
+      [36m</h2>[39m
+      [36m<h3>[39m
+        [0mQueue [0m
+        [0mR[0m
+      [36m</h3>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Public queue status"[39m
+        [33maria-live[39m=[32m"polite"[39m
+        [33mclass[39m=[32m"queue-ticket"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mCurrently called number[0m
+        [36m</p>[39m
+        [36m<strong[39m
+          [33mclass[39m=[32m"queue-number"[39m
+        [36m>[39m
+          [0mR-10000[0m
+        [36m</strong>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"queue-status status-serving"[39m
+        [36m>[39m
+          [0mSERVING[0m
+        [36m</p>[39m
+      [36m</section>[39m
+      [36m<p>[39m
+        [0mWaiting guests[0m
+      [36m</p>[39m
+      [36m<strong[39m
+        [33mclass[39m=[32m"waiting-count"[39m
+      [36m>[39m
+        [0m1[0m
+      [36m</strong>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getAllByLabelText node_modules/@testing-library/dom/dist/queries/label-text.js:111:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/ui/public-board.test.tsx:28:67
+     26|   mock.mockResolvedValueOnce(response(200, { data: { ...board, service…
+     27|   await act(async () => { await vi.advanceTimersByTimeAsync(10000); });
+     28|   expect(screen.getByText('SERVING')).toBeTruthy(); expect(screen.getB…
+       |                                                                   ^
+     29|   mock.mockResolvedValueOnce(response(200, { data: { ...board, calledN…
+     30|   await act(async () => { await vi.advanceTimersByTimeAsync(10000); });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  2 failed | 28 passed (30)
+   Start at  11:18:49
+   Duration  1.09s (environment 60%, tests 25%, import 11%, transform 5%)
+

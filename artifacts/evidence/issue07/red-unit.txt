@@ -1,0 +1,43 @@
+
+> restaurant-queue-server@0.1.0 test:unit
+> vitest run tests/unit
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/unit/public-board-dto.test.ts (2 tests | 2 failed) 7ms
+   × TEST-031 dedicated public DTO drops nested private properties instead of spreading records 5ms
+   × TEST-029 dedicated public DTO uses null for an empty current slot 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/public-board-dto.test.ts > TEST-031 dedicated public DTO drops nested private properties instead of spreading records
+Error: Cannot find module '/src/public-board/dto.js' imported from /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server/tests/unit/public-board-dto.test.ts
+ ❯ tests/unit/public-board-dto.test.ts:4:30
+      2| import { assertPublicBoard } from '../support/public-board-assertions.…
+      3| test('TEST-031 dedicated public DTO drops nested private properties in…
+      4|   const { publicBoardDto } = await import('../../src/public-board/dto.…
+       |                              ^
+      5|   const queue = { code: 'R', id: 'private queue', createdAt: 'private …
+      6|   const current = { displayNumber: 'R-10000', status: 'SERVING' as con…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/unit/public-board-dto.test.ts > TEST-029 dedicated public DTO uses null for an empty current slot
+Error: Cannot find module '/src/public-board/dto.js' imported from /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server/tests/unit/public-board-dto.test.ts
+ ❯ tests/unit/public-board-dto.test.ts:11:30
+      9| });
+     10| test('TEST-029 dedicated public DTO uses null for an empty current slo…
+     11|   const { publicBoardDto } = await import('../../src/public-board/dto.…
+       |                              ^
+     12|   const body = { data: publicBoardDto({ code: 'R' }, null, 0) }; asser…
+     13|   expect(body.data).toEqual({ queueCode: 'R', calledNumber: null, serv…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 3 passed (5)
+   Start at  11:17:56
+   Duration  108ms (transform 45%, tests 27%, import 19%, worker 8%)
+

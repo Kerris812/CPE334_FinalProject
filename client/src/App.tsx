@@ -113,6 +113,7 @@ export function App() {
   return <main>
     <h1>Restaurant Queue</h1>
     <p>Queue and service management</p>
+    {!publicBoard && <nav aria-label="Public display"><a className="board-link" href="/board/R">View public board</a></nav>}
     {publicBoard ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
       <p role="alert">Unable to restore your session. Please try again.</p>
       <button onClick={() => setAttempt(value => value + 1)}>Retry</button>

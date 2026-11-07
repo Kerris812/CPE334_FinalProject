@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import type { PrismaClient } from '@prisma/client';
 import { currentUser } from '../authorization/guards.js';
-import { joinQueue, readCustomerEntry, readPublicBoard } from './service.js';
+import { joinQueue, readCustomerEntry } from './service.js';
+import { readPublicBoard } from '../public-board/service.js';
 /** These private routers mount after the existing session, role and origin guards. */
 export function queueRoutes(db: PrismaClient) {
   const router = Router();

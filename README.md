@@ -122,3 +122,11 @@ Joining locks the customer and queue rows, validates role/activity and OPEN stat
 The my-queue and public board screens poll every 10 seconds while visible, stop after unmount, expose accessible loading/error/empty states, and use server-authoritative data. The public board reads slot and aggregate count in one database snapshot and never serializes private records. Cancellation, no-show and operator transitions remain unimplemented.
 
 Fresh test evidence after the reset, exact commands, changed files and limitations: [F-03/F-04 verification](docs/f03-f04-verification.md). No previous implementation's results are reused.
+
+## Public display board (Issue07)
+
+Open `/board/:queueId` with a queue UUID; no login is required. The page displays only public queue code, called number/state and WAITING entry count. It refreshes every 10 seconds while visible, pauses when hidden, and provides safe loading/empty/not-found/retry states. Desktop typography scales for distance viewing; narrow layouts retain all digits without horizontal overflow. The backend uses a dedicated four-field public DTO and one consistent PostgreSQL read snapshot. No customer information or private records are included.
+
+Issue07 changes, recursive privacy checks, actual RED/GREEN/REFACTOR counts and limitations: [public board verification](docs/public-board-verification.md). Existing endpoint behavior already passed the strengthened API tests before this issue; fresh failing evidence covers the dedicated DTO boundary and remaining display/accessibility gaps.
+
+The home and sign-in pages now include a **View public board** link below the app heading. It opens `/board/R` anonymously; `R` is resolved from the seeded database queue, and existing `/board/:queueId` UUID links still work. Both forms return the same four-field public DTO.

@@ -1,0 +1,19 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test tests/e2e/public-board.spec.ts
+
+[WebServer] (node:97305) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97306) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97332) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:97339) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/public-board.spec.ts:36:1 › TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors (468ms)
+  ✓  2 tests/e2e/public-board.spec.ts:57:1 › public number is readable at a distance on desktop and fits narrow viewports (227ms)
+
+  2 passed (2.1s)

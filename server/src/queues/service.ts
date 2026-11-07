@@ -48,14 +48,3 @@ export async function readCustomerEntry(db: PrismaClient, customerId: string, en
   if (!entry) { if (entryId !== undefined) throw notFound(); return null; }
   return privateDto(entry);
 }
-export async function readPublicBoard(db: PrismaClient, queueId: unknown) {
-  if (!validId(queueId)) throw queueNotFound();
-  // All reads share one PostgreSQL snapshot, including aggregate count and slot.
-  return db.$transaction(async tx => {
-    const queue = await tx.queue.findUnique({ where: { id: queueId }, select: { code: true } });
-    if (!queue) throw queueNotFound();
-    const current = await tx.queueEntry.findFirst({ where: { queueId, status: { in: ['CALLED', 'SERVING'] } }, select: { displayNumber: true, status: true } });
-    const waitingCount = await tx.queueEntry.count({ where: { queueId, status: 'WAITING' } });
-    return { queueCode: queue.code, calledNumber: current?.displayNumber ?? null, serviceState: current?.status ?? null, waitingCount };
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
-}

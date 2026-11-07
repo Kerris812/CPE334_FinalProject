@@ -1,0 +1,57 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts -t transaction revalidates
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "cpe334_auth_test", schema "public" at "127.0.0.1:55432"
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/api/queue-join.test.ts (14 tests | 1 failed | 13 skipped) 93ms
+   × transaction revalidates persisted customer role and activity before any queue write 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/queue-join.test.ts > transaction revalidates persisted customer role and activity before any queue write
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "displayNumber": "T860A4E6-0001",
++   "id": "3491149e-4afd-4320-8a17-fde1e261e40b",
++   "joinedAt": "2026-11-06T15:25:15.541Z",
++   "partySize": 4,
++   "queueId": "7c29c045-3cc3-4d4b-91db-3b32c2542ba8",
++   "sequence": 1,
++   "status": "WAITING",
+  }
+
+ ❯ tests/api/queue-join.test.ts:105:73
+    103|   const { joinQueue } = await import('../../src/queues/service.js');
+    104|   const operator = await f.actor('OPERATOR'); const before = await f.s…
+    105|   await expect(joinQueue(db, operator.id, f.queue.id, { partySize: 4 }…
+       |                                                                         ^
+    106|   await db.user.update({ where: { id: f.customer.id }, data: { isActiv…
+    107|   await expect(joinQueue(db, f.customer.id, f.queue.id, { partySize: 4…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 skipped (8)
+      Tests  1 failed | 48 skipped (49)
+   Start at  22:25:14
+   Duration  1.01s (import 72%, tests 16%, transform 9%, worker 2%)
+
+    Isolate  8 workers spawned · ~50ms startup each (spawn + environment, per file)
+             at least ~351ms faster with isolate: false — reuses workers across files instead of one per file
+

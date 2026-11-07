@@ -1,0 +1,128 @@
+[
+  {
+    "foreground": "cream",
+    "background": "burgundy-900",
+    "ratio": 15.002,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "gold",
+    "background": "burgundy-900",
+    "ratio": 8.134,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "cream",
+    "background": "burgundy-700",
+    "ratio": 10.821,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "burgundy-700",
+    "background": "cream",
+    "ratio": 10.821,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "burgundy-700",
+    "background": "surface",
+    "ratio": 11.647,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "burgundy-700",
+    "background": "burgundy-50",
+    "ratio": 10.082,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "espresso",
+    "background": "cream",
+    "ratio": 13.368,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "espresso",
+    "background": "surface",
+    "ratio": 14.388,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "espresso",
+    "background": "burgundy-50",
+    "ratio": 12.455,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "espresso",
+    "background": "gold",
+    "ratio": 7.248,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "taupe-text",
+    "background": "cream",
+    "ratio": 6.405,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "taupe-text",
+    "background": "surface",
+    "ratio": 6.893,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "taupe-text",
+    "background": "burgundy-50",
+    "ratio": 5.967,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "gold-text",
+    "background": "cream",
+    "ratio": 5.779,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "gold-text",
+    "background": "surface",
+    "ratio": 6.22,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "success",
+    "background": "success-bg",
+    "ratio": 5.384,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "cream",
+    "background": "success",
+    "ratio": 5.721,
+    "minimum": 4.5,
+    "passed": true
+  },
+  {
+    "foreground": "gold",
+    "background": "burgundy-700",
+    "ratio": 5.867,
+    "minimum": 3,
+    "passed": true
+  }
+]

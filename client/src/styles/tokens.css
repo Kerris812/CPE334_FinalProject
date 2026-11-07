@@ -1,0 +1,22 @@
+:root {
+  --burgundy-900: #3F0B16;
+  --burgundy-700: #6F0E22;
+  --burgundy-100: #EBD3D6;
+  --burgundy-50: #F6E9EA;
+  --cream: #FBF3E6;
+  --surface: #FFFCF7;
+  --espresso: #2F2626;
+  --taupe: #8A6F5B;
+  --taupe-text: #6B5444;
+  --gold: #D7B15D;
+  --gold-text: #7A5A12;
+  --success: #2E6B4F;
+  --success-bg: #E4F0E9;
+  --burgundy: var(--burgundy-700);
+  --card-border: var(--burgundy-100);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px;
+  --radius-control: 8px; --radius-badge: 12px; --radius-card: 16px;
+  --shadow-soft: 0 1px 3px rgba(47,38,38,.10);
+  --card-ring: 0 0 0 3px var(--surface), 0 0 0 4px var(--burgundy-100), var(--shadow-soft);
+}

@@ -1,0 +1,72 @@
+{
+  "branch": "feature/8-operator-workflow",
+  "baseCommit": "0e8ff3e554708b72084c61f8770ba9d134f6f349",
+  "red": {
+    "unit": {
+      "failed": 3,
+      "passed": 5
+    },
+    "apiSelected": {
+      "failed": 13,
+      "passed": 2,
+      "filteredOut": 56
+    },
+    "ui": {
+      "failed": 4,
+      "passed": 31
+    },
+    "e2eSelected": {
+      "failed": 1
+    }
+  },
+  "green": {
+    "unit": {
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    "api": {
+      "passed": 71,
+      "failed": 0,
+      "skipped": 0
+    },
+    "ui": {
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0
+    },
+    "e2e": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "concurrency": {
+    "simultaneousCalls": 20,
+    "successful": 1,
+    "serviceSlotBusy": 19,
+    "activeEntries": 1,
+    "calledEvents": 1,
+    "fifoHeadSelected": true,
+    "repeatedStartAndComplete": "one success and one INVALID_TRANSITION each"
+  },
+  "audit": {
+    "fullWorkflowEvents": [
+      "JOINED",
+      "CALLED",
+      "STARTED",
+      "COMPLETED"
+    ],
+    "forcedPostgresAuditFailure": "call, start, complete all rolled back; full fixture state unchanged"
+  },
+  "build": {
+    "server": "passed",
+    "client": "passed"
+  },
+  "database": "isolated PostgreSQL TEST_DATABASE_URL; migration 0002 applied here only",
+  "notes": [
+    "API and browser suites must run sequentially because existing foundation tests assert global fixture counts.",
+    "Contracts checked in as PROPOSED; GitHub issue could not be fetched.",
+    "No documentation edits, development data resets, commits, pushes, merges or branch switches."
+  ]
+}

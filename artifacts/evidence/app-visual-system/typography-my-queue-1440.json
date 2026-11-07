@@ -1,0 +1,96 @@
+{
+  "reference": {
+    "wordmark": {
+      "family": "Georgia, \"Times New Roman\", serif",
+      "size": "28px",
+      "weight": "700"
+    },
+    "board-link": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "400"
+    },
+    "identity": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "role": {
+      "family": "system-ui, sans-serif",
+      "size": "13px",
+      "weight": "400"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "24px",
+      "weight": "700"
+    },
+    "number": {
+      "family": "system-ui, sans-serif",
+      "size": "72px",
+      "weight": "750"
+    },
+    "badge": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "number-label": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "400"
+    }
+  },
+  "actual": {
+    "wordmark": {
+      "family": "Georgia, \"Times New Roman\", serif",
+      "size": "28px",
+      "weight": "700"
+    },
+    "board-link": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "400"
+    },
+    "identity": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "role": {
+      "family": "system-ui, sans-serif",
+      "size": "13px",
+      "weight": "400"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "24px",
+      "weight": "700"
+    },
+    "number": {
+      "family": "system-ui, sans-serif",
+      "size": "72px",
+      "weight": "750"
+    },
+    "badge": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "650"
+    },
+    "number-label": {
+      "family": "system-ui, sans-serif",
+      "size": "14px",
+      "weight": "400"
+    }
+  }
+}

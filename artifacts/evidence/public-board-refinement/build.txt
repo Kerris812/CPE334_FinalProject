@@ -1,0 +1,13 @@
+
+> restaurant-queue-client@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 39 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.36 kB │ gzip:  0.26 kB
+dist/assets/index-CQl5144e.css    9.95 kB │ gzip:  2.60 kB
+dist/assets/index-DuwoJ7E9.js   244.79 kB │ gzip: 76.17 kB
+✓ built in 392ms

@@ -1,0 +1,46 @@
+/* Public-board text pairs and measured contrast ratios are documented in ui-spec.md. */
+.public-display-page { max-width: 1200px; margin: 32px auto; padding: 32px; color: var(--espresso); }
+.public-display-page > h1 { margin: 0 0 24px; padding-bottom: 24px; border-bottom: 2px solid var(--gold); color: var(--burgundy); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; letter-spacing: -.02em; }
+.public-display-page :focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
+.board-navigation { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.board-navigation-links { display: flex; flex-wrap: wrap; max-width: 100%; }
+.board-navigation a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 8px 16px; border: 1px solid var(--taupe); background: transparent; color: var(--burgundy); font-size: 14px; font-weight: 650; text-decoration: none; }
+.board-navigation a:first-child { border-radius: 8px 0 0 8px; }
+.board-navigation a:last-child { border-radius: 0 8px 8px 0; }
+.board-navigation a:only-child { border-radius: 8px; }
+.board-navigation a[aria-current=page] { border-color: var(--burgundy); background: var(--burgundy); color: var(--cream); }
+.board-navigation > .board-back { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 8px; min-height: 44px; min-width: 44px; margin: 0 0 0 auto; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: var(--burgundy); font-size: 14px; }
+.board-navigation > .board-back:disabled { color: var(--espresso); background: transparent; }
+.board-navigation > .board-back:hover { text-decoration: underline; }
+.public-display { background: transparent; }
+.public-display-title { margin: 0 0 24px; color: var(--espresso); font-size: 20px; font-weight: 600; }
+.public-board-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.public-board { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--taupe); border-top: 4px solid var(--burgundy); border-radius: 16px; background: var(--surface); color: var(--espresso); box-shadow: 0 1px 3px color-mix(in srgb, var(--espresso) 10%, transparent); }
+.public-board-header { display: flex; align-items: center; gap: 16px; padding: 24px 24px 0; }
+.public-board-header h2 { margin: 0; color: var(--espresso); font-size: 20px; letter-spacing: 0; }
+.board-code { display: inline-grid; flex-shrink: 0; place-items: center; width: 48px; height: 48px; border: 1px solid var(--gold); border-radius: 50%; background: var(--burgundy); color: var(--cream); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.board-code-long { font-size: 10px; }
+.public-board-body { display: flex; flex-direction: column; flex: 1; padding: 24px; }
+.public-call { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 0; gap: 24px; padding: 24px 0 32px; text-align: center; }
+.public-call p { margin: 0; color: var(--espresso); }
+.board-call-label { font-size: 14px; letter-spacing: .12em; }
+.public-called-number { display: block; max-width: 100%; color: var(--burgundy); font-size: clamp(72px, 6vw, 120px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.1; overflow-wrap: anywhere; animation: board-number-fade 150ms ease-out; }
+.board-status { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; }
+.board-status-called { background: var(--burgundy); color: var(--cream); }
+.board-status-serving { background: var(--gold); color: var(--espresso); }
+.board-empty-title { max-width: 100%; margin: 0; color: var(--espresso); font-size: clamp(28px, 2.2vw, 32px); line-height: 1.3; font-weight: 600; }
+.board-empty-helper { max-width: 32ch; font-size: 16px; }
+.public-waiting { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; padding-top: 24px; border-top: 1px solid var(--gold); color: var(--espresso); }
+.public-waiting .waiting-count { font-size: 48px; line-height: 1.2; font-weight: 750; font-variant-numeric: tabular-nums; }
+.public-waiting span { font-size: 16px; }
+.public-board-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; padding-top: 24px; }
+.public-board-actions small { flex: 1 1 160px; color: var(--espresso); font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.public-board button.board-secondary { min-height: 44px; min-width: 44px; padding: 8px 16px; border: 1px solid var(--burgundy); border-radius: 8px; background: transparent; color: var(--burgundy); font-size: 14px; }
+.public-board button.board-secondary:disabled { border-color: var(--taupe); background: var(--cream); color: var(--espresso); }
+.public-board .board-error { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 0 32px; color: var(--espresso); text-align: center; }
+.board-error h3 { margin: 0; font-size: 24px; }
+.board-error p { margin: 0; font-size: 16px; }
+@keyframes board-number-fade { from { opacity: .75; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .public-called-number { animation: none; } }
+@media (min-width: 1024px) { .public-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) { .public-display-page { margin: 16px auto; padding: 16px; } .public-board-header { padding: 24px 16px 0; } .public-board-body { padding: 24px 16px; } }

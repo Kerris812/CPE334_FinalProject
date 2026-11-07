@@ -1,0 +1,76 @@
+{
+  "reference": {
+    "wordmark": {
+      "family": "system-ui, sans-serif",
+      "size": "40px",
+      "weight": "700"
+    },
+    "board-link": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "650"
+    },
+    "submit": {
+      "family": "system-ui, sans-serif",
+      "size": "18px",
+      "weight": "650"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "20px",
+      "weight": "700"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14.4px",
+      "weight": "650"
+    },
+    "label": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "600"
+    },
+    "input": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "400"
+    }
+  },
+  "actual": {
+    "wordmark": {
+      "family": "system-ui, sans-serif",
+      "size": "40px",
+      "weight": "700"
+    },
+    "board-link": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "650"
+    },
+    "submit": {
+      "family": "system-ui, sans-serif",
+      "size": "18px",
+      "weight": "650"
+    },
+    "title": {
+      "family": "system-ui, sans-serif",
+      "size": "20px",
+      "weight": "700"
+    },
+    "button": {
+      "family": "system-ui, sans-serif",
+      "size": "14.4px",
+      "weight": "650"
+    },
+    "label": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "600"
+    },
+    "input": {
+      "family": "system-ui, sans-serif",
+      "size": "16px",
+      "weight": "400"
+    }
+  }
+}

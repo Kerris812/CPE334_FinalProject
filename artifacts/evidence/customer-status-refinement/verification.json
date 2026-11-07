@@ -1,0 +1,48 @@
+{
+  "scope": "Customer My queue UI only; no backend, API, ownership, queue lifecycle or shared polling changes",
+  "baseCommit": "4055a963b345dc1182b90ee8ab93e74145dbcaa1",
+  "uncommittedChangesIncluded": true,
+  "recordedAt": "2026-11-07T10:09:00.404Z",
+  "commands": [
+    {
+      "command": "npm --prefix client run test:ui",
+      "passed": 56,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "command": "npm --prefix client run build",
+      "exitCode": 0
+    },
+    {
+      "command": "node .local/run-verification.mjs test npm --prefix client run test:e2e",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    }
+  ],
+  "viewportWidths": [
+    360,
+    768,
+    1440
+  ],
+  "privacy": "Only the existing current identity and owned-entry fields are rendered. Queue headings derive from queueCode; Updated is local receipt time.",
+  "notes": [
+    "Synthetic owned R-10000 fixture checks presentation, not queue number allocation or operator transitions.",
+    "Initial programmatic focus probe reported 3px; final real Tab/Shift+Tab navigation verifies the required 2px focus-visible ring. Initial output retained separately.",
+    "Finite animations are completed for stable status screenshots; normal 150ms and reduced-motion behavior are asserted in the browser."
+  ],
+  "sourceSha256": {
+    "client/src/App.tsx": "945bb0652c4f1290dbe5d6ef4380e568fd08251bbad48c163075a7da0910b6d0",
+    "client/src/AppHeader.tsx": "5c3a97ad76fbca0cfc0ac3db609fb03f1a0010a774dafb126586edbb0778c42d",
+    "client/src/CustomerQueues.tsx": "3a60e89d94a203d6b1c76cb53444ed52b82cdebf6f175af05d20e30f3c12c921",
+    "client/src/QueueNumberDisplay.tsx": "e52fcb79c676f0e9191e0a367524c58edaf48211dcc2e24085e7efa529b465e8",
+    "client/src/customer-status.css": "642769472b9e9b2f38e42b32391c66cdebd76943f22bfc881baa2f093cb9b141",
+    "client/tests/ui/customer-status.test.tsx": "2c670d85089e6ffa8688ce3b9b99c7f550b0576be97870bb8a5e6bdba2998786",
+    "client/tests/e2e/customer-status.spec.ts": "4a77ababbb291ccc62b789a89f26396b1843252c9d01fe2772017256bce5b4b5",
+    "client/tests/e2e/board-navigation.spec.ts": "7fa3db79e5bf34dd0332d9c79812c44fd99046004581bab5dbbbbcf53df77525",
+    "docs/sprint-1/ui-spec.md": "9c589d57e3bf385f0b45428798e6a8e6ef80321f2d5e7dff072c6ce7d7f50994"
+  }
+}

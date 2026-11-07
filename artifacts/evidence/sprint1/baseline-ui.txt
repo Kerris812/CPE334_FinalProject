@@ -1,0 +1,66 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui --reporter=verbose
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ✓ tests/ui/public-board.test.tsx > TEST-028 anonymous board labels all four public values without showing extra private response data 130ms
+ ✓ tests/ui/public-board.test.tsx > TEST-029 visible polling updates number, service state and waiting count then clears completed slot 45ms
+ ✓ tests/ui/public-board.test.tsx > board handles slow loading, network failure, safe retry and unknown queue states 64ms
+ ✓ tests/ui/public-board.test.tsx > hidden board stops timers, resumes immediately and cleans up on unmount 15ms
+ ✓ tests/ui/public-board.test.tsx > slow board poll never overlaps visibility refresh or retry and late responses do not render 14ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 customer status loading, empty and all four lifecycle states use server values 276ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 a missing private entry shows a safe not-found state and can retry 8ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 network/backend errors are retryable and expired identity invokes login redirect 11ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 manual refresh cannot overlap an in-flight automatic poll 19ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 hides stop the polling timer, visibility resumes one refresh, and unmount cleans up 9ms
+ ✓ tests/ui/customer-status.test.tsx > TEST-030 pending initial request, visibility changes and late unmounted responses never overlap 5ms
+ ✓ tests/ui/board-navigation.test.tsx > direct board entry falls back safely for CUSTOMER 203ms
+ ✓ tests/ui/board-navigation.test.tsx > direct board entry falls back safely for OPERATOR 61ms
+ ✓ tests/ui/login.test.tsx > login has accessible fields, password toggle, no role selector and associated validation 232ms
+ ✓ tests/ui/party-routing.test.tsx > TEST-057 party size derives queue, explains ranges and submits matching ID 296ms
+ ✓ tests/ui/party-routing.test.tsx > TEST-057 missing matching queue disables joining instead of falling back 19ms
+ ✓ tests/ui/party-routing.test.tsx > TEST-057 public overview fetches independent privacy-safe R/S responses 11ms
+ ✓ tests/ui/party-routing.test.tsx > TEST-057 rejected action refreshes capacity and prevents further invalid calls 64ms
+ ✓ tests/ui/operator-desk.test.tsx > operator desk drives valid actions from API state and refreshes 374ms
+ ✓ tests/ui/operator-desk.test.tsx > operator with no assignments sees an empty state 10ms
+ ✓ tests/ui/operator-desk.test.tsx > operator desk handles 403 safely 25ms
+ ✓ tests/ui/operator-desk.test.tsx > operator desk handles 500 safely 22ms
+ ✓ tests/ui/board-navigation.test.tsx > direct board entry falls back safely for anonymous 54ms
+ ✓ tests/ui/board-navigation.test.tsx > Back returns to the safe same-origin source page 31ms
+ ✓ tests/ui/board-navigation.test.tsx > recorded in-app navigation takes precedence over an external referrer 48ms
+ ✓ tests/ui/login.test.tsx > login submits once, announces loading, and redirects customer from trusted response 124ms
+ ✓ tests/ui/login.test.tsx > restores operator identity via me on reload and logs out to login 63ms
+ ✓ tests/ui/queues.test.tsx > queue form displays server metadata and associated party-size validation 373ms
+ ✓ tests/ui/queues.test.tsx > pending join disables double submission and displays authoritative number with my-queue link 94ms
+ ✓ tests/ui/login.test.tsx > shows generic credentials errors and server field validation with safe retry 47ms
+ ✓ tests/ui/login.test.tsx > connection failures during identity restore are retryable and do not show private content 26ms
+ ✓ tests/ui/login.test.tsx > failed logout keeps identity with retry; unauthenticated logout clears identity 34ms
+ ✓ tests/ui/login.test.tsx > home and sign-in expose a visible public board link without logging in 13ms
+ ✓ tests/ui/board-navigation.test.tsx > unsafe source https://outside.example/queues uses the role fallback 37ms
+ ✓ tests/ui/board-navigation.test.tsx > unsafe source //outside.example/queues uses the role fallback 23ms
+ ✓ tests/ui/board-navigation.test.tsx > unsafe source javascript:alert(1) uses the role fallback 22ms
+ ✓ tests/ui/board-navigation.test.tsx > unsafe source /api/v1/auth/logout uses the role fallback 12ms
+ ✓ tests/ui/board-navigation.test.tsx > unsafe source /unknown uses the role fallback 12ms
+ ✓ tests/ui/board-navigation.test.tsx > same-origin referrer without usable history uses the role fallback 13ms
+ ✓ tests/ui/board-navigation.test.tsx > Back is a focusable native button with a decorative left arrow 8ms
+ ✓ tests/ui/board-navigation.test.tsx > opening the board inside the app records the source and Back restores it 44ms
+ ✓ tests/ui/board-navigation.test.tsx > authenticated landing referrer resolves to the role home rather than a missing page 9ms
+ ✓ tests/ui/queues.test.tsx > duplicate conflict refreshes own latest entry and shows actionable message 34ms
+ ✓ tests/ui/queues.test.tsx > queue discovery recovers from connection errors and supports empty state 21ms
+ ✓ tests/ui/queues.test.tsx > my-queue reload reads saved entry and completed entries allow a new join 46ms
+ ✓ tests/ui/queues.test.tsx > join handles server field validation, unavailable queues and expired identity 43ms
+ ✓ tests/ui/queues.test.tsx > public board stays anonymous and displays only public number, state and count 5ms
+ ✓ tests/ui/queues.test.tsx > public board distinguishes loading, empty, missing and retryable errors 21ms
+ ✓ tests/ui/queues.test.tsx > my-queue polls while visible and stops polling after unmount 8ms
+ ✓ tests/ui/app.test.tsx > foundation page identifies the application 66ms
+ ✓ tests/ui/permissions.test.tsx > operator cannot access the customer private queue page 105ms
+ ✓ tests/ui/permissions.test.tsx > customer cannot access operator routes by a direct URL 12ms
+ ✓ tests/ui/permissions.test.tsx > anonymous public board stays public without inventing a display role 9ms
+
+ Test Files  9 passed (9)
+      Tests  53 passed (53)
+   Start at  16:06:47
+   Duration  1.92s (environment 49%, tests 31%, import 14%, transform 6%)
+

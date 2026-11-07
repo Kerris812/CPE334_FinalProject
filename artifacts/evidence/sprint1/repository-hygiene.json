@@ -1,0 +1,54 @@
+{
+  "filesScanned": 152,
+  "secretValueMatches": [],
+  "disabledOrExclusiveTestFiles": [],
+  "conflictMarkerFiles": [],
+  "ignoreChecks": [
+    {
+      "path": "server/.env",
+      "ignored": true
+    },
+    {
+      "path": "client/.env",
+      "ignored": true
+    },
+    {
+      "path": ".local/sprint1-verification.json",
+      "ignored": true
+    },
+    {
+      "path": "server/node_modules/x",
+      "ignored": true
+    },
+    {
+      "path": "client/dist/x",
+      "ignored": true
+    },
+    {
+      "path": "client/coverage/x",
+      "ignored": true
+    },
+    {
+      "path": "client/test-results/x",
+      "ignored": true
+    },
+    {
+      "path": "client/playwright-report/x",
+      "ignored": true
+    },
+    {
+      "path": "client/.vite/deps/x",
+      "ignored": true
+    },
+    {
+      "path": "client/x.tsbuildinfo",
+      "ignored": true
+    }
+  ],
+  "curatedEvidenceIgnored": false,
+  "removedTrackedGeneratedCache": [
+    "client/.vite/deps/_metadata.json",
+    "client/.vite/deps/package.json"
+  ],
+  "historicalScreenshotsRestored": true
+}

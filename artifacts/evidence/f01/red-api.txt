@@ -1,0 +1,204 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "cpe334_auth_test", schema "public" at "127.0.0.1:55432"
+
+1 migration found in prisma/migrations
+
+Applying migration `0001_foundation`
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.19.0 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+The following migration(s) have been applied:
+
+migrations/
+  └─ 0001_foundation/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/api/auth.test.ts (9 tests | 9 failed) 128ms
+   × TEST-001 valid customer and operator login use server identity 15ms
+   × TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions 4ms
+   × TEST-003 me returns only current identity and reads account activity from DB 3ms
+   × TEST-004 logout revokes only this session before 204 and prevents replay 2ms
+   × TEST-005 missing, malformed and unknown sessions cannot access protected requests 1ms
+   × TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal 1ms
+   × TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence 1ms
+   × TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets 2ms
+   × TEST-050 origin and JSON protection reject unsafe requests without revoking session 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-001 valid customer and operator login use server identity
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/api/auth.test.ts:45:29
+     43|   for (const [email, secret, role] of [[customerEmail, password, 'CUST…
+     44|     const response = await trackedLogin(app(), email.toUpperCase(), se…
+     45|     expect(response.status).toBe(200);
+       |                             ^
+     46|     const user = await db.user.findUniqueOrThrow({ where: { email } });
+     47|     expect(response.body).toEqual({ data: { user: { id: user.id, displ…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-002 wrong password and unknown/inactive account share generic errors and create no sessions
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ tests/api/auth.test.ts:57:29
+     55|   const unknown = await login(app(), 'missing@example.test');
+     56|   for (const response of [wrong, unknown]) {
+     57|     expect(response.status).toBe(401);
+       |                             ^
+     58|     expect(response.body.error).toEqual({ code: 'INVALID_CREDENTIALS',…
+     59|     expect(response.headers['set-cookie']).toBeUndefined();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-003 me returns only current identity and reads account activity from DB
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/api/auth.test.ts:74:21
+     72|   const user = await db.user.findUniqueOrThrow({ where: { email: custo…
+     73|   const me = await request(app()).get('/api/v1/auth/me').set('Cookie',…
+     74|   expect(me.status).toBe(200);
+       |                     ^
+     75|   safeIdentity(me.body, user.id, user.displayName, user.role);
+     76|   expect(me.headers['cache-control']).toContain('no-store');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-004 logout revokes only this session before 204 and prevents replay
+AssertionError: expected 404 to be 204 // Object.is equality
+
+- Expected
++ Received
+
+- 204
++ 404
+
+ ❯ tests/api/auth.test.ts:86:27
+     84|   const second = await trackedLogin();
+     85|   const response = await request(app()).post('/api/v1/auth/logout').se…
+     86|   expect(response.status).toBe(204);
+       |                           ^
+     87|   expect(response.text).toBe('');
+     88|   expect(response.headers['set-cookie'][0]).toContain('qs_session=;');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-005 missing, malformed and unknown sessions cannot access protected requests
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ tests/api/auth.test.ts:99:31
+     97|     for (const [method, path] of [['get', '/api/v1/auth/me'], ['post',…
+     98|       const response = await request(app())[method](path).set('Cookie'…
+     99|       expect(response.status).toBe(401);
+       |                               ^
+    100|       expect(response.body.error.code).toBe('UNAUTHENTICATED');
+    101|       expect(response.body.error.requestId).toEqual(expect.any(String)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-006 eight-hour absolute expiry rejects exactly at boundary without renewal
+TypeError: The "data" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received undefined
+ ❯ digest tests/api/auth.test.ts:16:56
+     14| let now = new Date('2026-11-06T08:00:00.000Z');
+     15| const app = () => createApp({ now: () => now, webOrigin: origin });
+     16| const digest = (token: string) => createHash('sha256').update(token).d…
+       |                                                        ^
+     17| const login = (api = app(), email = customerEmail, value = password) =…
+     18| function cookie(response: request.Response) {
+ ❯ tests/api/auth.test.ts:108:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-007 invalid fields return 422 and malformed JSON returns safe 400 without persistence
+AssertionError: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ tests/api/auth.test.ts:126:29
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-008 opaque unique tokens, SHA-256 storage, secure cookies, and no JSON/log secrets
+TypeError: Cannot read properties of undefined (reading '0')
+ ❯ tests/api/auth.test.ts:141:48
+    139|   const response = await trackedLogin();
+    140|   const another = await trackedLogin();
+    141|   const header = response.headers['set-cookie'][0];
+       |                                                ^
+    142|   for (const flag of ['HttpOnly', 'SameSite=Lax', 'Path=/', 'Max-Age=2…
+    143|   const token = cookie(response).split('=')[1];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  tests/api/auth.test.ts > TEST-050 origin and JSON protection reject unsafe requests without revoking session
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ tests/api/auth.test.ts:165:27
+    163|   for (const badOrigin of ['https://evil.example', 'null', '']) {
+    164|     const logout = await request(app()).post('/api/v1/auth/logout').se…
+    165|     expect(logout.status).toBe(403);
+       |                           ^
+    166|     expect(logout.body.error.code).toBe('FORBIDDEN');
+    167|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  9 failed | 4 passed (13)
+   Start at  19:31:05
+   Duration  2.55s (tests 89%, import 9%, transform 2%)
+

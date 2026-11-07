@@ -57,12 +57,13 @@ test('TEST-010 assigned operator receives only assigned queue public metadata', 
   expect(await state()).toEqual(before);
 });
 
-test('TEST-011 unassigned operator has empty list and cannot inspect or mutate R', async () => {
+test('TEST-011 operator B lists S and cannot inspect or mutate R', async () => {
   const cookie = await login('operator.b@example.test');
   const before = await state();
   const list = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie).set('operatorId', operatorId).query({ operatorId });
   expect(list.status).toBe(200);
-  expect(list.body).toEqual({ data: [] });
+  const s = await db.queue.findUniqueOrThrow({ where: { code: 'S' } });
+  expect(list.body).toEqual({ data: [{ id: s.id, code: 'S', name: s.name, state: 'OPEN' }] });
   denied(await request(app).get(`/api/v1/operator/queues/${queueId}/desk`).set('Cookie', cookie), 403, 'QUEUE_ACCESS_DENIED');
   for (const path of [`queues/${queueId}/call-next`, `entries/${entryId}/start-service`, `entries/${entryId}/complete`]) {
     denied(await request(app).post(`/api/v1/operator/${path}`).set('Cookie', cookie).set('Origin', origin).send({ operatorId }), 403, 'QUEUE_ACCESS_DENIED');

@@ -25,8 +25,9 @@ test('TEST-016 customer discovers R and joins with one WAITING entry and JOINED 
   expect(await db.queueEvent.findMany({ where: { entryId: entry.id } })).toEqual([expect.objectContaining({ actorId: f.customer.id, eventType: 'JOINED', fromStatus: null, toStatus: 'WAITING', occurredAt: expect.any(Date) })]);
   expect((await db.queue.findUniqueOrThrow({ where: { id: f.queue.id } })).lastSequence).toBe(BigInt(sequence));
 });
-test('TEST-017 minimum one and maximum eight are accepted', async () => {
-  for (const partySize of [1, 8]) { const response = await join(await f.actor(), { partySize }); expect(response.status).toBe(201); expect(response.body.data.partySize).toBe(partySize); }
+test('TEST-017 boundaries 1/4 on R and 5/8 on S are accepted', async () => {
+  const s = await f.useS();
+  for (const partySize of [1, 4, 5, 8]) { const response = await join(await f.actor(), { partySize }, partySize <= 4 ? f.queue.id : s.id); expect(response.status).toBe(201); expect(response.body.data.partySize).toBe(partySize); }
 });
 test('TEST-018 invalid sizes create no entries, events or counter increments', async () => {
   const before = await f.state();
@@ -36,8 +37,8 @@ test('TEST-018 invalid sizes create no entries, events or counter increments', a
 });
 test('TEST-019 active entries block same and other queues; COMPLETED permits joining', async () => {
   for (const status of ['WAITING', 'CALLED', 'SERVING'] as const) {
-    const other = await f.newQueue(); const entry = await f.entry(status, f.customer, other); const before = await f.state();
-    error(await join(), 409, 'DUPLICATE_ACTIVE_ENTRY'); error(await join(f.customer, { partySize: 4 }, other.id), 409, 'DUPLICATE_ACTIVE_ENTRY'); expect(await f.state()).toEqual(before);
+    const other = await f.useS(); const entry = await f.entry(status, f.customer, other); const before = await f.state();
+    error(await join(), 409, 'DUPLICATE_ACTIVE_ENTRY'); error(await join(f.customer, { partySize: 5 }, other.id), 409, 'DUPLICATE_ACTIVE_ENTRY'); expect(await f.state()).toEqual(before);
     await db.queueEntry.delete({ where: { id: entry.id } });
   }
   await f.entry('COMPLETED', f.customer, await f.newQueue()); expect((await join()).status).toBe(201);
@@ -85,7 +86,7 @@ test('join authentication, role, origin and unknown queue denials preserve data'
   for (const id of [randomUUID(), 'invalid']) error(await join(f.customer, { partySize: 4 }, id), 404, 'QUEUE_NOT_FOUND'); expect(await f.state()).toEqual(before);
 });
 test('cross-queue simultaneous same-customer joining commits only one increment', async () => {
-  const other = await f.newQueue(); const responses = await Promise.all([join(), join(f.customer, { partySize: 4 }, other.id)]); expect(responses.map(row => row.status).sort()).toEqual([201, 409]);
+  const other = await f.useS(); const responses = await Promise.all([join(), join(f.customer, { partySize: 5 }, other.id)]); expect(responses.map(row => row.status).sort()).toEqual([201, 409]);
   const state = await f.state(); expect(state.entries).toHaveLength(1); expect(state.events).toHaveLength(1); expect(state.queues.reduce((sum, row) => sum + row.lastSequence, 0n)).toBe(1n);
 });
 test('number collision returns NUMBER_CONFLICT and rolls back all writes', async () => {

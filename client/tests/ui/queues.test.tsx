@@ -45,7 +45,7 @@ test('my-queue reload reads saved entry and completed entries allow a new join',
 test('join handles server field validation, unavailable queues and expired identity', async () => {
   await form(); mock.mockResolvedValueOnce(response(422, { error: { code: 'VALIDATION_ERROR', details: { fields: { partySize: 'Must be an integer from 1 to 8.' } } } }));
   fireEvent.click(screen.getByRole('button', { name: 'Join queue' })); await screen.findByText('Must be an integer from 1 to 8.');
-  mock.mockResolvedValueOnce(response(409, { error: { code: 'QUEUE_NOT_OPEN' } })); fireEvent.click(screen.getByRole('button', { name: 'Join queue' })); await screen.findByText('This queue is no longer open. Please choose an available queue.'); await screen.findByLabelText('Party size');
+  mock.mockResolvedValueOnce(response(409, { error: { code: 'QUEUE_NOT_OPEN' } })); fireEvent.click(screen.getByRole('button', { name: 'Join queue' })); await screen.findByText('This queue is no longer open. Please refresh or try again later.'); await screen.findByLabelText('Party size');
   mock.mockResolvedValueOnce(response(401, { error: { code: 'UNAUTHENTICATED' } })); fireEvent.click(screen.getByRole('button', { name: 'Join queue' })); await waitFor(() => expect(window.location.pathname).toBe('/login'));
 });
 test('public board stays anonymous and displays only public number, state and count', async () => {

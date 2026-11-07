@@ -1,0 +1,220 @@
+{
+  "branch": "feature/8-operator-workflow",
+  "baseCommit": "0e8ff3e554708b72084c61f8770ba9d134f6f349",
+  "testedRevision": "uncommitted working tree; base commit is not claimed to contain these changes",
+  "changedSourceAndContractFiles": [
+    "client/playwright.config.ts",
+    "client/src/App.tsx",
+    "client/src/CustomerQueues.tsx",
+    "client/src/OperatorDesk.tsx",
+    "client/src/PublicQueueBoard.tsx",
+    "client/src/auth-api.ts",
+    "client/src/style.css",
+    "client/tests/e2e/operator-workflow.spec.ts",
+    "client/tests/e2e/party-routing.spec.ts",
+    "client/tests/e2e/public-board.spec.ts",
+    "client/tests/e2e/queue-journey.spec.ts",
+    "client/tests/ui/login.test.tsx",
+    "client/tests/ui/operator-desk.test.tsx",
+    "client/tests/ui/party-routing.test.tsx",
+    "client/tests/ui/queues.test.tsx",
+    "docs/sprint-1/api-spec.md",
+    "docs/sprint-1/specification.md",
+    "docs/sprint-1/tests.md",
+    "docs/sprint-1/ui-spec.md",
+    "server/prisma/migrations/0002_immutable_queue_sequence/migration.sql",
+    "server/prisma/seed.ts",
+    "server/scripts/seed.ts",
+    "server/src/app.ts",
+    "server/src/operator/service.ts",
+    "server/src/public-board/service.ts",
+    "server/src/queues/routes.ts",
+    "server/src/queues/rules.ts",
+    "server/src/queues/service.ts",
+    "server/tests/api/authorization.test.ts",
+    "server/tests/api/database.test.ts",
+    "server/tests/api/operator-workflow.test.ts",
+    "server/tests/api/party-routing.test.ts",
+    "server/tests/api/permission-guards.test.ts",
+    "server/tests/api/queue-join.test.ts",
+    "server/tests/support/queue-fixture.ts",
+    "server/tests/unit/operator-rules.test.ts",
+    "server/tests/unit/party-routing.test.ts"
+  ],
+  "fileSha256": {
+    "client/playwright.config.ts": "1481f54fb754f96785df53a4e6b2ec14b29f6b74d4ad91323316b7e1ad58ff74",
+    "client/src/App.tsx": "857e8351e9bb30cdd7c7aaf19eebf9a49c5dec28ffe7063bab5e40f237edeba9",
+    "client/src/CustomerQueues.tsx": "943e3861f9101a4bc37e794248f062b988f4f73cf832793403111d7523a3a9ee",
+    "client/src/OperatorDesk.tsx": "87a6c6785c0fe5c65d60abf57f30f02c27f4d2ef82aaa421609e6a2e96f3fdff",
+    "client/src/PublicQueueBoard.tsx": "4c0203b26707c931334263c3700815b97fcfa7b4cc8ca96f4ea9f9a67376720b",
+    "client/src/auth-api.ts": "00f2b851aafd5faddc4da7cdc22478162e149ce95e75db434ce3a08d08ee2c57",
+    "client/src/style.css": "6346bc1d2772b1729d499d40bf53e43e551007ced27cf009b06f2ddf437b7ad0",
+    "client/tests/e2e/operator-workflow.spec.ts": "6500fab084788316e69c6003ff3abf44eb25455db93cd0e2f7d2db4a8cfc2b8b",
+    "client/tests/e2e/party-routing.spec.ts": "f388a7a248615aeeab3474f663bbcca720df0bdf7982b48e08b0380f1fce76b4",
+    "client/tests/e2e/public-board.spec.ts": "8b2500e2945c42b8a68dc7670e64de295ee5b76792e159410f07650faeecec60",
+    "client/tests/e2e/queue-journey.spec.ts": "6d76afb568d2ba7153464f9364625f76004adfec92529801a4d0241b810e8275",
+    "client/tests/ui/login.test.tsx": "664f4ec8d62c6c1705b6e6ad8be1ef7a173f5a2ccb18a77bd72e1dfad1742efe",
+    "client/tests/ui/operator-desk.test.tsx": "f765fae6f717ac54122db40266fd6d862be5a48bc216fe1866a8839ade97f119",
+    "client/tests/ui/party-routing.test.tsx": "d130dc30b660c25a76fa182d3789d68b2233ac1a74af77b103b836179cea455d",
+    "client/tests/ui/queues.test.tsx": "d7d025fddf6041256bdc78fc1291a6cd113898f4d7214804e16b5805befc5357",
+    "docs/sprint-1/api-spec.md": "67b9cac6099b77f4903e3dccc81e6cdbcaba2b56beb4928356f0c835e4bb885c",
+    "docs/sprint-1/specification.md": "d3e3df5a3b875939a017c21d13c69cacddcd0cf5417d534768d6aeebd684568f",
+    "docs/sprint-1/tests.md": "df164bec8216cf8ce451f2e148b7170ac61e876f0f2a9cc9788a441e75083157",
+    "docs/sprint-1/ui-spec.md": "cbb9daa3464ee7c1acfdeea65561a69e4dd04be6a18b75fec6e4995c373365d1",
+    "server/prisma/migrations/0002_immutable_queue_sequence/migration.sql": "aa737fdc15e3ae15b27b684a7c9e66a9d265543413bfac2f7487b5efb3e1df1c",
+    "server/prisma/seed.ts": "4ee97ca33a32e52949018e1dce15f1d82ed3ed1bf755248214942dc030072a7d",
+    "server/scripts/seed.ts": "81ed61db193a74ce2386f0ee9dffa578603dfb1672350244a7dcc7d3a9945432",
+    "server/src/app.ts": "9eb05d5fca92bae88e534c432b56737d4770a4e6b9574b69cc76cff266f550bf",
+    "server/src/operator/service.ts": "1d9e415f26af48b8c1cd4262778373c6e98b6f8674a4500158aeaf266c702888",
+    "server/src/public-board/service.ts": "fa07b581523593d50eb65122430d19f0dbd61a6a9b50eb87d64a623422c50fb8",
+    "server/src/queues/routes.ts": "7985ac9cf72543421d4a6f707f9a979c4dd809200cad84100942b137f6a79e8f",
+    "server/src/queues/rules.ts": "c108dceef9424fc6e914f98d1ae540cf977b3343181659637d1e0620de108bc2",
+    "server/src/queues/service.ts": "b5839325eb17f6e74dfcbb27459bfc9030c2906efec6b32f7bc631ec11b90069",
+    "server/tests/api/authorization.test.ts": "1ee121f6ee9c2002c4478d29192c37d4ce5d98eb7fef73d89e1a47f7cf75435b",
+    "server/tests/api/database.test.ts": "3dae6db240748debb5870461c80280bc2065f51eb697050bf45a7bc49a73be05",
+    "server/tests/api/operator-workflow.test.ts": "5f51093bf1d90af0ffa2925793caa8f42422dbec2f694be8b3c6eea5cf4cb567",
+    "server/tests/api/party-routing.test.ts": "61d44a5f9db56f7f2259d84fc06326de9621191967de00c07205573406f2c5d8",
+    "server/tests/api/permission-guards.test.ts": "673a4de9af0611c5ccf405de53c2c4681408bdbf0cd1051cb55bdcc449c6d0b1",
+    "server/tests/api/queue-join.test.ts": "8ab7bdf71a37c1bd0cbd4ad3501607c091d4aa9620ccd024e73fba687a67bcc9",
+    "server/tests/support/queue-fixture.ts": "2743ffe6c2b2b95b1837b08053d4e297cf482951dabec31c586ba6ad94c69a79",
+    "server/tests/unit/operator-rules.test.ts": "443b7cfebeee5552d0fae75b3d309c374a0dd46c408b596e4079d178f30f3eaf",
+    "server/tests/unit/party-routing.test.ts": "c5cea8e9b3477431f6c6b64d4e77ff5b09ba62fa36f88e5f4d1cbf3a8926cbd2"
+  },
+  "approvedScope": {
+    "R": {
+      "partySizes": [
+        1,
+        4
+      ],
+      "operator": "A",
+      "capacity": 1
+    },
+    "S": {
+      "partySizes": [
+        5,
+        8
+      ],
+      "operator": "B",
+      "capacity": 1
+    },
+    "oneActiveEntryPerCustomer": "unchanged across all queues",
+    "multipleCounters": "deferred to Sprint 2"
+  },
+  "red": {
+    "unit": {
+      "failed": 2,
+      "passed": 8,
+      "log": "red-unit.log"
+    },
+    "apiSelected": {
+      "failed": 8,
+      "filteredOut": 71,
+      "log": "red-api.log"
+    },
+    "ui": {
+      "failed": 4,
+      "passed": 35,
+      "log": "red-ui.log"
+    },
+    "e2eSelected": {
+      "failed": 1,
+      "log": "red-e2e-isolated-ports.log"
+    },
+    "infrastructureOnlyFailure": "red-e2e.log: occupied development port; retried on isolated ports without stopping development server"
+  },
+  "greenAndRefactor": {
+    "unit": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "log": "refactor-unit-final.log"
+    },
+    "api": {
+      "passed": 79,
+      "failed": 0,
+      "skipped": 0,
+      "log": "refactor-api.log"
+    },
+    "ui": {
+      "passed": 39,
+      "failed": 0,
+      "skipped": 0,
+      "log": "refactor-ui.log"
+    },
+    "e2e": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "log": "refactor-e2e.log"
+    },
+    "totalPassed": 141
+  },
+  "commands": [
+    "npm --prefix server run test:unit",
+    "npm --prefix server run test:api",
+    "npm --prefix client run test:ui",
+    "E2E_API_PORT=3400 E2E_WEB_PORT=5473 npm --prefix client run test:e2e",
+    "npm --prefix server run build",
+    "npm --prefix client run build"
+  ],
+  "concurrency": {
+    "database": "actual isolated PostgreSQL TEST_DATABASE_URL",
+    "simultaneousCalls": 40,
+    "R": {
+      "requests": 20,
+      "successful": 1,
+      "serviceSlotBusy": 19,
+      "fifoHeadSelected": true,
+      "activeEntriesAfterCall": 1,
+      "calledAuditEvents": 1
+    },
+    "S": {
+      "requests": 20,
+      "successful": 1,
+      "serviceSlotBusy": 19,
+      "fifoHeadSelected": true,
+      "activeEntriesAfterCall": 1,
+      "calledAuditEvents": 1
+    },
+    "independence": "S call succeeds before R row lock is released (3-second deadline)",
+    "sameCustomerAcrossQueues": "one 201 and one 409 DUPLICATE_ACTIVE_ENTRY; one entry/event/counter increment"
+  },
+  "audit": {
+    "bothRealWorkflows": [
+      "JOINED",
+      "CALLED",
+      "STARTED",
+      "COMPLETED"
+    ],
+    "exactlyOnePerTransition": true,
+    "actorsVerified": true,
+    "rejectionsPreserveState": true,
+    "postgresAuditInsertFailure": "call/start/complete rollback regression tests pass"
+  },
+  "developmentDatabase": {
+    "newQueue": "S, OPEN",
+    "newAssignment": "Operator B -> S",
+    "existingUsersPreserved": 4,
+    "existingSessionsPreserved": 24,
+    "existingEntriesPreserved": 4,
+    "existingAuditEventsPreserved": 11,
+    "existingQueuesStatesAndCountersPreserved": 1,
+    "existingAssignmentsPreserved": 1,
+    "secondSeedUnchanged": true,
+    "newRoutingMigrationRequired": false,
+    "migrationDeploymentCheck": "No pending migrations to apply",
+    "seedConflictPolicy": "Fail transaction on contradictory seeded-operator assignments; do not delete them"
+  },
+  "builds": {
+    "server": "passed",
+    "client": "passed"
+  },
+  "remainingImplementationBlockers": [],
+  "notPerformed": [
+    "commit",
+    "push",
+    "merge",
+    "branch switch",
+    "destructive development database reset"
+  ]
+}

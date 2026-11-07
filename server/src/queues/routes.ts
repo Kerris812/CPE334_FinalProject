@@ -7,7 +7,7 @@ import { readPublicBoard } from '../public-board/service.js';
 export function queueRoutes(db: PrismaClient) {
   const router = Router();
   router.get('/', async (_req, res) => {
-    const queues = await db.queue.findMany({ where: { state: 'OPEN' }, select: { id: true, code: true, name: true, state: true }, orderBy: { code: 'asc' } });
+    const queues = await db.queue.findMany({ where: { state: 'OPEN', code: { in: ['R', 'S'] } }, select: { id: true, code: true, name: true, state: true }, orderBy: { code: 'asc' } });
     res.json({ data: queues });
   });
   router.post('/:queueId/entries', async (req, res) => { res.status(201).json({ data: await joinQueue(db, currentUser(res).id, req.params.queueId, req.body) }); });

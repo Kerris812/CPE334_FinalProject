@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, MouseEvent } from 'react';
 import { AuthError, authRequest, home, isUnauthenticated, isPublicBoard, routeAccess } from './auth-api';
+import { OperatorDesk } from './OperatorDesk';
 import { CustomerQueues } from './CustomerQueues';
-import { PublicQueueBoard } from './PublicQueueBoard';
+import { PublicQueueBoard, PublicQueueOverview } from './PublicQueueBoard';
 import type { User } from './auth-api';
+import { boardBackPath } from './board-navigation';
 
 function navigate(path: string) { window.history.replaceState({}, '', path); }
 
@@ -110,11 +112,25 @@ export function App() {
   useEffect(() => {
     if (!loading && !restoreError && !user && !isPublicBoard(path) && path !== '/login') signedOut();
   }, [path, user, loading, restoreError]);
+  function openBoard(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    window.history.pushState({ publicBoardPrevious: window.location.pathname }, '', '/board');
+    setPath('/board');
+  }
+  function backFromBoard() {
+    const destination = boardBackPath(user);
+    navigate(destination); setPath(destination);
+  }
   return <main>
+    {publicBoard && <button type="button" className="secondary board-back" onClick={backFromBoard} disabled={loading}>
+      <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 5-7 7 7 7M5 12h14" /></svg>
+      Back
+    </button>}
     <h1>Restaurant Queue</h1>
     <p>Queue and service management</p>
-    {!publicBoard && <nav aria-label="Public display"><a className="board-link" href="/board/R">View public board</a></nav>}
-    {publicBoard ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
+    {!publicBoard && <nav aria-label="Public display"><a className="board-link" href="/board" onClick={openBoard}>View public board</a></nav>}
+    {publicBoard ? (path.split('/')[2] ? <PublicQueueBoard key={path} queueId={path.split('/')[2]} /> : <PublicQueueOverview />) : loading ? <p role="status">Restoring your session…</p> : restoreError ? <section>
       <p role="alert">Unable to restore your session. Please try again.</p>
       <button onClick={() => setAttempt(value => value + 1)}>Retry</button>
     </section> : user ? <>
@@ -124,7 +140,7 @@ export function App() {
       </header>
       {logoutError && <p role="alert">{logoutError}</p>}
       {loggingOut && <p role="status">Logging out…</p>}
-      {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <section><h2>Operator desk</h2><p>Service controls will be available in a later feature.</p></section>}
+      {access === 'forbidden' ? <section><h2>Access denied</h2><p>You do not have permission to view this page.</p><a href={home(user)}>Back to your account</a></section> : access === 'missing' ? <section><h2>Page not found</h2><a href={home(user)}>Back to your account</a></section> : user.role === 'CUSTOMER' ? <CustomerQueues key={path} myQueue={path === '/my-queue'} onUnauthenticated={signedOut} /> : <OperatorDesk onUnauthenticated={signedOut} />}
     </> : <Login onLogin={signedIn} />}
   </main>;
 }

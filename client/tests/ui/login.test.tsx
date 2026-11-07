@@ -6,7 +6,7 @@ const response = (status: number, body?: unknown) => ({ ok: status >= 200 && sta
 let fetchMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   window.history.replaceState({}, '', '/login');
-  fetchMock = vi.fn(async (path: string) => path === '/api/v1/queues' ? response(200, { data: [] }) : path.endsWith('/entries/latest') ? response(200, { data: null }) : response(401));
+  fetchMock = vi.fn(async (path: string) => ['/api/v1/queues', '/api/v1/operator/queues'].includes(path) ? response(200, { data: [] }) : path.endsWith('/entries/latest') ? response(200, { data: null }) : response(401));
   vi.stubGlobal('fetch', fetchMock);
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
@@ -48,7 +48,7 @@ test('restores operator identity via me on reload and logs out to login', async 
   fireEvent.click(screen.getByRole('button', { name: 'Log out' }));
   await screen.findByRole('button', { name: 'Sign in' });
   expect(window.location.pathname).toBe('/login');
-  expect(fetchMock.mock.calls[1][0]).toBe('/api/v1/auth/logout');
+  expect(fetchMock.mock.calls.some(([url]) => url === '/api/v1/auth/logout')).toBe(true);
 });
 test('shows generic credentials errors and server field validation with safe retry', async () => {
   await form(); fill();
@@ -84,6 +84,6 @@ test('home and sign-in expose a visible public board link without logging in', a
   window.history.replaceState({}, '', '/');
   await form();
   const link = screen.getByRole('link', { name: 'View public board' });
-  expect(link.getAttribute('href')).toBe('/board/R');
+  expect(link.getAttribute('href')).toBe('/board');
   expect(fetchMock.mock.calls.some(call => String(call[0]).includes('/auth/login'))).toBe(false);
 });

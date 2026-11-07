@@ -11,3 +11,18 @@ export function joinInput(input: unknown): number {
 }
 export const validId = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 export const formatQueueNumber = (code: string, sequence: bigint) => `${code}-${sequence.toString().padStart(4, '0')}`;
+export function canTransition(from: string, to: string): boolean {
+  return (from === 'WAITING' && to === 'CALLED') || (from === 'CALLED' && to === 'SERVING') || (from === 'SERVING' && to === 'COMPLETED');
+}
+export function selectNextWaiting<T extends { sequence: bigint; status: string }>(entries: T[]): T | null {
+  return entries.reduce<T | null>((head, entry) => entry.status === 'WAITING' && (!head || entry.sequence < head.sequence) ? entry : head, null);
+}
+
+export function queueCodeForPartySize(value: unknown): 'R' | 'S' {
+  return validatePartySize(value) <= 4 ? 'R' : 'S';
+}
+
+/** Queue identity comes from the locked database row, never a browser assertion. */
+export function validatePartyQueue(queueCode: string, partySize: number): void {
+  if (queueCode !== queueCodeForPartySize(partySize)) throw new ApiError(422, 'VALIDATION_ERROR', 'Check the submitted fields.', { fields: { partySize: 'Parties of 1–4 must join Queue R; parties of 5–8 must join Queue S.' } });
+}

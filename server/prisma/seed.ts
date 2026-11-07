@@ -10,6 +10,7 @@ export async function seed(db: PrismaClient, env: NodeJS.ProcessEnv = process.en
   const operatorHash = await hash(operatorPassword, { type: argon2id });
   await db.$transaction(async tx => {
     const queue = await tx.queue.upsert({ where: { code: 'R' }, update: {}, create: { code: 'R', name: 'Restaurant Waiting Queue', state: 'OPEN' } });
+    const largeQueue = await tx.queue.upsert({ where: { code: 'S' }, update: {}, create: { code: 'S', name: 'Large Party Waiting Queue', state: 'OPEN' } });
     for (const [email, displayName, role, passwordHash] of [
       ['customer.a@example.test', 'Customer A', 'CUSTOMER', customerHash],
       ['customer.b@example.test', 'Customer B', 'CUSTOMER', customerHash],
@@ -19,8 +20,10 @@ export async function seed(db: PrismaClient, env: NodeJS.ProcessEnv = process.en
       // Existing passwords, account flags, queue state and counters are never reset.
       const user = await tx.user.upsert({ where: { email }, update: {}, create: { email, displayName, role, passwordHash } });
       if (user.role !== role) throw new Error('Seed account role conflicts with existing data.');
-      if (email === 'operator.a@example.test') {
-        await tx.operatorQueueAssignment.upsert({ where: { operatorId_queueId: { operatorId: user.id, queueId: queue.id } }, update: {}, create: { operatorId: user.id, queueId: queue.id } });
+      if (role === 'OPERATOR') {
+        const designated = email === 'operator.a@example.test' ? queue : largeQueue;
+        if (await tx.operatorQueueAssignment.findFirst({ where: { operatorId: user.id, queueId: { not: designated.id } } })) throw new Error('Seed operator assignment conflicts with the approved queue scope; existing assignments were preserved.');
+        await tx.operatorQueueAssignment.upsert({ where: { operatorId_queueId: { operatorId: user.id, queueId: designated.id } }, update: {}, create: { operatorId: user.id, queueId: designated.id } });
       }
     }
   });

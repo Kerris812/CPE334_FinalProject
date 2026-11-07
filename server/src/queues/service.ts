@@ -1,6 +1,6 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { ApiError } from '../http/errors.js';
-import { formatQueueNumber, joinInput, validId } from './rules.js';
+import { formatQueueNumber, joinInput, validId, validatePartyQueue } from './rules.js';
 const duplicate = () => new ApiError(409, 'DUPLICATE_ACTIVE_ENTRY', 'You already have an active queue entry.');
 const numberConflict = () => new ApiError(409, 'NUMBER_CONFLICT', 'A queue number could not be allocated. Please try again.');
 export const queueNotFound = () => new ApiError(404, 'QUEUE_NOT_FOUND', 'Queue not found.');
@@ -17,6 +17,7 @@ export async function joinQueue(db: PrismaClient, customerId: string, queueId: u
       const rows = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM queues WHERE id = ${queueId}::uuid FOR UPDATE`;
       if (!rows.length) throw queueNotFound();
       const queue = await tx.queue.findUniqueOrThrow({ where: { id: queueId } });
+      validatePartyQueue(queue.code, partySize);
       if (queue.state !== 'OPEN') throw new ApiError(409, 'QUEUE_NOT_OPEN', 'This queue is not open.');
       if (await tx.queueEntry.findFirst({ where: { customerId, status: { in: ['WAITING', 'CALLED', 'SERVING'] } }, select: { id: true } })) throw duplicate();
       const sequence = queue.lastSequence + 1n;

@@ -10,7 +10,6 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
     return { queues, entry };
   }, [myQueue]);
   const resource = useQueueResource(load, myQueue);
-  const [selected, setSelected] = useState('');
   const [joined, setJoined] = useState<QueueEntry | null>(null);
   const [partySize, setPartySize] = useState('4');
   const [fieldError, setFieldError] = useState('');
@@ -18,7 +17,8 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
   const [pending, setPending] = useState(false);
   const submitting = useRef(false);
   const queues = resource.data?.queues ?? [];
-  const queue = queues.find(value => value.id === selected) ?? queues[0];
+  const queueCode = Number(partySize) >= 5 && Number(partySize) <= 8 ? 'S' : 'R';
+  const queue = queues.find(value => value.code === queueCode && value.state === 'OPEN');
   const entry = myQueue ? resource.data?.entry : joined ?? resource.data?.entry;
   useEffect(() => { if (resource.error instanceof QueueError && resource.error.status === 401) onUnauthenticated(); }, [resource.error, onUnauthenticated]);
   async function submit(event: FormEvent) {
@@ -35,7 +35,7 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
         setMessage('You already have an active queue entry.');
         try { setJoined(await queueRequest<QueueEntry | null>('/customer/entries/latest')); }
         catch (failure) { if (failure instanceof QueueError && failure.status === 401) onUnauthenticated(); else setMessage('You already have an active queue entry. Open My queue to refresh its status.'); }
-      } else if (error instanceof QueueError && error.code === 'QUEUE_NOT_OPEN') { setMessage('This queue is no longer open. Please choose an available queue.'); resource.retry(); }
+      } else if (error instanceof QueueError && error.code === 'QUEUE_NOT_OPEN') { setMessage('This queue is no longer open. Please refresh or try again later.'); resource.retry(); }
       else if (error instanceof QueueError && error.status === 422) setFieldError(error.fields.partySize ?? 'Check the party size and try again.');
       else if (error instanceof QueueError && error.status === 403) setMessage('You do not have permission to join this queue.');
       else setMessage('Unable to join the queue. Please try again.');
@@ -58,16 +58,16 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
           {!entry && <p>You have no queue entry.</p>}
           <p><button className="secondary" onClick={resource.retry} disabled={resource.refreshing}>Refresh status</button></p><a href="/queues">Back to queues</a>
         </> : !active && <>
-          {!queue ? <p>No open queues are available.</p> : <div className="card queue-form">
-            {queues.length > 1 && <><label htmlFor="queue">Restaurant queue</label><select id="queue" value={queue.id} onChange={event => setSelected(event.target.value)} disabled={pending}>{queues.map(value => <option key={value.id} value={value.id}>{value.code} — {value.name}</option>)}</select></>}
-            <h3>{queue.name}</h3><p>Queue {queue.code} · {queue.state}</p>
+          <div className="card queue-form">
+            {queues.length === 0 && <p>No open queues are available.</p>}
+            {queue ? <><h3>{queue.name}</h3><p>Queue {queue.code} · {queue.state}</p></> : <p role="status">Queue {queueCode} is not open for joining.</p>}
             <form onSubmit={submit} noValidate aria-busy={pending}>
               <label htmlFor="party-size">Party size</label>
               <input id="party-size" name="partySize" type="number" min="1" max="8" step="1" inputMode="numeric" required value={partySize} onChange={event => setPartySize(event.target.value)} disabled={pending} aria-invalid={Boolean(fieldError)} aria-describedby="party-help party-error" />
-              <p id="party-help">Enter the number of guests, from 1 to 8.</p><p id="party-error" className="error" role={fieldError ? 'alert' : undefined}>{fieldError}</p>
-              <button type="submit" disabled={pending}>{pending ? 'Joining…' : 'Join queue'}</button><span role="status">{pending ? 'Joining the queue. Please wait.' : ''}</span>
+              <p id="party-help">Parties of 1–4 use Queue R; parties of 5–8 use Queue S.</p><p id="party-error" className="error" role={fieldError ? 'alert' : undefined}>{fieldError}</p>
+              <button type="submit" disabled={pending || !queue}>{pending ? 'Joining…' : 'Join queue'}</button><span role="status">{pending ? 'Joining the queue. Please wait.' : ''}</span>
             </form>
-          </div>}
+          </div>
         </>}
         {!myQueue && !entry && <p><a href="/my-queue">View my queue</a></p>}
       </>}

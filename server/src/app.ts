@@ -5,6 +5,7 @@ import { database } from './infrastructure/database.js';
 import { authentication } from './auth/auth.js';
 import { requireRole, requireQueueAssignment, requireEntryAssignment, currentUser } from './authorization/guards.js';
 import { queueRoutes, customerEntryRoutes, publicBoardRoutes } from './queues/routes.js';
+import { operate, readDesk } from './operator/service.js';
 import { ApiError, sendError } from './http/errors.js';
 
 interface AppOptions {
@@ -49,11 +50,10 @@ export function createApp(options: AppOptions = {}) {
     });
     res.json({ data: queues });
   });
-  // Reserve guards for future workflows; authorized requests still fall through to 404.
-  app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db));
-  app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db));
-  app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db));
-  app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db));
+  app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db), async (req, res) => { res.json({ data: await readDesk(db, currentUser(res).id, String(req.params.queueId)) }); });
+  app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { queueId: String(req.params.queueId) }) }); });
+  app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'SERVING' }) }); });
+  app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'COMPLETED' }) }); });
   app.use((_req, res) => sendError(res, new ApiError(404, 'NOT_FOUND', 'Resource not found.')));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
     if (error instanceof ApiError) { sendError(res, error); return; }

@@ -1,0 +1,49 @@
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: queue_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: restaurant_queue
+    volumes:
+      - queue_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U queue_user -d restaurant_queue"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: restaurant-queue-server:lab5
+    environment:
+      DATABASE_URL: postgresql://queue_user:${POSTGRES_PASSWORD}@db:5432/restaurant_queue
+      PORT: "3000"
+      NODE_ENV: production
+      TZ: UTC
+      WEB_ORIGIN: http://localhost:8081
+      COOKIE_SECURE: "false"
+      DEMO_CUSTOMER_PASSWORD: ${DEMO_CUSTOMER_PASSWORD:-}
+      DEMO_OPERATOR_PASSWORD: ${DEMO_OPERATOR_PASSWORD:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    image: restaurant-queue-client:lab5
+    ports:
+      - "127.0.0.1:8081:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  queue_postgres_data:

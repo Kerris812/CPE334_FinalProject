@@ -1,0 +1,167 @@
+name: Lab 5 CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab5-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  verify-ci:
+    name: Verify Release CI
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  deploy:
+    name: Build, Migrate, Deploy and Smoke Test
+    needs: verify-ci
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      AR_REPO: restaurant-queue
+      API_SERVICE: restaurant-api
+      WEB_SERVICE: restaurant-web
+      MIGRATE_JOB: restaurant-migrate
+      API_IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/restaurant-queue/restaurant-api:${{ github.sha }}
+      WEB_IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/restaurant-queue/restaurant-web:${{ github.sha }}
+
+    steps:
+      - name: Checkout approved release
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Verify existing Cloud Run resources
+        run: |
+          gcloud run jobs describe "$MIGRATE_JOB" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format="value(metadata.name)"
+
+          gcloud run services describe "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format="value(metadata.name)"
+
+          gcloud run services describe "$WEB_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format="value(metadata.name)"
+
+      - name: Configure Docker authentication
+        run: |
+          gcloud auth configure-docker \
+            "${REGION}-docker.pkg.dev" \
+            --quiet
+
+      - name: Build backend Docker image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -f Dockerfile \
+            -t "$API_IMAGE" .
+
+      - name: Build frontend Docker image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -f client/Dockerfile.cloudrun \
+            -t "$WEB_IMAGE" .
+
+      - name: Push images to Artifact Registry
+        run: |
+          docker push "$API_IMAGE"
+          docker push "$WEB_IMAGE"
+
+      - name: Update migration job image
+        run: |
+          gcloud run jobs update "$MIGRATE_JOB" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --image="$API_IMAGE"
+
+      - name: Execute database migrations
+        run: |
+          gcloud run jobs execute "$MIGRATE_JOB" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --wait
+
+      - name: Deploy backend
+        run: |
+          gcloud run services update "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --image="$API_IMAGE" \
+            --update-labels="commit-sha=${GITHUB_SHA}"
+
+      - name: Deploy frontend
+        run: |
+          gcloud run services update "$WEB_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --image="$WEB_IMAGE" \
+            --update-labels="commit-sha=${GITHUB_SHA}"
+
+      - name: Run production smoke tests
+        run: |
+          WEB_URL="$(gcloud run services describe "$WEB_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format='value(status.url)')"
+
+          test -n "$WEB_URL"
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$WEB_URL/" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$WEB_URL/health" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$WEB_URL/api/v1/public/queues/R/board" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$WEB_URL/api/v1/public/queues/S/board" > /dev/null
+
+          echo "Production smoke tests passed"
+          echo "Application URL: $WEB_URL"
+
+      - name: Record deployed revision and commit
+        run: |
+          echo "Release commit: $GITHUB_SHA"
+          echo "Backend image: $API_IMAGE"
+          echo "Frontend image: $WEB_IMAGE"
+
+          gcloud run services describe "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format="value(status.latestReadyRevisionName)"
+
+          gcloud run services describe "$WEB_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format="value(status.latestReadyRevisionName)"

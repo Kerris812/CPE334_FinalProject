@@ -1098,3 +1098,426 @@ Lab 5.7 / Issue #39; do not mix their implementation into this task.
 - Google Cloud IAM mutations are persistent across branches; Git reverts do not
   automatically undo Workload Identity Pools, IAM grants or GitHub rulesets.
 - Continue to monitor the Cloud SQL budget independently of CI and WIF setup.
+
+
+## 31. Lab 5.7: Automated CD and Release Pipeline
+
+### 31.1 Objective
+
+Lab 5.7 implements automated Continuous Deployment (CD) for the Restaurant Queue Management System.
+
+After an approved release Pull Request is merged into `main`, GitHub Actions automatically runs CI checks, builds and pushes Docker images, executes database migrations, deploys both Cloud Run services, and performs production smoke tests.
+
+This replaces the manual Docker image building and Cloud Run deployment procedures used in Lab 5.5.
+
+Related issue: [Issue #39](https://github.com/Kerris812/CPE334_FinalProject/issues/39)
+
+### 31.2 Release Workflow
+
+The release process follows these steps:
+
+1. Create a feature branch from `staging`.
+2. Implement the CD workflow and a visible frontend change.
+3. Open a feature Pull Request targeting `staging`.
+4. Pass required CI checks and obtain teammate approval.
+5. Merge the approved feature Pull Request into `staging`.
+6. Create a release Pull Request from `staging` into `main`.
+7. Pass CI checks and obtain teammate approval.
+8. Merge the approved release Pull Request into `main`.
+9. GitHub Actions automatically executes the production CD workflow.
+10. Verify deployment, smoke tests, Cloud Run revisions, and the released commit SHA.
+
+Production deployment is triggered by a push to `main`.
+
+The `staging` branch is used for integration and verification and does not trigger production deployment.
+
+### 31.3 Existing GCP Infrastructure
+
+Lab 5.7 reuses the infrastructure configured during Labs 5.5 and 5.6.
+
+| Resource | Existing Configuration |
+| --- | --- |
+| GCP project | `cpe334-final-project-theme9` |
+| Project number | `608461234576` |
+| Region | `asia-southeast1` |
+| Artifact Registry repository | `restaurant-queue` |
+| Backend image | `restaurant-api` |
+| Frontend image | `restaurant-web` |
+| Backend Cloud Run service | `restaurant-api` |
+| Frontend Cloud Run service | `restaurant-web` |
+| Cloud SQL instance | `restaurant-queue-db` |
+| Migration Cloud Run Job | `restaurant-migrate` |
+| Deployment service account | `restaurant-queue-deployer` |
+| Workload Identity Pool | `github-actions` |
+| GitHub OIDC provider | `github` |
+| Production branch | `main` |
+
+The deployment workflow updates the existing Cloud Run services rather than creating new ones.
+
+Existing runtime settings, including Cloud SQL connectivity, Secret Manager references, service accounts, and environment variables, must be preserved.
+
+### 31.4 GitHub Actions Workflows
+
+Two GitHub Actions workflows are used.
+
+#### Continuous Integration
+
+File: `.github/workflows/ci.yml`
+
+The existing CI workflow performs frontend testing, backend testing, application builds, and Docker build verification.
+
+The `workflow_call` trigger is added so the CD workflow can invoke the existing CI jobs before deployment.
+
+The original Pull Request and push triggers remain unchanged.
+
+#### Continuous Deployment
+
+File: `.github/workflows/deploy.yml`
+
+The new CD workflow runs on a push to `main`.
+
+The deployment process includes:
+
+| Stage | Operation |
+| --- | --- |
+| 1 | Execute the existing CI workflow |
+| 2 | Authenticate to GCP using Workload Identity Federation |
+| 3 | Configure the Google Cloud CLI |
+| 4 | Configure Docker authentication to Artifact Registry |
+| 5 | Build the backend Docker image |
+| 6 | Build the frontend Docker image |
+| 7 | Push both images to Artifact Registry |
+| 8 | Update the existing migration job image |
+| 9 | Execute Prisma database migrations |
+| 10 | Deploy the backend image to Cloud Run |
+| 11 | Deploy the frontend image to Cloud Run |
+| 12 | Execute production smoke tests |
+| 13 | Record deployed revisions and release commit SHA |
+
+If a required stage fails, subsequent deployment stages do not execute.
+
+The CD workflow does not execute database seeding during normal releases.
+
+### 31.5 Authentication and Deployment Permissions
+
+The pipeline uses GitHub OIDC and Google Cloud Workload Identity Federation, configured during Lab 5.6.
+
+GitHub Actions authenticates through the existing provider:
+
+`projects/608461234576/locations/global/workloadIdentityPools/github-actions/providers/github`
+
+The deployment service account is:
+
+`restaurant-queue-deployer@cpe334-final-project-theme9.iam.gserviceaccount.com`
+
+The deployment identity requires appropriately scoped permissions for:
+
+1. Publishing images to the existing Artifact Registry repository.
+2. Updating and executing Cloud Run jobs.
+3. Updating existing Cloud Run services.
+4. Using the existing Cloud Run runtime service accounts.
+
+No permanent Google Cloud service account JSON key is stored in GitHub.
+
+Database passwords remain in Google Cloud Secret Manager and are not stored in the deployment workflow.
+
+### 31.6 Docker Image Versioning
+
+The backend and frontend images are tagged with the full Git commit SHA associated with the approved `main` release.
+
+Backend image format:
+
+`asia-southeast1-docker.pkg.dev/cpe334-final-project-theme9/restaurant-queue/restaurant-api:<COMMIT_SHA>`
+
+Frontend image format:
+
+`asia-southeast1-docker.pkg.dev/cpe334-final-project-theme9/restaurant-queue/restaurant-web:<COMMIT_SHA>`
+
+Using the commit SHA provides traceability between the released source code and the deployed container images.
+
+The deployment record must use the commit SHA that actually triggered the workflow on `main`.
+
+This may differ from the original feature branch commit if the release Pull Request uses a merge or squash commit.
+
+### 31.7 Automated Database Migrations
+
+The deployment pipeline reuses the existing Cloud Run Job:
+
+`restaurant-migrate`
+
+The workflow updates the job with the newly built backend image and executes it before updating the backend and frontend services.
+
+The migration command is:
+
+`npm run db:migrate`
+
+The server script invokes:
+
+`prisma migrate deploy`
+
+The existing migration job must retain:
+
+1. Cloud SQL connectivity.
+2. The database connection secret.
+3. Its assigned runtime service account.
+4. The database migration command.
+5. The required execution environment.
+
+Database migrations execute synchronously, and the pipeline waits for completion.
+
+If the migration job fails, the pipeline stops before deploying new application revisions.
+
+The `restaurant-seed` job is not executed automatically during normal production deployments.
+
+### 31.8 Automated Cloud Run Deployment
+
+After successful CI checks, Docker image publishing, and database migration, the pipeline updates these services:
+
+1. `restaurant-api`
+2. `restaurant-web`
+
+Both services receive images tagged with the release commit SHA.
+
+Cloud Run creates new revisions using the updated images.
+
+The existing backend configuration must preserve:
+
+- `DATABASE_URL`
+- `WEB_ORIGIN`
+- Cloud SQL connection
+- Secure session cookie settings
+- Backend runtime service account
+
+The existing frontend configuration must preserve:
+
+- `BACKEND_HOST`
+- Nginx API proxying
+- Frontend runtime service account
+
+The automated deployment must not replace these settings with development values.
+
+### 31.9 Automated Production Smoke Tests
+
+After deploying the backend and frontend, the workflow checks the public application endpoints.
+
+Production frontend URL:
+
+https://restaurant-web-608461234576.asia-southeast1.run.app
+
+| Endpoint | Expected HTTP Status |
+| --- | --- |
+| `/` | 200 |
+| `/health` | 200 |
+| `/api/v1/public/queues/R/board` | 200 |
+| `/api/v1/public/queues/S/board` | 200 |
+
+All smoke tests must succeed before the deployment workflow is considered successful.
+
+These tests confirm that the frontend, API proxy, backend, and public queue endpoints respond after deployment.
+
+They do not replace manual testing of authenticated customer and operator workflows.
+
+### 31.10 Visible Frontend Release Change
+
+A small visible change is included in the frontend login page.
+
+The added text is:
+
+`Lab 5.7 cloud release`
+
+This provides visual confirmation that the approved release has reached the public Cloud Run frontend.
+
+The change must be visible at:
+
+https://restaurant-web-608461234576.asia-southeast1.run.app
+
+The text update does not change authentication, authorization, database operations, queue handling, or application permissions.
+
+A screenshot of the deployed login page must be collected after the CD workflow completes.
+
+### 31.11 Local Verification Results
+
+The following local verification results were recorded before release preparation.
+
+| Verification | Result |
+| --- | --- |
+| Frontend dependency installation | Passed |
+| Frontend production build | Passed |
+| Frontend UI tests | 75 passed |
+| Prisma Client generation | Passed |
+| Backend unit tests | 10 passed |
+| Backend production build | Pending verification |
+| Backend API tests | Pending CI verification |
+| Docker build verification | Pending CI verification |
+| Backend dependency audit | 4 high severity findings reported |
+
+All 85 executed automated tests passed.
+
+The backend dependency audit findings require review before production release.
+
+The production dependency audit should be checked separately using:
+
+`npm audit --omit=dev`
+
+A passing unit test suite does not establish that every dependency is free from vulnerabilities.
+
+Local verification does not replace the required GitHub Actions CI checks.
+
+### 31.12 Release Pull Request Process
+
+The release process uses two Pull Requests.
+
+#### Feature Pull Request
+
+Source branch:
+
+`feature/lab5.7-automated-cd`
+
+Target branch:
+
+`staging`
+
+Title:
+
+`feat(lab5.7): Automated CD and Release Pipeline`
+
+The feature PR contains the reusable CI configuration, CD workflow, visible frontend change, and updated deployment documentation.
+
+Required verification:
+
+1. CI checks pass.
+2. Teammate reviews and approves the changes.
+3. Changes are merged into `staging`.
+
+#### Release Pull Request
+
+Source branch:
+
+`staging`
+
+Target branch:
+
+`main`
+
+Title:
+
+`release: Lab 5.7 Automated Cloud Deployment`
+
+Required verification:
+
+1. Review the release changes.
+2. Confirm required CI checks pass.
+3. Obtain teammate approval.
+4. Merge the approved release into `main`.
+
+The merge into `main` triggers the automated CD workflow.
+
+No separate manual deployment command is required for the normal release process.
+
+### 31.13 Production Release Verification
+
+After the release PR is merged into `main`, verify the following:
+
+1. The `Lab 5 CD` workflow starts automatically.
+2. The reusable CI workflow completes successfully.
+3. Both Docker images are built and pushed to Artifact Registry.
+4. Image tags match the approved release SHA.
+5. The Prisma migration job completes successfully.
+6. The backend Cloud Run revision becomes ready.
+7. The frontend Cloud Run revision becomes ready.
+8. All automated production smoke tests pass.
+9. The public website displays `Lab 5.7 cloud release`.
+10. Customer and operator login still work.
+11. Customers can join queues and receive queue numbers.
+12. Operators can call, start, and complete service.
+13. Queue information remains persistent after deployment.
+14. The active Cloud Run revisions correspond to the approved release.
+
+The release is considered verified only after the required automated and manual checks are successful.
+
+### 31.14 Failure Handling and Rollback
+
+If CI fails, deployment must not begin.
+
+If image building or publishing fails, deployment must stop.
+
+If the migration job fails, the backend and frontend deployment steps must not execute.
+
+If Cloud Run deployment fails, inspect the failed GitHub Actions step and the affected Cloud Run service logs.
+
+If smoke tests fail, the GitHub Actions workflow must report failure.
+
+A smoke test failure does not automatically roll back the deployment.
+
+Cloud Run traffic can be redirected to a previously verified revision if necessary.
+
+Database migrations are not automatically reversed by restoring an earlier service revision.
+
+Any rollback must consider database schema compatibility and application data integrity.
+
+### 31.15 Release Evidence
+
+The following evidence must be collected for Issue #39.
+
+| Evidence | Status |
+| --- | --- |
+| CD workflow file | Pending |
+| Feature PR into `staging` | Pending |
+| Release PR into `main` | Pending |
+| Successful GitHub Actions CD run | Pending |
+| Successful Prisma migration execution | Pending |
+| Backend Cloud Run revision | Pending |
+| Frontend Cloud Run revision | Pending |
+| Deployed release commit SHA | Pending |
+| Successful production smoke tests | Pending |
+| Visible frontend release change | Pending |
+
+#### Release Record
+
+| Field | Value |
+| --- | --- |
+| GitHub issue | #39 |
+| Feature branch | `feature/lab5.7-automated-cd` |
+| Integration branch | `staging` |
+| Production branch | `main` |
+| Feature PR URL | Pending |
+| Release PR URL | Pending |
+| GitHub Actions CD run URL | Pending |
+| Deployed commit SHA | Pending |
+| Backend Cloud Run revision | Pending |
+| Frontend Cloud Run revision | Pending |
+| Production verification result | Pending |
+
+Update these records only after the corresponding results have been verified.
+
+### 31.16 Completion Checklist
+
+- [ ] Existing CI workflow supports `workflow_call`.
+- [ ] Automated CD workflow is implemented.
+- [ ] Visible frontend release change is added.
+- [ ] Local application builds and tests pass.
+- [ ] Feature PR passes CI checks.
+- [ ] Teammate approves the feature PR.
+- [ ] Feature PR is merged into `staging`.
+- [ ] Release PR is created from `staging` into `main`.
+- [ ] Release PR passes CI and teammate review.
+- [ ] Release PR is merged into `main`.
+- [ ] GitHub Actions authenticates through Workload Identity Federation.
+- [ ] Backend and frontend images are pushed with release SHA tags.
+- [ ] Prisma migrations execute successfully.
+- [ ] Both Cloud Run services deploy successfully.
+- [ ] Production smoke tests pass.
+- [ ] Visible frontend release text appears on the public website.
+- [ ] Customer and operator regression tests pass.
+- [ ] Cloud Run revisions match the approved release.
+- [ ] Required evidence links and screenshots are recorded.
+- [ ] Issue #39 is closed after verification.
+
+### 31.17 References
+
+1. [Issue #39: Automated CD and Release Pipeline](https://github.com/Kerris812/CPE334_FinalProject/issues/39)
+2. [GitHub Actions](https://github.com/Kerris812/CPE334_FinalProject/actions)
+3. [Google Cloud Run](https://console.cloud.google.com/run?project=cpe334-final-project-theme9)
+4. [Artifact Registry](https://console.cloud.google.com/artifacts?project=cpe334-final-project-theme9)
+5. [GitHub Reusable Workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
+6. [Cloud Run Jobs](https://cloud.google.com/run/docs/execute/jobs)

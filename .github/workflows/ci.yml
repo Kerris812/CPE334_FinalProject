@@ -6,7 +6,8 @@ on:
     branches: [staging, main]
   push:
     branches: [staging, main]
-
+  workflow_call:
+  
 jobs:
   build-and-test:
     name: Build and Test

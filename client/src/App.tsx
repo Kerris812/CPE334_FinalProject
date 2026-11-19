@@ -43,6 +43,7 @@ function Login({ onLogin }: { onLogin: (user: User) => void }) {
   }
   return <Card className="card login-card" aria-labelledby="login-title" title="Sign in" titleId="login-title" badge="R">
     <p className="ui-card-description">Use your restaurant account to continue.</p>
+    <p className="ui-card-description">Lab 5.7 cloud release</p>
     <form onSubmit={submit} noValidate aria-busy={pending}>
       <FormField id="email" label="Email" error={fields.email}>
       <input id="email" name="email" type="email" placeholder="customer@example.com" autoComplete="username" required maxLength={254} value={email}

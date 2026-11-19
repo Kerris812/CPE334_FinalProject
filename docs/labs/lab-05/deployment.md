@@ -1,4 +1,32 @@
-# Lab 5 — CI and First GCP Deployment
+# Lab 5 — CI, First GCP Deployment, and Secure GitHub Integration
+
+## Document scope and verification status
+
+This document preserves the earlier continuous integration (Sections 1–7) and
+manual first deployment runbook (Sections 8–17) and adds Lab 5.6 secure GitHub
+integration, branch protection, and evidence requirements (Sections 18–31).
+
+The execution history below reflects **reported Cloud Run and Cloud Run Jobs
+outputs**, not independent access to the GCP project. Do not mark a step
+complete until its actual command, GitHub check, or screenshot confirms success.
+
+| Area | Last confirmed result | Still to verify |
+| --- | --- | --- |
+| Existing CI | `Build and Test` and `Docker Build` passed on PR #32 | Current Lab 5.6 PR CI run |
+| Cloud SQL and Prisma | Migration job succeeded; migrations `0001_foundation` and `0002_immutable_queue_sequence` applied | Application persistence test if not already completed |
+| Database seed | Synthetic seed job finished successfully | Demo login and end-to-end queue workflows if not already completed |
+| Cloud Run services | `restaurant-api` and `restaurant-web` deployed in `asia-southeast1`; API revision `restaurant-api-00002-vxs` reported serving all traffic | Browser login, operator workflow, evidence capture |
+| API reverse proxy | `POST /api/v1/auth/login` returned the expected HTTP 401 for deliberately invalid credentials with a matching Origin | Browser login HTTP 403 investigation, unless independently resolved |
+| Lab 5.6 Workload Identity Federation | Not yet confirmed | Provider, identity, IAM binding, GitHub Actions run |
+| Lab 5.6 branch protection | Not yet confirmed | `main` and `staging` rulesets and failing PR evidence |
+
+Confirmed service URLs:
+
+- Frontend: <https://restaurant-web-608461234576.asia-southeast1.run.app>
+- Backend: <https://restaurant-api-608461234576.asia-southeast1.run.app>
+
+Project: `cpe334-final-project-theme9` (number `608461234576`).
+Region: `asia-southeast1`.
 
 ## 1. CI Workflow
 
@@ -82,12 +110,14 @@ Evidence to include in the Lab 5 report:
 
 ## 8. Lab 5.5 scope and architecture
 
-This is a manual deployment runbook for issue #37. Repository preparation is not
-proof of a successful deployment. Sections 1–7 retain the earlier CI record;
-no new cloud execution results are claimed. **Do not execute cloud mutations,
-image pushes, jobs, or cleanup until the owner has approved them.** Run commands
-one block at a time in Bash in Cloud Shell, from this repository's root. Stop on
-errors; do not paste the entire guide as a script.
+This is the reusable manual deployment runbook for issue #37. The earlier
+commands have been executed successfully for this project as summarized in the
+status table above, but the instructions remain useful for verification and
+recovery. **Do not repeat cloud mutations, image pushes, jobs, or cleanup without
+an explicit need and the project owner's approval.** Run commands one block at a
+time in Bash in the appropriate environment. Build images on a machine with
+Docker available; use Cloud Shell for gcloud administration. Stop on errors;
+do not paste the entire guide as a script.
 
 ```text
 Browser --HTTPS--> frontend Cloud Run (Nginx, PORT=8080)
@@ -506,3 +536,565 @@ and finally the SQL instance if its data is no longer needed. Deletion protectio
 and backup retention must be reviewed explicitly. Never delete shared resources,
 the project, billing configuration, or use the starter teardown script blindly.
 No automatic teardown is included.
+
+## 18. Lab 5.6 purpose, separation of responsibilities, and acceptance criteria
+
+Issue: <https://github.com/Kerris812/CPE334_FinalProject/issues/38>
+
+Issue #38 requires (1) Workload Identity Federation, (2) a deployment service
+account with appropriate IAM permissions, (3) GitHub Actions configuration,
+(4) branch rulesets and required CI checks for `main` and `staging`, (5) teammate
+review, and (6) a temporary failing Pull Request whose merge is blocked and
+which is closed without merging. Evidence includes the Workload Identity setup,
+branch rulesets, failing PR link, and blocked merge screenshot.
+
+Lab 5.6 is about **authentication and merge protection**, not creating a second
+manual Cloud Run deployment. Lab 5.7 will add automated deployment. Keep the
+existing `.github/workflows/ci.yml` unchanged. Its current status check names
+are exactly `Build and Test` and `Docker Build`.
+
+| Action | Principal / location | Scope |
+| --- | --- | --- |
+| Enable APIs and configure identity | Human administrator / Google Cloud Shell | GCP project |
+| Authenticate to GCP | GitHub Actions OIDC token | Only the authorized repository and permitted branches |
+| Deploy images in a future lab | `restaurant-queue-deployer` service account | Cloud Run and the selected Artifact Registry repository |
+| Serve backend traffic | `restaurant-queue-api` service account | Cloud SQL and selected runtime database secret |
+| Serve frontend traffic | `restaurant-queue-web` service account | No database credentials |
+| Enforce merges | GitHub repository rulesets | `staging` and `main` |
+
+Do not create a JSON service account key or add database passwords to GitHub
+repository variables. The GitHub deployment identity should not inherit the
+backend runtime account's permissions to read database secrets.
+
+## 19. Prepare the Git branch and check prerequisites
+
+**Mac Terminal, repository root.** First ensure Lab 5.5 has been merged into
+`staging` or consciously base your changes on the current `staging`. Never
+switch branches with uncommitted changes that may be lost.
+
+```bash
+git status
+git fetch origin
+git switch staging
+git pull --ff-only origin staging
+git switch -c feature/lab5.6-gcp-auth-branch-protection
+```
+
+If local `staging` does not exist, replace `git switch staging` with
+`git switch --track origin/staging`. Check `git status` first. The new branch
+will contain the authentication workflow, `.gitignore` / `.dockerignore`
+updates, and this documentation. GCP IAM changes and GitHub ruleset settings
+are console configuration, not Git commits.
+
+Before proceeding, verify the operator can administer IAM, service accounts,
+Workload Identity Pools, Artifact Registry IAM and GitHub repository settings.
+The project also needs billing/credits and a configured budget because Lab 5.5
+Cloud SQL continues to incur costs even if Cloud Run scales to zero.
+
+## 20. Configure the GitHub Workload Identity Pool and OIDC provider
+
+**Google Cloud Shell.** Check the project and enable required APIs. Use the
+project's actual number rather than a project ID in IAM principal set strings.
+
+```bash
+export PROJECT_ID='cpe334-final-project-theme9'
+export REGION='asia-southeast1'
+export GITHUB_REPO='Kerris812/CPE334_FinalProject'
+export POOL_ID='github-actions'
+export PROVIDER_ID='github'
+export DEPLOY_SA_NAME='restaurant-queue-deployer'
+export DEPLOY_SA="${DEPLOY_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+gcloud config set project "$PROJECT_ID"
+export PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+printf 'Project number: %s\n' "$PROJECT_NUMBER"
+```
+
+The confirmed project number is `608461234576`. Stop if the command reports a
+different value. Enable the APIs only if you have authorization:
+
+```bash
+gcloud services enable \
+  iam.googleapis.com \
+  iamcredentials.googleapis.com \
+  sts.googleapis.com \
+  run.googleapis.com \
+  artifactregistry.googleapis.com \
+  --project="$PROJECT_ID"
+```
+
+Inspect existing pools before creating resources:
+
+```bash
+gcloud iam workload-identity-pools list \
+  --project="$PROJECT_ID" \
+  --location=global
+```
+
+Create pool `github-actions` only if it is absent:
+
+```bash
+gcloud iam workload-identity-pools create "$POOL_ID" \
+  --project="$PROJECT_ID" \
+  --location=global \
+  --display-name='GitHub Actions'
+```
+
+Inspect existing providers:
+
+```bash
+gcloud iam workload-identity-pools providers list \
+  --project="$PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool="$POOL_ID"
+```
+
+Create `github` only if absent. The exact GitHub repository and two branch
+references are intentionally part of the acceptance condition:
+
+```bash
+gcloud iam workload-identity-pools providers create-oidc "$PROVIDER_ID" \
+  --project="$PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool="$POOL_ID" \
+  --display-name='GitHub Actions OIDC' \
+  --issuer-uri='https://token.actions.githubusercontent.com/' \
+  --attribute-mapping='google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.ref=assertion.ref' \
+  --attribute-condition="assertion.repository=='Kerris812/CPE334_FinalProject' && (assertion.ref=='refs/heads/staging' || assertion.ref=='refs/heads/main')"
+```
+
+Inspect the actual configuration rather than assuming an existing provider
+matches the desired policy:
+
+```bash
+gcloud iam workload-identity-pools providers describe "$PROVIDER_ID" \
+  --project="$PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool="$POOL_ID"
+```
+
+Expected issuer:
+`https://token.actions.githubusercontent.com/`.
+Expected mapped claims:
+`google.subject`, `attribute.repository`, and `attribute.ref`.
+Expected condition: exact repository and `refs/heads/staging` or
+`refs/heads/main`.
+
+A Pull Request workflow normally has a `refs/pull/...` reference and will not
+satisfy this provider condition. For Lab 5.6, the GCP authentication check runs
+**after the feature PR merges into `staging`**. The existing CI workflow still
+runs on the feature PR without acquiring GCP credentials.
+
+Evidence: screenshot from
+<https://console.cloud.google.com/iam-admin/workload-identity-pools?project=cpe334-final-project-theme9>
+showing the trusted GitHub provider and attribute condition.
+
+## 21. Create and grant access to the deployment service account
+
+**Google Cloud Shell.** Inspect service accounts first:
+
+```bash
+gcloud iam service-accounts list --project="$PROJECT_ID"
+```
+
+If the dedicated account does not already exist:
+
+```bash
+gcloud iam service-accounts create "$DEPLOY_SA_NAME" \
+  --project="$PROJECT_ID" \
+  --display-name='Restaurant Queue GitHub Deployer'
+```
+
+Allow identities accepted by the provider and mapped to this repository to
+impersonate only this deployment service account:
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding "$DEPLOY_SA" \
+  --project="$PROJECT_ID" \
+  --role='roles/iam.workloadIdentityUser' \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${GITHUB_REPO}"
+```
+
+Grant permission to push container images **only to the existing registry**:
+
+```bash
+gcloud artifacts repositories add-iam-policy-binding restaurant-queue \
+  --project="$PROJECT_ID" \
+  --location="$REGION" \
+  --member="serviceAccount:${DEPLOY_SA}" \
+  --role='roles/artifactregistry.writer'
+```
+
+Grant Cloud Run developer permissions for Lab 5.7:
+
+```bash
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${DEPLOY_SA}" \
+  --role='roles/run.developer' \
+  --condition=None
+```
+
+Allow it to deploy services using only the two approved runtime accounts:
+
+```bash
+for account in restaurant-queue-api restaurant-queue-web; do
+  gcloud iam service-accounts add-iam-policy-binding \
+    "${account}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --project="$PROJECT_ID" \
+    --member="serviceAccount:${DEPLOY_SA}" \
+    --role='roles/iam.serviceAccountUser'
+done
+```
+
+Verify the impersonation policy, project role and registry access:
+
+```bash
+gcloud iam service-accounts get-iam-policy "$DEPLOY_SA" \
+  --project="$PROJECT_ID"
+gcloud projects get-iam-policy "$PROJECT_ID" \
+  --flatten='bindings[].members' \
+  --filter="bindings.members:serviceAccount:${DEPLOY_SA}" \
+  --format='table(bindings.role)'
+gcloud artifacts repositories get-iam-policy restaurant-queue \
+  --project="$PROJECT_ID" \
+  --location="$REGION"
+```
+
+Expected grants:
+
+| Target | Role | Reason |
+| --- | --- | --- |
+| Deployment service account | `roles/iam.workloadIdentityUser` | Allow the trusted GitHub principal set to impersonate it |
+| Selected Artifact Registry repository | `roles/artifactregistry.writer` | Push images in Lab 5.7 |
+| Project | `roles/run.developer` | Read and update Cloud Run services |
+| Backend and frontend runtime accounts | `roles/iam.serviceAccountUser` | Attach those identities to Cloud Run revisions |
+
+Project Owner, Project Editor, `roles/secretmanager.admin` and
+`roles/cloudsql.admin` are not required by this authentication verification.
+If later automation needs additional privileges, review the exact operation and
+add the narrowest applicable permission instead of granting broad access.
+
+## 22. Add GitHub Actions repository variables
+
+**Google Cloud Shell:** obtain the provider's full resource name:
+
+```bash
+gcloud iam workload-identity-pools providers describe "$PROVIDER_ID" \
+  --project="$PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool="$POOL_ID" \
+  --format='value(name)'
+```
+
+Expected output:
+
+```text
+projects/608461234576/locations/global/workloadIdentityPools/github-actions/providers/github
+```
+
+**GitHub website:** navigate to
+<https://github.com/Kerris812/CPE334_FinalProject/settings/variables/actions>
+and create the following **repository variables** under
+Settings > Secrets and variables > Actions > Variables.
+
+| Name | Value |
+| --- | --- |
+| `GCP_PROJECT_ID` | `cpe334-final-project-theme9` |
+| `GCP_REGION` | `asia-southeast1` |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/608461234576/locations/global/workloadIdentityPools/github-actions/providers/github` |
+| `GCP_DEPLOY_SERVICE_ACCOUNT` | `restaurant-queue-deployer@cpe334-final-project-theme9.iam.gserviceaccount.com` |
+
+Do not use a JSON key secret such as `GCP_CREDENTIALS`. Existing CI credentials
+`CI_DEMO_CUSTOMER_PASSWORD` and `CI_DEMO_OPERATOR_PASSWORD` are unrelated to
+this GCP identity and should remain configured according to `ci.yml`.
+
+## 23. Create the authentication verification workflow
+
+**Mac Terminal, feature branch:** create `.github/workflows/gcp-auth-check.yml`.
+Keep the existing CI workflow unchanged. The proposed complete new workflow is:
+
+```yaml
+name: Lab 5 GCP Authentication Check
+
+on:
+  push:
+    branches: [staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-gcp-auth:
+    name: Verify GCP Authentication
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+      - name: Verify access to existing Cloud Run services
+        run: |
+          gcloud run services describe restaurant-api \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --format='value(metadata.name)'
+          gcloud run services describe restaurant-web \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --format='value(metadata.name)'
+```
+
+**GitHub Actions detail:** `id-token: write` is mandatory for GitHub OIDC token
+issuance. The WIF provider only accepts the `staging` and `main` branch refs;
+therefore, run this verification using a push to an authorized branch. Because
+`workflow_dispatch` is usually listed only for workflows present on the default
+branch, the `push` trigger allows testing as soon as the feature PR is merged
+into `staging` without deploying anything. Do not make this push-only workflow
+a required Pull Request status check.
+
+**Local repository:** ignore generated authentication artifacts:
+
+```bash
+grep -qxF 'gha-creds-*.json' .gitignore || printf '\ngha-creds-*.json\n' >> .gitignore
+grep -qxF 'gha-creds-*.json' .dockerignore || printf '\ngha-creds-*.json\n' >> .dockerignore
+```
+
+The root `.dockerignore` exists in the current repository. Keep these temporary
+credentials out of Git commits and Docker build contexts. Treat them as sensitive
+if they ever appear in logs or the working directory.
+
+## 24. Review, commit, and open the Lab 5.6 PR
+
+**Mac Terminal:** confirm expected file changes. Do not stage unrelated files.
+
+```bash
+git branch --show-current
+git status
+git diff --check
+git add .github/workflows/gcp-auth-check.yml
+git add .gitignore .dockerignore
+git add docs/labs/lab-05/deployment.md
+git diff --cached --check
+git commit -m 'feat(lab5.6): configure GitHub GCP authentication'
+git push -u origin feature/lab5.6-gcp-auth-branch-protection
+```
+
+Open a Pull Request from
+`feature/lab5.6-gcp-auth-branch-protection` to `staging`.
+Review the existing CI (`Build and Test` and `Docker Build`). Obtain approval
+from the teammate. At this stage, only the identity and workflow configuration
+have been committed. The cloud IAM and GitHub branch settings live outside Git.
+
+PR title: `feat(lab5.6): GitHub GCP Authentication and Merge Protection`.
+In the PR body, use `Refs #38` while the remaining acceptance criteria are
+pending; do not prematurely use `Closes #38` if the failing PR demonstration
+and protection evidence are still unfinished.
+
+## 25. Verify GitHub Actions federation from staging
+
+**GitHub website:** after the feature PR is merged into `staging`, open
+<https://github.com/Kerris812/CPE334_FinalProject/actions>.
+Find `Lab 5 GCP Authentication Check` and select the run from the `staging`
+push. The job `Verify GCP Authentication` should show successful checkout,
+OIDC authentication, Cloud CLI setup, and read-only Cloud Run verification.
+The output should include:
+
+```text
+restaurant-api
+restaurant-web
+```
+
+This result proves the configured GitHub identity can authenticate to GCP
+and access both services. It does **not** prove the application was redeployed
+or that automated continuous deployment is working.
+
+If no run appears, verify the workflow was merged into `staging` and has the
+`push` trigger. Do not assume a manual `workflow_dispatch` is available until
+the workflow has also been added to the default branch. Save the successful
+workflow run URL and screenshot.
+
+| Failure | Inspect | Preferred remedy |
+| --- | --- | --- |
+| Provider not found or invalid target | Full provider resource string, project number | Correct `GCP_WORKLOAD_IDENTITY_PROVIDER` |
+| Repository / branch attribute condition rejected | GitHub `repository` and `ref` claims | Use a normal push on `staging` or `main`; confirm the exact provider condition |
+| Cannot impersonate service account | WIF principal set binding on `restaurant-queue-deployer` | Repair `roles/iam.workloadIdentityUser` binding |
+| Cloud Run permission denied | Deployment service account project roles | Check `roles/run.developer` |
+| Cloud Run service not found | Project, region, service name | Correct the identifier; do not create a duplicate service |
+| Required variable empty | GitHub Actions repository variables | Create or correct the matching variable |
+
+Do not add service account JSON keys or grant Owner as a troubleshooting
+shortcut. Check error details and use minimal IAM changes.
+
+## 26. Protect staging and main with GitHub rulesets
+
+**GitHub website:** navigate to
+<https://github.com/Kerris812/CPE334_FinalProject/settings/rules>.
+Repository admin permission is required. Create two **active branch rulesets**.
+The rulesets are configured through GitHub Settings, not in `deployment.md`.
+
+| Setting | Protect staging | Protect main |
+| --- | --- | --- |
+| Target branch | Exact `staging` | Exact `main` |
+| Enforcement status | Active | Active |
+| Require a Pull Request before merging | Enabled | Enabled |
+| Required approving reviews | 1 teammate | 1 teammate |
+| Require status checks before merging | Enabled | Enabled |
+| Required status check 1 | `Build and Test` | `Build and Test` |
+| Required status check 2 | `Docker Build` | `Docker Build` |
+| Block force pushes | Enabled | Enabled |
+| Restrict deletions | Enabled | Enabled |
+| Bypass list | Empty unless course requires otherwise | Empty unless course requires otherwise |
+
+For each target branch, use an exact branch selector and confirm that the rules
+apply to the intended branch. In the status check picker, choose the exact
+check names reported by recent GitHub Actions runs and GitHub Actions as the
+expected source if GitHub offers that choice. If checks are not listed, inspect
+successful workflow runs and their check names before saving the ruleset.
+
+Do **not** require the `Verify GCP Authentication` check on feature PRs because
+this workflow is configured to execute on pushes to authorized branches, not on
+`pull_request` events. The GitHub WIF provider also intentionally blocks
+ordinary PR refs.
+
+The PR author cannot approve their own PR. With a two-person team, one person
+opens the PR and the other approves it. Avoid admin bypass allowances when
+verifying enforcement. Capture a screenshot of the two active rulesets and the
+required review/check settings.
+
+## 27. Demonstrate blocked merging using a temporary failing PR
+
+**Mac Terminal:** after the Lab 5.6 workflow PR has merged and branch protection
+is active, create a separate disposable branch from the latest `staging`:
+
+```bash
+git status
+git fetch origin
+git switch staging
+git pull --ff-only origin staging
+git switch -c test/lab5.6-merge-protection
+mkdir -p server/tests/unit
+```
+
+Create `server/tests/unit/lab5-merge-protection.test.ts` on the disposable branch:
+
+```typescript
+import { expect, test } from 'vitest';
+
+test('Lab 5.6 merge protection verification', () => {
+  expect(1).toBe(2);
+});
+```
+
+The repository's current server script is
+`"test:unit": "vitest run tests/unit"`, so the `Build and Test` job should
+execute this test and fail. Do not run this test against production services.
+
+```bash
+git add server/tests/unit/lab5-merge-protection.test.ts
+git commit -m 'test(lab5.6): demonstrate blocked merge'
+git push -u origin test/lab5.6-merge-protection
+```
+
+Open the PR from `test/lab5.6-merge-protection` to `staging`.
+Suggested title: `test(lab5.6): Verify Failing CI Blocks Merge`.
+
+Verify the following *on the actual Pull Request*:
+
+1. `Build and Test` fails because the deliberately incorrect assertion runs.
+2. `Docker Build` normally succeeds if the build is otherwise healthy.
+3. GitHub states that a required status check has failed and **blocks merge**.
+4. Teammate approval is required separately.
+
+The critical evidence is a blocked merge specifically due to a failing required
+check, not merely a disabled merge button due to missing review. Take a
+screenshot of the failing check and blocked merge, and record the PR URL.
+
+After evidence is captured, click **Close pull request** without merging.
+Delete the disposable branch if desired. Do not cherry-pick or merge the
+intentionally failing test into `staging` or `main`.
+
+To clean up the local branch after closing the PR:
+
+```bash
+git switch staging
+git branch -D test/lab5.6-merge-protection
+```
+
+## 28. Evidence inventory and final reporting
+
+Issue #38 expects these concrete artifacts:
+
+| Evidence | Content required | Status |
+| --- | --- | --- |
+| WIF provider screenshot | GitHub issuer, attribute mapping and repository/branch condition | Pending verification |
+| GitHub Actions authentication run | Green `Verify GCP Authentication` run and Cloud Run service names | Pending verification |
+| Rulesets screenshot | Active `main` and `staging` rules, required checks and review | Pending verification |
+| Failing PR link | URL to the temporary PR that ran a failing test | Pending verification |
+| Blocked merge screenshot | GitHub's failed required check and blocked merge message | Pending verification |
+| Closed PR confirmation | Temporary test PR closed unmerged | Pending verification |
+
+Keep the screenshots in the designated lab evidence folder if the team chooses
+to store them in the repository. Otherwise attach them directly to Issue #38
+and link them here. Never include secret values, passwords, session cookies,
+GitHub tokens or generated `gha-creds-*.json` files in screenshots or commits.
+
+Record completion details only after the checks pass:
+
+| Result | Record |
+| --- | --- |
+| WIF pool and provider | `github-actions` / `github` |
+| Deployment identity | `restaurant-queue-deployer@cpe334-final-project-theme9.iam.gserviceaccount.com` |
+| Auth verification run URL | Pending |
+| Staging ruleset screenshot | Pending |
+| Main ruleset screenshot | Pending |
+| Failing PR URL | Pending |
+| Blocked merge evidence | Pending |
+| Reviewer approval evidence | Pending |
+| Lab 5.6 PR URL | Pending |
+
+## 29. Lab 5.6 completion criteria
+
+The issue can be marked complete when all applicable items are verified:
+
+- [ ] WIF Pool and OIDC provider exist with the correct attribute condition.
+- [ ] A separate GitHub deployment service account exists with scoped access.
+- [ ] `roles/iam.workloadIdentityUser` permits the intended GitHub principal set.
+- [ ] Artifact Registry, Cloud Run, and runtime account permissions are correct.
+- [ ] Required GitHub Actions variables are configured; no JSON key is stored.
+- [ ] A workflow push on `staging` successfully authenticates to GCP.
+- [ ] Active rulesets protect `staging` and `main`.
+- [ ] Both branches require `Build and Test`, `Docker Build`, and one approval.
+- [ ] The deliberately failing PR is blocked by a failed required check.
+- [ ] The deliberately failing PR is closed without merging.
+- [ ] Evidence links and nonsecret screenshots are attached to Issue #38.
+
+After completion, close Issue #38. Future automated deployments belong to
+Lab 5.7 / Issue #39; do not mix their implementation into this task.
+
+## 30. Security and recovery notes
+
+- Treat `WEB_ORIGIN` and forwarded `Origin` as application CSRF controls, not as
+  proof that a GCP deployment identity has been authenticated.
+- The GitHub OIDC provider condition and service account WIF policy both matter.
+  Do not rely on a repo variable or branch ruleset alone for GCP authorization.
+- Avoid key downloads. A service account key permits long-lived access until
+  revoked and is unnecessary for this workflow.
+- If a feature PR is required to authenticate before merging in a future lab,
+  design a separate constrained identity and explicit PR trust policy. Do not
+  remove the branch condition from this deployment provider without a review.
+- Required GitHub checks are selected by the check name, not necessarily by
+  the workflow filename or workflow display title.
+- Rulesets change who can merge. Configure them deliberately with the teammate
+  available to approve so the two-person team is not accidentally locked out.
+- Google Cloud IAM mutations are persistent across branches; Git reverts do not
+  automatically undo Workload Identity Pools, IAM grants or GitHub rulesets.
+- Continue to monitor the Cloud SQL budget independently of CI and WIF setup.

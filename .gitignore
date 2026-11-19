@@ -13,3 +13,5 @@ test-results/
 # Local compiler/bundler caches (curated evidence under artifacts/evidence is intentional).
 .vite/
 *.tsbuildinfo
+
+gha-creds-*.json

@@ -1,40 +1,59 @@
-# Lab 5 — CI, First GCP Deployment, and Secure GitHub Integration
+# Lab 5 — Deployment, Secure GitHub Integration, and Persistence Verification
 
 ## Document scope and verification status
 
-This document preserves the earlier continuous integration (Sections 1–7) and
-manual first deployment runbook (Sections 8–17) and adds Lab 5.6 secure GitHub
-integration, branch protection, and evidence requirements (Sections 18–31).
+Project: **Restaurant Queue and Service Management System**.
+Reviewed against the current repository on **20 November 2026 (Asia/Bangkok)**.
+Sections 1–7 cover CI; 8–17 retain the first-deployment and recovery runbook;
+18–30 describe secure GitHub integration and merge protection; 31 records the
+implemented CD pipeline and release; 32 defines persistence and recovery tests.
 
-The execution history below reflects **reported Cloud Run and Cloud Run Jobs
-outputs**, not independent access to the GCP project. Do not mark a step
-complete until its actual command, GitHub check, or screenshot confirms success.
+Repository implementation, verified GitHub results, reported first-deployment
+results, and unexecuted manual tests are distinguished below. A passing health
+check or deployment workflow does not establish authenticated browser behavior
+or session/data persistence across revisions. No cloud mutation or Git publishing
+was performed during this documentation review.
 
-| Area | Last confirmed result | Still to verify |
+| Area | Evidence available | Remaining evidence |
 | --- | --- | --- |
-| Existing CI | `Build and Test` and `Docker Build` passed on PR #32 | Current Lab 5.6 PR CI run |
-| Cloud SQL and Prisma | Migration job succeeded; migrations `0001_foundation` and `0002_immutable_queue_sequence` applied | Application persistence test if not already completed |
-| Database seed | Synthetic seed job finished successfully | Demo login and end-to-end queue workflows if not already completed |
-| Cloud Run services | `restaurant-api` and `restaurant-web` deployed in `asia-southeast1`; API revision `restaurant-api-00002-vxs` reported serving all traffic | Browser login, operator workflow, evidence capture |
-| API reverse proxy | `POST /api/v1/auth/login` returned the expected HTTP 401 for deliberately invalid credentials with a matching Origin | Browser login HTTP 403 investigation, unless independently resolved |
-| Lab 5.6 Workload Identity Federation | Not yet confirmed | Provider, identity, IAM binding, GitHub Actions run |
-| Lab 5.6 branch protection | Not yet confirmed | `main` and `staging` rulesets and failing PR evidence |
-
-Confirmed service URLs:
-
-- Frontend: <https://restaurant-web-608461234576.asia-southeast1.run.app>
-- Backend: <https://restaurant-api-608461234576.asia-southeast1.run.app>
+| CI | [Main CI run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135676) passed | Preserve run links/screenshots for submission |
+| First deployment | [PR #42](https://github.com/Kerris812/CPE334_FinalProject/pull/42) records successful SQL migration, seed and service deployment | Original job execution IDs/screenshots remain to be attached |
+| GCP federation | [Main authentication run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135641) passed | Provider/IAM screenshots for the evidence package |
+| Merge protection | Active main/staging rulesets require both CI checks and one review; [PR #44](https://github.com/Kerris812/CPE334_FinalProject/pull/44) failed CI and closed unmerged | Blocked-merge screenshot |
+| Production CD | [Release run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135629) passed CI, WIF, both image builds/pushes, migrations, service updates and smoke tests | Export the logged revision names/image digests and collect browser evidence |
+| Public deployment | On 20 November: health and R/S boards returned 200, `/queues` returned HTML with 200, anonymous `/auth/me` returned 401 | Authenticated customer/operator regression |
+| Lab 5.8 persistence | Procedures are defined in Section 32 | Before/after records, session continuity, rollback/recovery results and screenshots are not supplied |
 
 Project: `cpe334-final-project-theme9` (number `608461234576`).
 Region: `asia-southeast1`.
 
+- Frontend: <https://restaurant-web-608461234576.asia-southeast1.run.app>
+- Backend: <https://restaurant-api-608461234576.asia-southeast1.run.app>
+
+The verified production release SHA is
+`fc178ed639619e3e74a37724a0373e990839a0e8` ([release PR #46](https://github.com/Kerris812/CPE334_FinalProject/pull/46)).
+The local source reviewed is `d9744228974df1fdf1d2a71cb3ae57a12c30a7e3`
+(the staging merge of PR #45), plus this uncommitted documentation update.
+Do not confuse the staging commit with the production merge SHA.
+
+## Navigation
+
+- [CI and builds](#1-ci-workflow)
+- [First deployment and recovery runbook](#8-lab-55-scope-and-architecture)
+- [Environment reference](#15-environment-reference-actual-implementation)
+- [Secure GitHub integration](#18-lab-56-purpose-separation-of-responsibilities-and-acceptance-criteria)
+- [Verified CD release](#31-lab-57-automated-cd-and-release-record)
+- [Persistence and recovery tests](#32-lab-58-persistence-verification-and-release-validation)
+
 ## 1. CI Workflow
 
-The Restaurant Queue Management project uses GitHub Actions for continuous integration.
+The Restaurant Queue and Service Management System uses GitHub Actions for continuous integration.
 
 Workflow file: `.github/workflows/ci.yml`
 
-The workflow runs automatically when a pull request targets `staging` or `main`, and when changes are pushed to either branch.
+The workflow runs automatically when a pull request targets `staging` or `main`,
+when changes are pushed to either branch, and through `workflow_call` from the
+CD pipeline. CD waits for the reusable CI jobs to pass.
 
 ## 2. Build and Test Job
 
@@ -58,7 +77,7 @@ npm run test:unit
 npm run test:api
 ```
 
-Verified results:
+Historical local verification recorded during Lab 5.4 (not rerun during this documentation-only review):
 
 - Backend unit tests: 10 passed.
 - Backend API tests: 80 passed.
@@ -74,7 +93,7 @@ npm run build
 npm run test:ui
 ```
 
-Verified results:
+Historical local verification recorded during Lab 5.4 (not rerun during this documentation-only review):
 
 - Frontend production build: Passed.
 - Frontend UI tests: 75 passed.
@@ -88,7 +107,9 @@ docker build -t restaurant-queue-server:ci .
 docker build -f client/Dockerfile -t restaurant-queue-client:ci .
 ```
 
-The CI workflow verifies that both Docker images can be built.
+The CI workflow builds the backend and **local** frontend images. The CD workflow
+separately builds `client/Dockerfile.cloudrun` for the deployed frontend. Both
+workflows passed for the production release recorded above.
 
 ## 6. CI Execution Results
 
@@ -96,7 +117,8 @@ GitHub Actions initially reported failed checks because of incorrect database co
 
 After correcting these issues, both `Build and Test` and `Docker Build` passed on PR #32.
 
-The project uses pull request reviews before merging into `staging`. Required CI status checks must also be configured in GitHub branch protection to prevent merging when tests fail.
+The project uses pull request reviews before merging into `staging`. The active main/staging rulesets require `Build and Test`, `Docker Build`,
+and one approving review. See Section 26 for verified settings.
 
 ## 7. Verification Evidence
 
@@ -107,12 +129,11 @@ Evidence to include in the Lab 5 report:
 - Screenshot of the pull request review requirement.
 - Screenshot of required status checks and merge blocking, once verified.
 
-
 ## 8. Lab 5.5 scope and architecture
 
-This is the reusable manual deployment runbook for issue #37. The earlier
-commands have been executed successfully for this project as summarized in the
-status table above, but the instructions remain useful for verification and
+This is the reusable manual deployment runbook for issue #37. The
+first deployment is reported in PR #42, and the later CD execution is linked in
+the status table above. These instructions remain useful for verification and
 recovery. **Do not repeat cloud mutations, image pushes, jobs, or cleanup without
 an explicit need and the project owner's approval.** Run commands one block at a
 time in Bash in the appropriate environment. Build images on a machine with
@@ -137,6 +158,16 @@ listens on `PORT`, includes Prisma CLI, tsx, migrations, `prisma/seed.ts` and
 `scripts/seed.ts`, and starts only `node dist/index.js`. Do not prune development
 dependencies from that image without providing an alternative job image.
 No migration or seed runs during API instance startup.
+
+Implementation references:
+[backend image](../../../Dockerfile),
+[Cloud Run frontend image](../../../client/Dockerfile.cloudrun),
+[Nginx template](../../../client/nginx.cloudrun.conf.template),
+[API startup](../../../server/src/index.ts),
+[authentication](../../../server/src/auth/auth.ts),
+[database sessions](../../../server/src/auth/session.ts),
+[Prisma schema](../../../server/prisma/schema.prisma), and
+[seed](../../../server/prisma/seed.ts).
 
 The browser still fetches `/api/v1` with `credentials: same-origin`. Nginx forwards
 Cookie, Set-Cookie and the unchanged Origin; it uses the backend hostname for
@@ -217,7 +248,9 @@ this example.
 After approval, enable missing APIs:
 
 ```bash
-gcloud services enable run.googleapis.com sqladmin.googleapis.com   artifactregistry.googleapis.com secretmanager.googleapis.com   iam.googleapis.com --project="$PROJECT_ID"
+gcloud services enable run.googleapis.com sqladmin.googleapis.com \
+  artifactregistry.googleapis.com secretmanager.googleapis.com \
+  iam.googleapis.com --project="$PROJECT_ID"
 ```
 
 Cloud Build and WIF are unnecessary for this manual Docker build procedure.
@@ -311,12 +344,12 @@ flow. Never copy the starter's `ADMIN_PASSWORD` or `SEED_DEMO_DATA` variables.
 
 ```bash
 for secret in "$CUSTOMER_SECRET" "$OPERATOR_SECRET"; do
-  python3 -c 'import secrets,sys; sys.stdout.write(secrets.token_urlsafe(32))' |   \
-  gcloud secrets versions add "$secret" --data-file=- --project="$PROJECT_ID"
+  python3 -c 'import secrets,sys; sys.stdout.write(secrets.token_urlsafe(32))' | \
+    gcloud secrets versions add "$secret" --data-file=- --project="$PROJECT_ID"
 done
 for secret in "$DB_SECRET" "$CUSTOMER_SECRET" "$OPERATOR_SECRET"; do
-  gcloud secrets add-iam-policy-binding "$secret" --project="$PROJECT_ID"   \
-  --member="serviceAccount:${RUNTIME_SA}" --role=roles/secretmanager.secretAccessor
+  gcloud secrets add-iam-policy-binding "$secret" --project="$PROJECT_ID" \
+    --member="serviceAccount:${RUNTIME_SA}" --role=roles/secretmanager.secretAccessor
 done
 ```
 
@@ -469,12 +502,14 @@ curl --fail --show-error "$WEB_URL/health"
 curl --fail --show-error "$WEB_URL/api/v1/public/queues/R/board"
 curl --fail --show-error "$WEB_URL/api/v1/public/queues/S/board"
 curl --fail --show-error "$WEB_URL/queues"
-curl --fail --show-error "$WEB_URL/api/v1/auth/me"
+AUTH_STATUS="$(curl --silent --show-error --output /dev/null \
+  --write-out '%{http_code}' "$WEB_URL/api/v1/auth/me")"
+test "$AUTH_STATUS" = 401
 ```
 
 Expect safe health JSON, board JSON containing the R/S queue codes, HTML for
-`/queues`, and **401** for anonymous `/auth/me` (curl's nonzero exit is expected
-only for that last negative check). Health alone is liveness: startup SELECT 1
+`/queues`, and **401** for anonymous `/auth/me` (the last assertion checks that expected
+negative result explicitly). Health alone is liveness: startup SELECT 1
 and `/health` do not prove migrations, seeded records or a complete journey.
 The board reads query application tables and seeded queue records.
 
@@ -549,15 +584,15 @@ which is closed without merging. Evidence includes the Workload Identity setup,
 branch rulesets, failing PR link, and blocked merge screenshot.
 
 Lab 5.6 is about **authentication and merge protection**, not creating a second
-manual Cloud Run deployment. Lab 5.7 will add automated deployment. Keep the
-existing `.github/workflows/ci.yml` unchanged. Its current status check names
+manual Cloud Run deployment. Lab 5.7 now supplies automated deployment in `.github/workflows/deploy.yml`.
+The existing CI workflow supports reuse through `workflow_call`. Its PR check names
 are exactly `Build and Test` and `Docker Build`.
 
 | Action | Principal / location | Scope |
 | --- | --- | --- |
 | Enable APIs and configure identity | Human administrator / Google Cloud Shell | GCP project |
 | Authenticate to GCP | GitHub Actions OIDC token | Only the authorized repository and permitted branches |
-| Deploy images in a future lab | `restaurant-queue-deployer` service account | Cloud Run and the selected Artifact Registry repository |
+| Deploy approved main releases | `restaurant-queue-deployer` service account | Cloud Run and the selected Artifact Registry repository |
 | Serve backend traffic | `restaurant-queue-api` service account | Cloud SQL and selected runtime database secret |
 | Serve frontend traffic | `restaurant-queue-web` service account | No database credentials |
 | Enforce merges | GitHub repository rulesets | `staging` and `main` |
@@ -566,30 +601,18 @@ Do not create a JSON service account key or add database passwords to GitHub
 repository variables. The GitHub deployment identity should not inherit the
 backend runtime account's permissions to read database secrets.
 
-## 19. Prepare the Git branch and check prerequisites
+## 19. Existing implementation and prerequisites
 
-**Mac Terminal, repository root.** First ensure Lab 5.5 has been merged into
-`staging` or consciously base your changes on the current `staging`. Never
-switch branches with uncommitted changes that may be lost.
+The Lab 5.6 changes were merged through [PR #43](https://github.com/Kerris812/CPE334_FinalProject/pull/43).
+The current repository already contains `.github/workflows/gcp-auth-check.yml`
+and ignores `gha-creds-*.json` in `.gitignore`. Do not recreate these files or
+repeat the old feature-branch setup as part of submission preparation.
 
-```bash
-git status
-git fetch origin
-git switch staging
-git pull --ff-only origin staging
-git switch -c feature/lab5.6-gcp-auth-branch-protection
-```
-
-If local `staging` does not exist, replace `git switch staging` with
-`git switch --track origin/staging`. Check `git status` first. The new branch
-will contain the authentication workflow, `.gitignore` / `.dockerignore`
-updates, and this documentation. GCP IAM changes and GitHub ruleset settings
-are console configuration, not Git commits.
-
-Before proceeding, verify the operator can administer IAM, service accounts,
-Workload Identity Pools, Artifact Registry IAM and GitHub repository settings.
-The project also needs billing/credits and a configured budget because Lab 5.5
-Cloud SQL continues to incur costs even if Cloud Run scales to zero.
+GCP IAM and GitHub rulesets exist outside Git and must be inspected in their
+respective consoles. Sections 20–22 are administrative reference instructions,
+not a request to recreate the existing pool/provider, accounts or variables.
+Use existing resources; any IAM, deployment or billing change requires owner
+approval. Cloud SQL continues to incur costs independently of CI activity.
 
 ## 20. Configure the GitHub Workload Identity Pool and OIDC provider
 
@@ -680,9 +703,8 @@ Expected condition: exact repository and `refs/heads/staging` or
 `refs/heads/main`.
 
 A Pull Request workflow normally has a `refs/pull/...` reference and will not
-satisfy this provider condition. For Lab 5.6, the GCP authentication check runs
-**after the feature PR merges into `staging`**. The existing CI workflow still
-runs on the feature PR without acquiring GCP credentials.
+satisfy this provider condition. The GCP authentication check runs on pushes to `staging`/`main`, while PR CI
+runs without acquiring GCP credentials. The Lab 5.6 integration has already merged.
 
 Evidence: screenshot from
 <https://console.cloud.google.com/iam-admin/workload-identity-pools?project=cpe334-final-project-theme9>
@@ -724,7 +746,9 @@ gcloud artifacts repositories add-iam-policy-binding restaurant-queue \
   --role='roles/artifactregistry.writer'
 ```
 
-Grant Cloud Run developer permissions for Lab 5.7:
+For the existing CD identity, the documented baseline is Cloud Run Developer.
+This reference binding covers service/job updates and execution; do not repeat it
+unless the inspected policy is missing the approved grant:
 
 ```bash
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
@@ -770,7 +794,7 @@ Expected grants:
 
 Project Owner, Project Editor, `roles/secretmanager.admin` and
 `roles/cloudsql.admin` are not required by this authentication verification.
-If later automation needs additional privileges, review the exact operation and
+If an operation needs additional privileges, review the exact operation and
 add the narrowest applicable permission instead of granting broad access.
 
 ## 22. Add GitHub Actions repository variables
@@ -793,7 +817,7 @@ projects/608461234576/locations/global/workloadIdentityPools/github-actions/prov
 
 **GitHub website:** navigate to
 <https://github.com/Kerris812/CPE334_FinalProject/settings/variables/actions>
-and create the following **repository variables** under
+and inspect the following existing **repository variables** under
 Settings > Secrets and variables > Actions > Variables.
 
 | Name | Value |
@@ -807,138 +831,64 @@ Do not use a JSON key secret such as `GCP_CREDENTIALS`. Existing CI credentials
 `CI_DEMO_CUSTOMER_PASSWORD` and `CI_DEMO_OPERATOR_PASSWORD` are unrelated to
 this GCP identity and should remain configured according to `ci.yml`.
 
-## 23. Create the authentication verification workflow
+## 23. Authentication verification workflow
 
-**Mac Terminal, feature branch:** create `.github/workflows/gcp-auth-check.yml`.
-Keep the existing CI workflow unchanged. The proposed complete new workflow is:
+The implemented workflow is [gcp-auth-check.yml](../../../.github/workflows/gcp-auth-check.yml).
+It runs on pushes to `staging` and `main`, with `workflow_dispatch` available for
+an authorized branch. Job `verify-gcp-auth` is named `Verify GCP Authentication`.
+It grants `id-token: write`, uses `google-github-actions/auth@v3` and
+`setup-gcloud@v3`, then reads both existing Cloud Run services. It deploys nothing.
 
-```yaml
-name: Lab 5 GCP Authentication Check
+The exact repository variables are listed in Section 22. PR refs do not match the
+documented WIF branch condition, so this push-only job is not a required PR check.
+The existing main authentication run is linked in Section 25.
 
-on:
-  push:
-    branches: [staging, main]
-  workflow_dispatch:
+Generated `gha-creds-*.json` files are ignored by `.gitignore`. The current root
+`.dockerignore` does **not** exclude that pattern. Current Dockerfiles use explicit
+COPY paths that do not copy those generated files into images, but the ignore rule
+is still a build-context hardening gap. No other files were changed by this review.
+Never retain or publish generated credentials in evidence.
 
-permissions:
-  contents: read
+## 24. Lab 5.6 integration record
 
-jobs:
-  verify-gcp-auth:
-    name: Verify GCP Authentication
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-      - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v3
-      - name: Verify access to existing Cloud Run services
-        run: |
-          gcloud run services describe restaurant-api \
-            --project="${{ vars.GCP_PROJECT_ID }}" \
-            --region="${{ vars.GCP_REGION }}" \
-            --format='value(metadata.name)'
-          gcloud run services describe restaurant-web \
-            --project="${{ vars.GCP_PROJECT_ID }}" \
-            --region="${{ vars.GCP_REGION }}" \
-            --format='value(metadata.name)'
-```
+[PR #43](https://github.com/Kerris812/CPE334_FinalProject/pull/43) merged the
+Lab 5.6 implementation into `staging` on 19 November 2026. Its code is already
+present in this checkout. Review and merge evidence should be linked from that
+PR rather than recreating its commits or opening a duplicate PR.
 
-**GitHub Actions detail:** `id-token: write` is mandatory for GitHub OIDC token
-issuance. The WIF provider only accepts the `staging` and `main` branch refs;
-therefore, run this verification using a push to an authorized branch. Because
-`workflow_dispatch` is usually listed only for workflows present on the default
-branch, the `push` trigger allows testing as soon as the feature PR is merged
-into `staging` without deploying anything. Do not make this push-only workflow
-a required Pull Request status check.
+The submission process does not require rerunning Git publishing commands.
+Do not commit, push, force-push or merge during documentation review.
 
-**Local repository:** ignore generated authentication artifacts:
+## 25. Verified GitHub Actions federation
 
-```bash
-grep -qxF 'gha-creds-*.json' .gitignore || printf '\ngha-creds-*.json\n' >> .gitignore
-grep -qxF 'gha-creds-*.json' .dockerignore || printf '\ngha-creds-*.json\n' >> .dockerignore
-```
+The [staging authentication run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44543128218)
+and [main authentication run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135641)
+completed successfully. The production CD run also successfully authenticated
+through WIF before updating the existing resources.
 
-The root `.dockerignore` exists in the current repository. Keep these temporary
-credentials out of Git commits and Docker build contexts. Treat them as sensitive
-if they ever appear in logs or the working directory.
+These runs demonstrate working short-lived federation and read access to the
+services. The authentication-check workflow itself does not redeploy the app.
+Archive the run links and non-sensitive screenshots; inspect the live provider
+and IAM policies separately before changing access.
 
-## 24. Review, commit, and open the Lab 5.6 PR
+| Failure | Inspect |
+| --- | --- |
+| Provider not found | Full resource name and numeric project number |
+| Attribute condition rejected | Exact repository and authorized branch ref |
+| Impersonation denied | `roles/iam.workloadIdentityUser` binding |
+| Cloud Run access denied | Deployment account permissions and resource identifiers |
+| Empty workflow input | The four GitHub repository variables in Section 22 |
 
-**Mac Terminal:** confirm expected file changes. Do not stage unrelated files.
-
-```bash
-git branch --show-current
-git status
-git diff --check
-git add .github/workflows/gcp-auth-check.yml
-git add .gitignore .dockerignore
-git add docs/labs/lab-05/deployment.md
-git diff --cached --check
-git commit -m 'feat(lab5.6): configure GitHub GCP authentication'
-git push -u origin feature/lab5.6-gcp-auth-branch-protection
-```
-
-Open a Pull Request from
-`feature/lab5.6-gcp-auth-branch-protection` to `staging`.
-Review the existing CI (`Build and Test` and `Docker Build`). Obtain approval
-from the teammate. At this stage, only the identity and workflow configuration
-have been committed. The cloud IAM and GitHub branch settings live outside Git.
-
-PR title: `feat(lab5.6): GitHub GCP Authentication and Merge Protection`.
-In the PR body, use `Refs #38` while the remaining acceptance criteria are
-pending; do not prematurely use `Closes #38` if the failing PR demonstration
-and protection evidence are still unfinished.
-
-## 25. Verify GitHub Actions federation from staging
-
-**GitHub website:** after the feature PR is merged into `staging`, open
-<https://github.com/Kerris812/CPE334_FinalProject/actions>.
-Find `Lab 5 GCP Authentication Check` and select the run from the `staging`
-push. The job `Verify GCP Authentication` should show successful checkout,
-OIDC authentication, Cloud CLI setup, and read-only Cloud Run verification.
-The output should include:
-
-```text
-restaurant-api
-restaurant-web
-```
-
-This result proves the configured GitHub identity can authenticate to GCP
-and access both services. It does **not** prove the application was redeployed
-or that automated continuous deployment is working.
-
-If no run appears, verify the workflow was merged into `staging` and has the
-`push` trigger. Do not assume a manual `workflow_dispatch` is available until
-the workflow has also been added to the default branch. Save the successful
-workflow run URL and screenshot.
-
-| Failure | Inspect | Preferred remedy |
-| --- | --- | --- |
-| Provider not found or invalid target | Full provider resource string, project number | Correct `GCP_WORKLOAD_IDENTITY_PROVIDER` |
-| Repository / branch attribute condition rejected | GitHub `repository` and `ref` claims | Use a normal push on `staging` or `main`; confirm the exact provider condition |
-| Cannot impersonate service account | WIF principal set binding on `restaurant-queue-deployer` | Repair `roles/iam.workloadIdentityUser` binding |
-| Cloud Run permission denied | Deployment service account project roles | Check `roles/run.developer` |
-| Cloud Run service not found | Project, region, service name | Correct the identifier; do not create a duplicate service |
-| Required variable empty | GitHub Actions repository variables | Create or correct the matching variable |
-
-Do not add service account JSON keys or grant Owner as a troubleshooting
-shortcut. Check error details and use minimal IAM changes.
+Do not add a service account JSON key or grant Owner to bypass an error.
 
 ## 26. Protect staging and main with GitHub rulesets
 
 **GitHub website:** navigate to
 <https://github.com/Kerris812/CPE334_FinalProject/settings/rules>.
-Repository admin permission is required. Create two **active branch rulesets**.
+The active [Protect main](https://github.com/Kerris812/CPE334_FinalProject/rules/27646194)
+and [Protect staging](https://github.com/Kerris812/CPE334_FinalProject/rules/27645966)
+rulesets were inspected through the GitHub API on 20 November 2026.
+Repository admin permission is required to change them; do not create duplicates.
 The rulesets are configured through GitHub Settings, not in `deployment.md`.
 
 | Setting | Protect staging | Protect main |
@@ -952,7 +902,8 @@ The rulesets are configured through GitHub Settings, not in `deployment.md`.
 | Required status check 2 | `Docker Build` | `Docker Build` |
 | Block force pushes | Enabled | Enabled |
 | Restrict deletions | Enabled | Enabled |
-| Bypass list | Empty unless course requires otherwise | Empty unless course requires otherwise |
+| Configured bypass actors | None returned by the ruleset API | None returned by the ruleset API |
+| Require branch up to date | Enabled | Disabled |
 
 For each target branch, use an exact branch selector and confirm that the rules
 apply to the intended branch. In the status check picker, choose the exact
@@ -970,115 +921,42 @@ opens the PR and the other approves it. Avoid admin bypass allowances when
 verifying enforcement. Capture a screenshot of the two active rulesets and the
 required review/check settings.
 
-## 27. Demonstrate blocked merging using a temporary failing PR
+## 27. Failing-PR merge-protection evidence
 
-**Mac Terminal:** after the Lab 5.6 workflow PR has merged and branch protection
-is active, create a separate disposable branch from the latest `staging`:
+[PR #44](https://github.com/Kerris812/CPE334_FinalProject/pull/44), from
+`test/lab5.6-merge-protection`, is closed without merging. Its
+[CI run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44546852020)
+failed. The active staging ruleset requires the `Build and Test` check, so a failing
+required check blocks merging independently of the reviewer-approval requirement.
+Retain the original blocked-merge screenshot to document the observed UI behavior.
 
-```bash
-git status
-git fetch origin
-git switch staging
-git pull --ff-only origin staging
-git switch -c test/lab5.6-merge-protection
-mkdir -p server/tests/unit
-```
+The intentionally failing `server/tests/unit/lab5-merge-protection.test.ts` belongs
+to that disposable PR and is **absent from this checkout**. It must not be restored,
+merged or included in the submission branch. No new failing test or publishing
+operation is needed to reuse the existing evidence.
 
-Create `server/tests/unit/lab5-merge-protection.test.ts` on the disposable branch:
+## 28. Lab 5.6 evidence inventory
 
-```typescript
-import { expect, test } from 'vitest';
-
-test('Lab 5.6 merge protection verification', () => {
-  expect(1).toBe(2);
-});
-```
-
-The repository's current server script is
-`"test:unit": "vitest run tests/unit"`, so the `Build and Test` job should
-execute this test and fail. Do not run this test against production services.
-
-```bash
-git add server/tests/unit/lab5-merge-protection.test.ts
-git commit -m 'test(lab5.6): demonstrate blocked merge'
-git push -u origin test/lab5.6-merge-protection
-```
-
-Open the PR from `test/lab5.6-merge-protection` to `staging`.
-Suggested title: `test(lab5.6): Verify Failing CI Blocks Merge`.
-
-Verify the following *on the actual Pull Request*:
-
-1. `Build and Test` fails because the deliberately incorrect assertion runs.
-2. `Docker Build` normally succeeds if the build is otherwise healthy.
-3. GitHub states that a required status check has failed and **blocks merge**.
-4. Teammate approval is required separately.
-
-The critical evidence is a blocked merge specifically due to a failing required
-check, not merely a disabled merge button due to missing review. Take a
-screenshot of the failing check and blocked merge, and record the PR URL.
-
-After evidence is captured, click **Close pull request** without merging.
-Delete the disposable branch if desired. Do not cherry-pick or merge the
-intentionally failing test into `staging` or `main`.
-
-To clean up the local branch after closing the PR:
-
-```bash
-git switch staging
-git branch -D test/lab5.6-merge-protection
-```
-
-## 28. Evidence inventory and final reporting
-
-Issue #38 expects these concrete artifacts:
-
-| Evidence | Content required | Status |
-| --- | --- | --- |
-| WIF provider screenshot | GitHub issuer, attribute mapping and repository/branch condition | Pending verification |
-| GitHub Actions authentication run | Green `Verify GCP Authentication` run and Cloud Run service names | Pending verification |
-| Rulesets screenshot | Active `main` and `staging` rules, required checks and review | Pending verification |
-| Failing PR link | URL to the temporary PR that ran a failing test | Pending verification |
-| Blocked merge screenshot | GitHub's failed required check and blocked merge message | Pending verification |
-| Closed PR confirmation | Temporary test PR closed unmerged | Pending verification |
-
-Keep the screenshots in the designated lab evidence folder if the team chooses
-to store them in the repository. Otherwise attach them directly to Issue #38
-and link them here. Never include secret values, passwords, session cookies,
-GitHub tokens or generated `gha-creds-*.json` files in screenshots or commits.
-
-Record completion details only after the checks pass:
-
-| Result | Record |
+| Evidence | Verified reference / remaining artifact |
 | --- | --- |
-| WIF pool and provider | `github-actions` / `github` |
-| Deployment identity | `restaurant-queue-deployer@cpe334-final-project-theme9.iam.gserviceaccount.com` |
-| Auth verification run URL | Pending |
-| Staging ruleset screenshot | Pending |
-| Main ruleset screenshot | Pending |
-| Failing PR URL | Pending |
-| Blocked merge evidence | Pending |
-| Reviewer approval evidence | Pending |
-| Lab 5.6 PR URL | Pending |
+| Integration PR | [PR #43](https://github.com/Kerris812/CPE334_FinalProject/pull/43), merged |
+| Authentication | [Successful main run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135641) |
+| Active main ruleset | [Protect main](https://github.com/Kerris812/CPE334_FinalProject/rules/27646194) |
+| Active staging ruleset | [Protect staging](https://github.com/Kerris812/CPE334_FinalProject/rules/27645966) |
+| Deliberately failing CI | [Failed run](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44546852020) |
+| Closed unmerged test PR | [PR #44](https://github.com/Kerris812/CPE334_FinalProject/pull/44) |
+| Provider/IAM, approval and blocked-merge screenshots | Not supplied in this document; attach existing evidence |
 
-## 29. Lab 5.6 completion criteria
+Keep screenshots free of passwords, cookies, tokens and generated credential files.
+A PR body claiming completion does not replace the associated run or screenshot.
 
-The issue can be marked complete when all applicable items are verified:
+## 29. Lab 5.6 assessment
 
-- [ ] WIF Pool and OIDC provider exist with the correct attribute condition.
-- [ ] A separate GitHub deployment service account exists with scoped access.
-- [ ] `roles/iam.workloadIdentityUser` permits the intended GitHub principal set.
-- [ ] Artifact Registry, Cloud Run, and runtime account permissions are correct.
-- [ ] Required GitHub Actions variables are configured; no JSON key is stored.
-- [ ] A workflow push on `staging` successfully authenticates to GCP.
-- [ ] Active rulesets protect `staging` and `main`.
-- [ ] Both branches require `Build and Test`, `Docker Build`, and one approval.
-- [ ] The deliberately failing PR is blocked by a failed required check.
-- [ ] The deliberately failing PR is closed without merging.
-- [ ] Evidence links and nonsecret screenshots are attached to Issue #38.
-
-After completion, close Issue #38. Future automated deployments belong to
-Lab 5.7 / Issue #39; do not mix their implementation into this task.
+Working WIF authentication, the integrated verification workflow, active rulesets
+requiring both checks and one approval, and a failed closed/unmerged test PR are
+supported by the linked evidence. Exact current provider/IAM policy screenshots
+and the original blocked-merge screenshot remain submission artifacts to attach.
+Issue closure is a separate reviewer decision; this document does not close issues.
 
 ## 30. Security and recovery notes
 
@@ -1099,425 +977,422 @@ Lab 5.7 / Issue #39; do not mix their implementation into this task.
   automatically undo Workload Identity Pools, IAM grants or GitHub rulesets.
 - Continue to monitor the Cloud SQL budget independently of CI and WIF setup.
 
+## 31. Lab 5.7: Automated CD and release record
 
-## 31. Lab 5.7: Automated CD and Release Pipeline
+Related issue: [#39](https://github.com/Kerris812/CPE334_FinalProject/issues/39).
+The implemented workflow is [deploy.yml](../../../.github/workflows/deploy.yml),
+named `Lab 5 CD`. Normal releases now use this workflow rather than repeating
+the first-deployment provisioning commands.
 
-### 31.1 Objective
+### 31.1 Release triggers and gates
 
-Lab 5.7 implements automated Continuous Deployment (CD) for the Restaurant Queue Management System.
+A push to `main` starts CD. Feature PRs integrate through `staging`; staging
+pushes run CI and authentication checks but do not deploy production. There is no
+manual `workflow_dispatch` or automated rollback trigger in `deploy.yml`.
 
-After an approved release Pull Request is merged into `main`, GitHub Actions automatically runs CI checks, builds and pushes Docker images, executes database migrations, deploys both Cloud Run services, and performs production smoke tests.
+Job `verify-ci` calls the existing `ci.yml` with `secrets: inherit` and is named
+`Verify Release CI`. The deploy job depends on it. Deployment has
+`contents: read` and `id-token: write`; the concurrency group is
+`lab5-production-deployment` with `cancel-in-progress: false`. Deployments are
+serialized instead of cancelling an active migration/deployment.
 
-This replaces the manual Docker image building and Cloud Run deployment procedures used in Lab 5.5.
+The separate push-triggered CI workflow may also run on main. Inside CD, reusable
+checks are displayed as `Verify Release CI / Build and Test` and
+`Verify Release CI / Docker Build`; PR rulesets require the ordinary CI contexts
+`Build and Test` and `Docker Build`.
 
-Related issue: [Issue #39](https://github.com/Kerris812/CPE334_FinalProject/issues/39)
+### 31.2 Actual deployment sequence
 
-### 31.2 Release Workflow
+1. Run both reusable CI jobs successfully.
+2. Authenticate via WIF using the four repository variables in Section 22.
+3. Verify the existing migration job and both Cloud Run services exist.
+4. Configure Artifact Registry Docker authentication.
+5. Build Linux amd64 backend with `Dockerfile` and frontend with `client/Dockerfile.cloudrun`.
+6. Push both images tagged with the triggering full `${{ github.sha }}`.
+7. Update only the image of `restaurant-migrate`; preserve its command, SQL attachment,
+   secret references and runtime service account.
+8. Execute the migration job with `--wait`; failure stops deployment.
+9. Update the image and `commit-sha` label on `restaurant-api`, then `restaurant-web`.
+   Existing environment, Secret Manager, SQL and service-account settings are retained.
+10. Run curl smoke checks against `/`, `/health`, and both public R/S board endpoints.
+11. Print the release SHA, image references and latest ready revision names.
 
-The release process follows these steps:
+The workflow does not provision infrastructure or execute `restaurant-seed`.
+The migration job must already use `npm run db:migrate`, which invokes
+`prisma migrate deploy`. These configuration dependencies must be confirmed before
+changing the job or deploying into another environment.
 
-1. Create a feature branch from `staging`.
-2. Implement the CD workflow and a visible frontend change.
-3. Open a feature Pull Request targeting `staging`.
-4. Pass required CI checks and obtain teammate approval.
-5. Merge the approved feature Pull Request into `staging`.
-6. Create a release Pull Request from `staging` into `main`.
-7. Pass CI checks and obtain teammate approval.
-8. Merge the approved release Pull Request into `main`.
-9. GitHub Actions automatically executes the production CD workflow.
-10. Verify deployment, smoke tests, Cloud Run revisions, and the released commit SHA.
+Image references use the region/project variables and fixed repository/image names:
 
-Production deployment is triggered by a push to `main`.
+```text
+REGION-docker.pkg.dev/PROJECT_ID/restaurant-queue/restaurant-api:RELEASE_SHA
+REGION-docker.pkg.dev/PROJECT_ID/restaurant-queue/restaurant-web:RELEASE_SHA
+```
 
-The `staging` branch is used for integration and verification and does not trigger production deployment.
+CD deploys SHA-tagged references, not explicit `@sha256` digests. Cloud Run resolves
+an image for each revision; retain the resolved digest as evidence. This differs
+from the optional digest-pinned manual first-deployment procedure in Section 12.
 
-### 31.3 Existing GCP Infrastructure
+### 31.3 Verified production release
 
-Lab 5.7 reuses the infrastructure configured during Labs 5.5 and 5.6.
+The GitHub API confirms these records as of 20 November 2026:
 
-| Resource | Existing Configuration |
+| Record | Verified value |
 | --- | --- |
-| GCP project | `cpe334-final-project-theme9` |
-| Project number | `608461234576` |
+| Feature PR | [#45](https://github.com/Kerris812/CPE334_FinalProject/pull/45), merged into staging |
+| Staging merge SHA | `d9744228974df1fdf1d2a71cb3ae57a12c30a7e3` |
+| Release PR | [#46](https://github.com/Kerris812/CPE334_FinalProject/pull/46), merged into main |
+| Production release SHA | `fc178ed639619e3e74a37724a0373e990839a0e8` |
+| CD run | [44569135629](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135629), success |
+| Reusable CI jobs | Both succeeded: server/client builds, unit/API/UI tests and local Docker builds |
+| Cloud deployment job | Authentication, cloud image builds/pushes, migration, both service updates and smoke tests succeeded |
+| Backend/frontend revision names and resolved digests | Available in the run/Cloud Run; not transcribed here without inspecting those outputs |
+| Visible release marker | `Lab 5.7 cloud release` exists in `client/src/App.tsx`; browser screenshot still required |
+
+The feature commit and staging merge are not the SHA deployed by the main release.
+Use the production SHA above for the two Artifact Registry release tags.
+
+### 31.4 Smoke-test coverage and limitations
+
+On 20 November 2026, read-only requests to the frontend returned:
+
+| Endpoint | Observed result |
+| --- | --- |
+| `/health` | HTTP 200; `status: ok`, service `restaurant-queue-api` |
+| `/api/v1/public/queues/R/board` | HTTP 200; `data.queueCode: R` |
+| `/api/v1/public/queues/S/board` | HTTP 200; `data.queueCode: S` |
+| `/queues` | HTTP 200, SPA HTML |
+| `/api/v1/auth/me` without cookie | HTTP 401, expected authentication guard |
+
+The workflow smoke checks only HTTP success using curl (with retries), not JSON
+schema, browser rendering, release text, role permissions or session continuity.
+Do not describe them as a complete customer/operator end-to-end test. Section 32
+records the remaining manual and persistence checks.
+
+Historical local counts were 10 backend unit and 75 frontend UI tests; the linked
+release CI additionally passed API tests. No application tests or dependency audit
+were rerun for this documentation-only review. An earlier report of four high
+severity dependency findings is historical, not a current audit result. Review a
+current production dependency audit separately before asserting vulnerabilities
+are resolved.
+
+### 31.5 Failure handling and recovery
+
+A failed required step stops subsequent steps. Deployment is sequential, not atomic:
+if the backend update succeeds and the frontend update fails, the backend may
+already be serving the new release. A smoke failure reports failure but does not
+automatically roll back. Completed migrations remain applied.
+
+A revision name being latest/ready does not establish its traffic percentage.
+Inspect `status.traffic` and resolved image digests for both services. After manual
+rollback pins traffic, the current CD workflow does not explicitly restore
+`--to-latest`; review routing before assuming a later image update serves users.
+Section 32 provides owner-approved traffic and recovery checks. Do not reverse
+Prisma migrations or reseed to simulate a rollback.
+
+### 31.6 Submission evidence
+
+Retain PR #45/#46, the successful CD/authentication/CI links, release SHA, migration
+execution ID, resolved image digests, serving revision names/traffic, and a
+screenshot of the visible release marker. Add authenticated customer/operator
+and persistence evidence from Section 32. Successful automated deployment is
+verified; completion of every manual acceptance criterion is not inferred.
+
+## 32. Lab 5.8: Persistence Verification and Release Validation
+
+### 32.1 Objective
+
+**Execution status: NOT VERIFIED.** These are retained test procedures and
+evidence fields, not completed tests. The successful CD run in Section 31 proves
+a deployment occurred, but contains no before/after customer entry or session
+comparison. Do not mark persistence or rollback PASS without that evidence.
+Any revision replacement, release, traffic change or test-data mutation requires
+owner approval; none was executed during this review.
+
+Verify that the Restaurant Queue and Service Management System preserves its application data and remains functional after Cloud Run revision replacement, automated CD redeployment, and rollback and recovery operations.
+
+Related GitHub issue: [#40](https://github.com/Kerris812/CPE334_FinalProject/issues/40)
+
+### 32.2 Deployment Environment
+
+| Component | Configuration |
+| --- | --- |
+| GCP Project | `cpe334-final-project-theme9` |
 | Region | `asia-southeast1` |
-| Artifact Registry repository | `restaurant-queue` |
-| Backend image | `restaurant-api` |
-| Frontend image | `restaurant-web` |
-| Backend Cloud Run service | `restaurant-api` |
-| Frontend Cloud Run service | `restaurant-web` |
-| Cloud SQL instance | `restaurant-queue-db` |
-| Migration Cloud Run Job | `restaurant-migrate` |
-| Deployment service account | `restaurant-queue-deployer` |
-| Workload Identity Pool | `github-actions` |
-| GitHub OIDC provider | `github` |
-| Production branch | `main` |
+| Frontend Service | `restaurant-web` |
+| Backend Service | `restaurant-api` |
+| Database | Cloud SQL PostgreSQL |
+| Migration Job | `restaurant-migrate` |
+| Deployment Pipeline | GitHub Actions `Lab 5 CD` |
+| Frontend URL | https://restaurant-web-608461234576.asia-southeast1.run.app |
+| Backend URL | https://restaurant-api-608461234576.asia-southeast1.run.app |
 
-The deployment workflow updates the existing Cloud Run services rather than creating new ones.
+### 32.3 Test 1: Database Persistence After Backend Revision Replacement
 
-Existing runtime settings, including Cloud SQL connectivity, Secret Manager references, service accounts, and environment variables, must be preserved.
+**Purpose:** Confirm that an existing queue entry remains stored in Cloud SQL when the backend is replaced with a new Cloud Run revision.
 
-### 31.4 GitHub Actions Workflows
+**Procedure:**
 
-Two GitHub Actions workflows are used.
+1. Open the deployed frontend.
+2. Log in using the seeded Customer A account.
+3. Join Queue R with party size 3, or identify an existing queue entry.
+4. Record the entry ID, queue number (`displayNumber`), status, party size and
+   `joinedAt`. Keep the same browser session for the continuity check.
+5. Record the backend revision actually receiving traffic, its resolved image
+   digest and `status.traffic`; latest ready is not necessarily the serving revision.
+6. Create a new Cloud Run backend revision without changing the database.
+7. Confirm that the new revision receives production traffic.
+8. Refresh the customer page and inspect the original queue entry.
+9. Compare the data before and after revision replacement.
 
-#### Continuous Integration
+**Cloud Shell commands:**
 
-File: `.github/workflows/ci.yml`
+```bash
+export PROJECT_ID="cpe334-final-project-theme9"
+export REGION="asia-southeast1"
 
-The existing CI workflow performs frontend testing, backend testing, application builds, and Docker build verification.
+# Record traffic as well as latest-ready revision before proceeding.
+gcloud run services describe restaurant-api \
+  --project="$PROJECT_ID" --region="$REGION" --format='yaml(status.traffic)'
 
-The `workflow_call` trigger is added so the CD workflow can invoke the existing CI jobs before deployment.
+export API_REV_BEFORE="$(gcloud run services describe restaurant-api \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --format='value(status.latestReadyRevisionName)')"
 
-The original Pull Request and push triggers remain unchanged.
+gcloud run services update restaurant-api \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --update-env-vars="LAB58_RESTART_ID=$(date -u +%Y%m%d%H%M%S)"
 
-#### Continuous Deployment
+export API_REV_AFTER="$(gcloud run services describe restaurant-api \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --format='value(status.latestReadyRevisionName)')"
 
-File: `.github/workflows/deploy.yml`
+echo "Before: $API_REV_BEFORE"
+echo "After: $API_REV_AFTER"
+test "$API_REV_BEFORE" != "$API_REV_AFTER"
+gcloud run services describe restaurant-api \
+  --project="$PROJECT_ID" --region="$REGION" --format='yaml(status.traffic)'
+```
 
-The new CD workflow runs on a push to `main`.
+**Results:**
 
-The deployment process includes:
+| Verification Item | Before | After |
+| --- | --- | --- |
+| Backend Revision | Not recorded | Not recorded |
+| Customer | Customer A | Customer A |
+| Queue | R | R |
+| Queue Number | Not recorded | Not recorded |
+| Party Size | Not recorded | Not recorded |
+| Queue Status | Not recorded | Not recorded |
+| Joined Timestamp | Not recorded | Not recorded |
+| Customer Session | Not recorded | Not recorded |
 
-| Stage | Operation |
+**Expected Result:** The serving backend revision changes, while the same entry ID,
+queue number, party size, status and joined timestamp remain. The same authenticated
+browser session remains valid within its eight-hour lifetime. Do not advance service
+status during the comparison. If traffic remains pinned to the old revision, the
+replacement test has not reached the new container; resolve routing only with approval.
+
+**Actual Result:** Not recorded; no persistence/rollback execution is claimed.
+
+**Test Status:** NOT VERIFIED — execution evidence not supplied.
+
+**Evidence:**
+
+1. Screenshot of queue entry before replacement — evidence not attached.
+2. Screenshot of new Cloud Run revision — evidence not attached.
+3. Screenshot of queue entry after replacement — evidence not attached.
+
+### 32.4 Test 2: Database Persistence After Automated CD Redeployment
+
+**Purpose:** Verify that the GitHub Actions CD pipeline can deploy a new application release without deleting existing database records.
+
+**Procedure:**
+
+1. Record the original backend and frontend revisions.
+2. Record the existing customer queue entry.
+3. Use an approved release with a recorded before-state, or propose a new change
+   for owner approval. Do not create a redundant release solely for this document.
+4. Open a Pull Request targeting `staging`.
+5. Confirm that the required CI checks pass.
+6. Obtain teammate approval and merge into `staging`.
+7. Create a release Pull Request from `staging` into `main`.
+8. Confirm CI and reviewer approval.
+9. Merge the release PR into `main`.
+10. Verify that `Lab 5 CD` runs successfully.
+11. Record the new Cloud Run revisions and release commit SHA.
+12. Refresh the deployed application and verify the original queue entry remains available.
+
+**Expected CD sequence (for an owner-approved new release):**
+
+1. Execute required CI checks.
+2. Authenticate to GCP using Workload Identity Federation.
+3. Build backend and frontend Docker images.
+4. Push images to Artifact Registry with the commit SHA.
+5. Execute Prisma migrations.
+6. Deploy the backend to Cloud Run.
+7. Deploy the frontend to Cloud Run.
+8. Execute production smoke tests.
+
+**Results:**
+
+| Verification Item | Recorded Value |
 | --- | --- |
-| 1 | Execute the existing CI workflow |
-| 2 | Authenticate to GCP using Workload Identity Federation |
-| 3 | Configure the Google Cloud CLI |
-| 4 | Configure Docker authentication to Artifact Registry |
-| 5 | Build the backend Docker image |
-| 6 | Build the frontend Docker image |
-| 7 | Push both images to Artifact Registry |
-| 8 | Update the existing migration job image |
-| 9 | Execute Prisma database migrations |
-| 10 | Deploy the backend image to Cloud Run |
-| 11 | Deploy the frontend image to Cloud Run |
-| 12 | Execute production smoke tests |
-| 13 | Record deployed revisions and release commit SHA |
+| Feature PR | Existing release: [#45](https://github.com/Kerris812/CPE334_FinalProject/pull/45); no persistence before-state supplied |
+| Release PR | Existing release: [#46](https://github.com/Kerris812/CPE334_FinalProject/pull/46) |
+| GitHub Actions Run | [44569135629](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135629), deployment passed; persistence comparison missing |
+| Release Commit SHA | `fc178ed639619e3e74a37724a0373e990839a0e8` |
+| Backend Revision Before CD | Not recorded |
+| Backend Revision After CD | Not recorded |
+| Frontend Revision Before CD | Not recorded |
+| Frontend Revision After CD | Not recorded |
+| Original Queue Number | Not recorded |
+| Queue Number After CD | Not recorded |
+| Database Persistence | Not recorded |
+| Smoke Test Result | Passed in existing CD run; not an authenticated persistence check |
 
-If a required stage fails, subsequent deployment stages do not execute.
+**Expected Result:** CD succeeds, the new revisions receive traffic, and the same
+entry ID, number, party size, status, joined timestamp and browser session survive.
+The successful release run `44569135629` is deployment evidence only; without a
+before-state it cannot retrospectively prove this persistence test.
 
-The CD workflow does not execute database seeding during normal releases.
+**Actual Result:** Not recorded; no persistence/rollback execution is claimed.
 
-### 31.5 Authentication and Deployment Permissions
+**Test Status:** NOT VERIFIED — execution evidence not supplied.
 
-The pipeline uses GitHub OIDC and Google Cloud Workload Identity Federation, configured during Lab 5.6.
+**Evidence:**
 
-GitHub Actions authenticates through the existing provider:
+1. Feature PR URL — evidence not attached.
+2. Release PR URL — evidence not attached.
+3. Successful CD workflow screenshot — evidence not attached.
+4. Cloud Run revision screenshot — evidence not attached.
+5. Queue entry after redeployment screenshot — evidence not attached.
 
-`projects/608461234576/locations/global/workloadIdentityPools/github-actions/providers/github`
+### 32.5 Test 3: Cloud Run Rollback and Recovery
 
-The deployment service account is:
+**Purpose:** Verify that application traffic can be redirected to a previous compatible backend revision and restored to the latest release without losing database records.
 
-`restaurant-queue-deployer@cpe334-final-project-theme9.iam.gserviceaccount.com`
+**Prerequisites:**
 
-The deployment identity requires appropriately scoped permissions for:
+1. A previous working backend revision is available.
+2. The previous revision is compatible with the current database schema.
+3. Both previous and latest revision names have been recorded.
 
-1. Publishing images to the existing Artifact Registry repository.
-2. Updating and executing Cloud Run jobs.
-3. Updating existing Cloud Run services.
-4. Using the existing Cloud Run runtime service accounts.
+**Procedure:**
 
-No permanent Google Cloud service account JSON key is stored in GitHub.
+1. Record the latest active backend revision.
+2. Route backend traffic to the previous compatible revision.
+3. Verify that the health endpoint and public queue board work.
+4. Log in and confirm the original queue entry still exists.
+5. Restore traffic to the latest backend revision.
+6. Repeat the health and persistence checks.
 
-Database passwords remain in Google Cloud Secret Manager and are not stored in the deployment workflow.
+**Rollback command:**
 
-### 31.6 Docker Image Versioning
+```bash
+gcloud run services update-traffic restaurant-api \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --to-revisions="PREVIOUS_REVISION_NAME=100"
+```
 
-The backend and frontend images are tagged with the full Git commit SHA associated with the approved `main` release.
+**Recovery command (restore the recorded revision for comparison):**
 
-Backend image format:
+```bash
+gcloud run services update-traffic restaurant-api \
+  --project="$PROJECT_ID" \
+  --region="$REGION" \
+  --to-revisions="LATEST_REVISION_NAME=100"
+```
 
-`asia-southeast1-docker.pkg.dev/cpe334-final-project-theme9/restaurant-queue/restaurant-api:<COMMIT_SHA>`
+Replace `PREVIOUS_REVISION_NAME` and `LATEST_REVISION_NAME` with recorded compatible
+revision names, not the literal placeholders. Inspect `status.traffic` after each
+command. Restoring a named revision pins routing to it. After verifying recovery,
+restore normal latest-revision routing only with owner approval:
 
-Frontend image format:
+```bash
+gcloud run services update-traffic restaurant-api \
+  --project="$PROJECT_ID" --region="$REGION" --to-latest
+gcloud run services describe restaurant-api \
+  --project="$PROJECT_ID" --region="$REGION" --format='yaml(status.traffic)'
+```
 
-`asia-southeast1-docker.pkg.dev/cpe334-final-project-theme9/restaurant-queue/restaurant-web:<COMMIT_SHA>`
+If the original routing was intentionally split rather than 100% latest, restore
+that recorded split instead. Never infer the serving revision from latest-ready alone.
 
-Using the commit SHA provides traceability between the released source code and the deployed container images.
+**Results:**
 
-The deployment record must use the commit SHA that actually triggered the workflow on `main`.
-
-This may differ from the original feature branch commit if the release Pull Request uses a merge or squash commit.
-
-### 31.7 Automated Database Migrations
-
-The deployment pipeline reuses the existing Cloud Run Job:
-
-`restaurant-migrate`
-
-The workflow updates the job with the newly built backend image and executes it before updating the backend and frontend services.
-
-The migration command is:
-
-`npm run db:migrate`
-
-The server script invokes:
-
-`prisma migrate deploy`
-
-The existing migration job must retain:
-
-1. Cloud SQL connectivity.
-2. The database connection secret.
-3. Its assigned runtime service account.
-4. The database migration command.
-5. The required execution environment.
-
-Database migrations execute synchronously, and the pipeline waits for completion.
-
-If the migration job fails, the pipeline stops before deploying new application revisions.
-
-The `restaurant-seed` job is not executed automatically during normal production deployments.
-
-### 31.8 Automated Cloud Run Deployment
-
-After successful CI checks, Docker image publishing, and database migration, the pipeline updates these services:
-
-1. `restaurant-api`
-2. `restaurant-web`
-
-Both services receive images tagged with the release commit SHA.
-
-Cloud Run creates new revisions using the updated images.
-
-The existing backend configuration must preserve:
-
-- `DATABASE_URL`
-- `WEB_ORIGIN`
-- Cloud SQL connection
-- Secure session cookie settings
-- Backend runtime service account
-
-The existing frontend configuration must preserve:
-
-- `BACKEND_HOST`
-- Nginx API proxying
-- Frontend runtime service account
-
-The automated deployment must not replace these settings with development values.
-
-### 31.9 Automated Production Smoke Tests
-
-After deploying the backend and frontend, the workflow checks the public application endpoints.
-
-Production frontend URL:
-
-https://restaurant-web-608461234576.asia-southeast1.run.app
-
-| Endpoint | Expected HTTP Status |
+| Verification Item | Result |
 | --- | --- |
-| `/` | 200 |
-| `/health` | 200 |
-| `/api/v1/public/queues/R/board` | 200 |
-| `/api/v1/public/queues/S/board` | 200 |
-
-All smoke tests must succeed before the deployment workflow is considered successful.
-
-These tests confirm that the frontend, API proxy, backend, and public queue endpoints respond after deployment.
-
-They do not replace manual testing of authenticated customer and operator workflows.
-
-### 31.10 Visible Frontend Release Change
-
-A small visible change is included in the frontend login page.
-
-The added text is:
-
-`Lab 5.7 cloud release`
-
-This provides visual confirmation that the approved release has reached the public Cloud Run frontend.
-
-The change must be visible at:
-
-https://restaurant-web-608461234576.asia-southeast1.run.app
-
-The text update does not change authentication, authorization, database operations, queue handling, or application permissions.
-
-A screenshot of the deployed login page must be collected after the CD workflow completes.
-
-### 31.11 Local Verification Results
-
-The following local verification results were recorded before release preparation.
-
-| Verification | Result |
-| --- | --- |
-| Frontend dependency installation | Passed |
-| Frontend production build | Passed |
-| Frontend UI tests | 75 passed |
-| Prisma Client generation | Passed |
-| Backend unit tests | 10 passed |
-| Backend production build | Pending verification |
-| Backend API tests | Pending CI verification |
-| Docker build verification | Pending CI verification |
-| Backend dependency audit | 4 high severity findings reported |
-
-All 85 executed automated tests passed.
-
-The backend dependency audit findings require review before production release.
-
-The production dependency audit should be checked separately using:
-
-`npm audit --omit=dev`
-
-A passing unit test suite does not establish that every dependency is free from vulnerabilities.
-
-Local verification does not replace the required GitHub Actions CI checks.
-
-### 31.12 Release Pull Request Process
-
-The release process uses two Pull Requests.
-
-#### Feature Pull Request
-
-Source branch:
-
-`feature/lab5.7-automated-cd`
-
-Target branch:
-
-`staging`
-
-Title:
-
-`feat(lab5.7): Automated CD and Release Pipeline`
-
-The feature PR contains the reusable CI configuration, CD workflow, visible frontend change, and updated deployment documentation.
-
-Required verification:
-
-1. CI checks pass.
-2. Teammate reviews and approves the changes.
-3. Changes are merged into `staging`.
-
-#### Release Pull Request
-
-Source branch:
-
-`staging`
-
-Target branch:
-
-`main`
-
-Title:
-
-`release: Lab 5.7 Automated Cloud Deployment`
-
-Required verification:
-
-1. Review the release changes.
-2. Confirm required CI checks pass.
-3. Obtain teammate approval.
-4. Merge the approved release into `main`.
-
-The merge into `main` triggers the automated CD workflow.
-
-No separate manual deployment command is required for the normal release process.
-
-### 31.13 Production Release Verification
-
-After the release PR is merged into `main`, verify the following:
-
-1. The `Lab 5 CD` workflow starts automatically.
-2. The reusable CI workflow completes successfully.
-3. Both Docker images are built and pushed to Artifact Registry.
-4. Image tags match the approved release SHA.
-5. The Prisma migration job completes successfully.
-6. The backend Cloud Run revision becomes ready.
-7. The frontend Cloud Run revision becomes ready.
-8. All automated production smoke tests pass.
-9. The public website displays `Lab 5.7 cloud release`.
-10. Customer and operator login still work.
-11. Customers can join queues and receive queue numbers.
-12. Operators can call, start, and complete service.
-13. Queue information remains persistent after deployment.
-14. The active Cloud Run revisions correspond to the approved release.
-
-The release is considered verified only after the required automated and manual checks are successful.
-
-### 31.14 Failure Handling and Rollback
-
-If CI fails, deployment must not begin.
-
-If image building or publishing fails, deployment must stop.
-
-If the migration job fails, the backend and frontend deployment steps must not execute.
-
-If Cloud Run deployment fails, inspect the failed GitHub Actions step and the affected Cloud Run service logs.
-
-If smoke tests fail, the GitHub Actions workflow must report failure.
-
-A smoke test failure does not automatically roll back the deployment.
-
-Cloud Run traffic can be redirected to a previously verified revision if necessary.
-
-Database migrations are not automatically reversed by restoring an earlier service revision.
-
-Any rollback must consider database schema compatibility and application data integrity.
-
-### 31.15 Release Evidence
-
-The following evidence must be collected for Issue #39.
-
-| Evidence | Status |
-| --- | --- |
-| CD workflow file | Pending |
-| Feature PR into `staging` | Pending |
-| Release PR into `main` | Pending |
-| Successful GitHub Actions CD run | Pending |
-| Successful Prisma migration execution | Pending |
-| Backend Cloud Run revision | Pending |
-| Frontend Cloud Run revision | Pending |
-| Deployed release commit SHA | Pending |
-| Successful production smoke tests | Pending |
-| Visible frontend release change | Pending |
-
-#### Release Record
-
-| Field | Value |
-| --- | --- |
-| GitHub issue | #39 |
-| Feature branch | `feature/lab5.7-automated-cd` |
-| Integration branch | `staging` |
-| Production branch | `main` |
-| Feature PR URL | Pending |
-| Release PR URL | Pending |
-| GitHub Actions CD run URL | Pending |
-| Deployed commit SHA | Pending |
-| Backend Cloud Run revision | Pending |
-| Frontend Cloud Run revision | Pending |
-| Production verification result | Pending |
-
-Update these records only after the corresponding results have been verified.
-
-### 31.16 Completion Checklist
-
-- [ ] Existing CI workflow supports `workflow_call`.
-- [ ] Automated CD workflow is implemented.
-- [ ] Visible frontend release change is added.
-- [ ] Local application builds and tests pass.
-- [ ] Feature PR passes CI checks.
-- [ ] Teammate approves the feature PR.
-- [ ] Feature PR is merged into `staging`.
-- [ ] Release PR is created from `staging` into `main`.
-- [ ] Release PR passes CI and teammate review.
-- [ ] Release PR is merged into `main`.
-- [ ] GitHub Actions authenticates through Workload Identity Federation.
-- [ ] Backend and frontend images are pushed with release SHA tags.
-- [ ] Prisma migrations execute successfully.
-- [ ] Both Cloud Run services deploy successfully.
-- [ ] Production smoke tests pass.
-- [ ] Visible frontend release text appears on the public website.
-- [ ] Customer and operator regression tests pass.
-- [ ] Cloud Run revisions match the approved release.
-- [ ] Required evidence links and screenshots are recorded.
-- [ ] Issue #39 is closed after verification.
-
-### 31.17 References
-
-1. [Issue #39: Automated CD and Release Pipeline](https://github.com/Kerris812/CPE334_FinalProject/issues/39)
-2. [GitHub Actions](https://github.com/Kerris812/CPE334_FinalProject/actions)
-3. [Google Cloud Run](https://console.cloud.google.com/run?project=cpe334-final-project-theme9)
-4. [Artifact Registry](https://console.cloud.google.com/artifacts?project=cpe334-final-project-theme9)
-5. [GitHub Reusable Workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
-6. [Cloud Run Jobs](https://cloud.google.com/run/docs/execute/jobs)
+| Previous Revision | Not recorded |
+| Latest Revision | Not recorded |
+| Rollback Traffic Assignment | Not recorded |
+| Health Check After Rollback | Not recorded |
+| Queue Data After Rollback | Not recorded |
+| Recovery Traffic Assignment | Not recorded |
+| Health Check After Recovery | Not recorded |
+| Queue Data After Recovery | Not recorded |
+
+**Expected Result:** The application remains accessible and retains its database records during rollback and recovery.
+
+**Actual Result:** Not recorded; no persistence/rollback execution is claimed.
+
+**Test Status:** NOT VERIFIED — execution evidence not supplied.
+
+**Note:** Cloud Run revision rollback does not reverse database migrations. Only perform this test when the previous application revision is compatible with the current database schema. If rollback is not practical, document the reason instead of reporting a successful result.
+
+### 32.6 Final Functional Verification
+
+After the latest release is restored, verify the complete Restaurant Queue workflow.
+
+| Test Case | Expected Result | Actual Result | Status |
+| --- | --- | --- | --- |
+| Frontend SPA route | `/queues` returns HTML | HTTP 200 on 20 November; browser rendering not checked | HTTP check passed |
+| Backend health through frontend | HTTP 200 | HTTP 200 on 20 November | HTTP check passed |
+| Customer login | Authentication successful | Not recorded | Not recorded |
+| Operator login | Authentication successful | Not recorded | Not recorded |
+| Join Queue R | Queue number assigned | Not recorded | Not recorded |
+| View queue status | Correct entry displayed | Not recorded | Not recorded |
+| Operator calls next | Status becomes CALLED | Not recorded | Not recorded |
+| Operator starts service | Status becomes SERVING | Not recorded | Not recorded |
+| Operator completes service | Status becomes COMPLETED | Not recorded | Not recorded |
+| Public queue boards | R/S API responses available | HTTP 200 and correct queue codes on 20 November; UI not checked | API check passed |
+| Queue S functionality | Queue operations successful | Not recorded | Not recorded |
+| Database persistence | Existing records preserved | Not recorded | Not recorded |
+
+### 32.7 Evidence Summary
+
+| Evidence ID | Description | Reference |
+| --- | --- | --- |
+| E01 | Original queue entry | Not recorded |
+| E02 | Original Cloud Run revision | Not recorded |
+| E03 | New backend revision | Not recorded |
+| E04 | Queue entry after revision replacement | Not recorded |
+| E05 | Successful automated CD workflow | [Run 44569135629](https://github.com/Kerris812/CPE334_FinalProject/actions/runs/44569135629) |
+| E06 | New Cloud Run revisions and commit SHA | Release SHA in Section 31.3; serving revision/digest evidence not transcribed |
+| E07 | Queue entry after CD redeployment | Not recorded |
+| E08 | Rollback traffic configuration | Not recorded |
+| E09 | Recovery traffic configuration | Not recorded |
+| E10 | Final functional verification | Not recorded |
+| E11 | Final Lab 5 PDF evidence index | Not recorded |
+
+### 32.8 Final Assessment
+
+The Lab 5.8 verification will be considered complete when:
+
+1. Application data survives Cloud Run backend revision replacement.
+2. Application data survives automated CD redeployment.
+3. The deployment workflow succeeds with the expected release commit SHA.
+4. Customer, operator, and public queue functionality remain operational.
+5. Rollback and recovery are verified when practical, or the limitation is documented.
+6. Test results and supporting evidence are included in the deployment documentation.
+7. The final Lab 5 PDF evidence index is prepared.
+
+**Overall Verification Result:** INCOMPLETE — persistence, authenticated regression, and recovery evidence remain outstanding.
+
+**Documentation review date:** 20 November 2026 (Asia/Bangkok). Cloud persistence test execution date: not recorded.
+
+**GitHub Issue:** [#40](https://github.com/Kerris812/CPE334_FinalProject/issues/40)

@@ -1,3 +1,4 @@
+
 name: Lab 5 CD
 
 on:
@@ -106,13 +107,67 @@ jobs:
             --region="$REGION" \
             --wait
 
-      - name: Deploy backend
+      - name: Deploy backend to test revision
         run: |
+          set -euo pipefail
+
           gcloud run services update "$API_SERVICE" \
             --project="$PROJECT_ID" \
             --region="$REGION" \
             --image="$API_IMAGE" \
-            --update-labels="commit-sha=${GITHUB_SHA}"
+            --update-labels="commit-sha=${GITHUB_SHA}" \
+            --no-traffic
+
+          NEW_REVISION="$(gcloud run services describe "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format='value(status.latestCreatedRevisionName)')"
+
+          test -n "$NEW_REVISION"
+          echo "New backend revision: $NEW_REVISION"
+
+          REVISION_SHA="$(gcloud run revisions describe "$NEW_REVISION" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format='value(metadata.labels.commit-sha)')"
+
+          test "$REVISION_SHA" = "$GITHUB_SHA"
+
+          gcloud run services update-traffic "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --update-tags="release-check=$NEW_REVISION"
+
+          API_URL="$(gcloud run services describe "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format='value(status.url)')"
+
+          test -n "$API_URL"
+          TEST_URL="https://release-check---${API_URL#https://}"
+
+          echo "Testing backend: $TEST_URL"
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$TEST_URL/health" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$TEST_URL/api/v1/public/queues/R/board" > /dev/null
+
+          curl --fail --show-error --silent \
+            --retry 5 --retry-delay 3 --retry-all-errors \
+            "$TEST_URL/api/v1/public/queues/S/board" > /dev/null
+
+          echo "Backend revision passed smoke tests"
+
+          gcloud run services update-traffic "$API_SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --to-revisions="$NEW_REVISION=100"
+
+          echo "Backend promoted: $NEW_REVISION"
 
       - name: Deploy frontend
         run: |
@@ -124,6 +179,8 @@ jobs:
 
       - name: Run production smoke tests
         run: |
+          set -euo pipefail
+
           WEB_URL="$(gcloud run services describe "$WEB_SERVICE" \
             --project="$PROJECT_ID" \
             --region="$REGION" \
@@ -150,18 +207,48 @@ jobs:
           echo "Production smoke tests passed"
           echo "Application URL: $WEB_URL"
 
-      - name: Record deployed revision and commit
+      - name: Verify production revisions and commit
         run: |
-          echo "Release commit: $GITHUB_SHA"
+          set -euo pipefail
+
+          echo "Expected release commit: $GITHUB_SHA"
           echo "Backend image: $API_IMAGE"
           echo "Frontend image: $WEB_IMAGE"
 
-          gcloud run services describe "$API_SERVICE" \
-            --project="$PROJECT_ID" \
-            --region="$REGION" \
-            --format="value(status.latestReadyRevisionName)"
+          for SERVICE in "$API_SERVICE" "$WEB_SERVICE"; do
+            echo "===== $SERVICE ====="
 
-          gcloud run services describe "$WEB_SERVICE" \
-            --project="$PROJECT_ID" \
-            --region="$REGION" \
-            --format="value(status.latestReadyRevisionName)"
+            TRAFFIC="$(gcloud run services describe "$SERVICE" \
+              --project="$PROJECT_ID" \
+              --region="$REGION" \
+              --format='value(status.traffic[0].percent)')"
+
+            REVISION="$(gcloud run services describe "$SERVICE" \
+              --project="$PROJECT_ID" \
+              --region="$REGION" \
+              --format='value(status.traffic[0].revisionName)')"
+
+            test "$TRAFFIC" = "100"
+            test -n "$REVISION"
+
+            DEPLOYED_SHA="$(gcloud run revisions describe "$REVISION" \
+              --project="$PROJECT_ID" \
+              --region="$REGION" \
+              --format='value(metadata.labels.commit-sha)')"
+
+            echo "Production revision: $REVISION"
+            echo "Production traffic: $TRAFFIC%"
+            echo "Deployed commit: $DEPLOYED_SHA"
+
+            if [ "$DEPLOYED_SHA" != "$GITHUB_SHA" ]; then
+              echo "ERROR: $SERVICE is serving the wrong commit"
+              exit 1
+            fi
+
+            gcloud run revisions describe "$REVISION" \
+              --project="$PROJECT_ID" \
+              --region="$REGION" \
+              --format='value(status.imageDigest)'
+          done
+
+          echo "Both production services match release commit $GITHUB_SHA"

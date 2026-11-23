@@ -21,6 +21,14 @@ test('TEST-028 anonymous board recursively exposes exactly four approved primiti
   }
   expect(await f.state()).toEqual(before);
 });
+test('board waitingCount excludes the CALLED entry', async () => {
+  await f.entry('CALLED');
+  await f.entry('WAITING', await f.actor(), f.queue, 2n);
+
+  const response = await board();
+
+  expect(response.body.data.waitingCount).toBe(1);
+});
 test('TEST-029 CALLED to SERVING, waiting changes, completion and empty queues reflect PostgreSQL', async () => {
   expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 });
   const current = await f.entry('CALLED'); const waiting = await f.entry('WAITING', await f.actor(), f.queue, 2n);

@@ -11,7 +11,7 @@ export async function readPublicBoard(db: PrismaClient, queueId: unknown) {
     const queue = await tx.queue.findUnique({ where: queueId === 'R' || queueId === 'S' ? { code: queueId } : { id: queueId }, select: { id: true, code: true } });
     if (!queue) throw new ApiError(404, 'QUEUE_NOT_FOUND', 'Queue not found.');
     const current = await tx.queueEntry.findFirst({ where: { queueId: queue.id, status: { in: ['CALLED', 'SERVING'] } }, select: { displayNumber: true, status: true } });
-    const waitingCount = await tx.queueEntry.count({ where: { queueId: queue.id, status: 'WAITING' } });
+    const waitingCount = await tx.queueEntry.count({ where: { queueId: queue.id, status: { in: ['WAITING', 'CALLED'] } } });
     return publicBoardDto(queue, current, waitingCount);
   }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
 }

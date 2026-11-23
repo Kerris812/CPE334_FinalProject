@@ -1,0 +1,17 @@
+services:
+  db:
+    volumes: !override
+      - queue_postgres_data_lab6:/var/lib/postgresql/data
+
+  server:
+    image: restaurant-queue-server:lab6
+    environment:
+      WEB_ORIGIN: http://localhost:8092
+
+  client:
+    image: restaurant-queue-client:lab6
+    ports: !override
+      - "127.0.0.1:8092:80"
+
+volumes:
+  queue_postgres_data_lab6:

@@ -1,0 +1,5 @@
+Production defect found in Phase 6: every Prisma P2002 error was translated into SERVICE_SLOT_BUSY, including a queue_events uniqueness failure. Scoped PostgreSQL audit-failure triggers reproduced two failures: HTTP 409 instead of expected safe HTTP 500. Both are genuine RED assertions (audit-constraint-red.txt).
+Fix: map P2002 to SERVICE_SLOT_BUSY only for QueueEntry; propagate QueueEvent errors to the existing safe INTERNAL_ERROR boundary. State and audit rollback remain atomic.
+GREEN: targeted audit and concurrency files passed 8 cases, including both new error regression cases and six additional concurrency/restart cases in the working tree (concurrency-green.txt). The additional concurrency file is committed with the Phase 6 test verification commit, separately from this production fix.
+Command from server with disposable test URL: DATABASE_URL="$TEST_DATABASE_URL" npx vitest run tests/api/issue19-audit-errors.test.ts tests/api/issue19-concurrency.test.ts --maxWorkers=1 --no-file-parallelism.
+Traceability S2-TEST-27. This production fix is deliberately separate from the forthcoming test-only Phase 6 commit.

@@ -79,7 +79,7 @@ export async function operate(db: PrismaClient, operatorId: string, target: { qu
     }, { maxWait: 10000, timeout: 10000 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') throw conflict('SERVICE_SLOT_BUSY', 'Finish the active service before calling next.');
+      if (error.code === 'P2002' && error.meta?.modelName === 'QueueEntry') throw conflict('SERVICE_SLOT_BUSY', 'Finish the active service before calling next.');
       if (['P2025', 'P2034'].includes(error.code)) throw conflict('CONCURRENT_UPDATE', 'The queue changed. Refresh and try again.');
     }
     throw error;

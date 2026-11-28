@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
+import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, expect, test } from 'vitest';
-import { action, call, db, get, lab7Fixture, post, rejected, setup, type Lab7Fixture } from '../support/lab7-fixture.js';
+import { action, app, call, db, get, lab7Fixture, post, rejected, setup, type Lab7Fixture } from '../support/lab7-fixture.js';
+import { origin } from '../support/queue-fixture.js';
 
 let f: Lab7Fixture;
 beforeAll(setup);
@@ -37,6 +39,18 @@ test('S2-TEST-19: nonexistent selected counter is denied without consuming the F
   const operator = await f.seeded('a');
   const { entry } = await f.join();
   await rejected(() => post(`/operator/queues/${f.r.id}/call-next`, operator, { counterId: randomUUID(), expectedEntryId: entry.id }), 'COUNTER_ACCESS_DENIED', 403);
+});
+
+test('S2-TEST-19: absent legacy JSON body resolves the dedicated counter', async () => {
+  const operator = await f.seeded('a'); const { entry } = await f.join();
+  const response = await request(app).post(`/api/v1/operator/queues/${f.r.id}/call-next`).set('Cookie', operator.cookie).set('Origin', origin).set('Content-Type', 'application/json');
+  expect(response.status).toBe(200);
+  expect(response.body.data).toMatchObject({ id: entry.id, counterId });
+});
+
+test.each([null, [], 'invalid'])('S2-TEST-19: non-object selection body %j is rejected without writes', async body => {
+  const operator = await f.seeded('a'); await f.join();
+  await rejected(() => post(`/operator/queues/${f.r.id}/call-next`, operator, body), 'VALIDATION_ERROR', 422);
 });
 
 test.each([

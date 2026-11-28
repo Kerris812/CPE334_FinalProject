@@ -16,6 +16,7 @@
     "db:seed": "tsx scripts/seed.ts",
     "test:unit": "vitest run tests/unit",
     "test:api": "tsx scripts/test-api.ts",
+    "test:database": "vitest run tests/database --maxWorkers=1 --no-file-parallelism",
     "dev:e2e": "tsx scripts/e2e-server.ts"
   },
   "dependencies": {

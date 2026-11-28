@@ -1,0 +1,13 @@
+
+> restaurant-queue-server@0.1.0 test:database
+> vitest run tests/database --maxWorkers=1 --no-file-parallelism
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  18:56:24
+   Duration  1.88s (tests 98%, import 1%, transform 1%)
+

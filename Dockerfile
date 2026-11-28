@@ -11,7 +11,7 @@ COPY server/package.json server/package-lock.json ./
 
 RUN npm ci
 
-COPY server/tsconfig.json ./
+COPY server/tsconfig.json server/tsconfig.build.json ./
 COPY server/prisma ./prisma
 COPY server/src ./src
 COPY server/scripts ./scripts

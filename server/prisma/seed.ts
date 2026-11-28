@@ -11,6 +11,10 @@ export async function seed(db: PrismaClient, env: NodeJS.ProcessEnv = process.en
   await db.$transaction(async tx => {
     const queue = await tx.queue.upsert({ where: { code: 'R' }, update: {}, create: { code: 'R', name: 'Restaurant Waiting Queue', state: 'OPEN' } });
     const largeQueue = await tx.queue.upsert({ where: { code: 'S' }, update: {}, create: { code: 'S', name: 'Large Party Waiting Queue', state: 'OPEN' } });
+    for (const target of [queue, largeQueue]) {
+      const counter = await tx.serviceCounter.upsert({ where: { code: target.code }, update: {}, create: { code: target.code, name: `Counter ${target.code}`, queueId: target.id } });
+      if (counter.queueId !== target.id || counter.name !== `Counter ${target.code}`) throw new Error('Seed counter configuration conflicts with existing data.');
+    }
     for (const [email, displayName, role, passwordHash] of [
       ['customer.a@example.test', 'Customer A', 'CUSTOMER', customerHash],
       ['customer.b@example.test', 'Customer B', 'CUSTOMER', customerHash],

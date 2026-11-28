@@ -1,0 +1,32 @@
+
+> restaurant-queue-server@0.1.0 db:seed
+> tsx scripts/seed.ts
+
+Synthetic seed complete.
+                  id                  | code |   name    |               queue_id               
+--------------------------------------+------+-----------+--------------------------------------
+ f3684c28-e945-4a48-8975-c1b8c20e7e61 | R    | Counter R | 15a0839a-e6dd-48e9-9987-9efee13729be
+ cea684f2-f32f-4399-a1be-44ab24449601 | S    | Counter S | 68ba8510-4c22-4ff6-9167-3f84c78bceef
+(2 rows)
+
+ assignments 
+-------------
+           4
+(1 row)
+
+
+> restaurant-queue-server@0.1.0 db:seed
+> tsx scripts/seed.ts
+
+Synthetic seed complete.
+                  id                  | code |   name    |               queue_id               
+--------------------------------------+------+-----------+--------------------------------------
+ f3684c28-e945-4a48-8975-c1b8c20e7e61 | R    | Counter R | 15a0839a-e6dd-48e9-9987-9efee13729be
+ cea684f2-f32f-4399-a1be-44ab24449601 | S    | Counter S | 68ba8510-4c22-4ff6-9167-3f84c78bceef
+(2 rows)
+
+ assignments 
+-------------
+           4
+(1 row)
+

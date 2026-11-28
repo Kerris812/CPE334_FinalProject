@@ -1,0 +1,38 @@
+{
+  "same-RED-API": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "report": "red-results.json"
+  },
+  "all-API": {
+    "passed": 123,
+    "failed": 0,
+    "skipped": 0,
+    "report": "api-all-results.json"
+  },
+  "UI": {
+    "passed": 79,
+    "failed": 0,
+    "skipped": 0,
+    "report": "ui-results.json"
+  },
+  "browser": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "report": "browser-results.json"
+  },
+  "browser-regression": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "report": "browser-regression-results.json"
+  },
+  "unit": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "report": "unit.txt"
+  }
+}

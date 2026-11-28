@@ -1,0 +1,107 @@
+[
+  {
+    "test": "L7-017 seeded Operator A lists both R and S after valid setup",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-017 seeded Operator B lists both R and S after valid setup",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-017 setup twice provisions exactly four distinct approved pairs without resetting history",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-001 Operator A calls the FIFO head in Queue S using seeded assignments",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-002 Operator B calls the FIFO head in Queue R using seeded assignments",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-003 Operator A starts a Queue S customer called by B",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-004 Operator B completes a Queue R customer started by A",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded AAB handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded ABA handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded ABB handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BAA handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BAB handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BBA handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BBB handoff in Queue R retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded AAA handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded AAB handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded ABA handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded ABB handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BAA handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BAB handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  },
+  {
+    "test": "L7-005 seeded BBA handoff in Queue S retains each actual actor",
+    "actualReason": "Old seed yields only designated R/S assignments; list/pair assertion differs or crossed action returns 403 instead of required 200",
+    "rawFailureIn": "red.txt and red-results.json"
+  }
+]

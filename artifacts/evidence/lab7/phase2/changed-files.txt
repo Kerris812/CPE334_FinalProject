@@ -1,0 +1,24 @@
+Branch: feature/lab7-shared-operators
+RED test/base commit: faf4bb779e146924c7510375c5c7e93b579c38de
+
+ M client/tests/e2e/operator-workflow.spec.ts
+ M client/tests/e2e/party-routing.spec.ts
+ M client/tests/e2e/sprint1-journey.spec.ts
+ M client/tests/ui/lab7-shared-operators.test.tsx
+ M server/prisma/seed.ts
+ M server/tests/api/authorization.test.ts
+ M server/tests/api/database.test.ts
+ M server/tests/api/party-routing.test.ts
+ M server/tests/api/permission-guards.test.ts
+?? artifacts/evidence/lab7/
+
+ client/tests/e2e/operator-workflow.spec.ts     |  5 ++--
+ client/tests/e2e/party-routing.spec.ts         |  9 ++++----
+ client/tests/e2e/sprint1-journey.spec.ts       | 12 ++++++----
+ client/tests/ui/lab7-shared-operators.test.tsx |  2 +-
+ server/prisma/seed.ts                          |  8 ++++---
+ server/tests/api/authorization.test.ts         | 32 +++++++++++++++-----------
+ server/tests/api/database.test.ts              |  8 +++++--
+ server/tests/api/party-routing.test.ts         | 32 +++++++++++++++-----------
+ server/tests/api/permission-guards.test.ts     |  7 +++++-
+ 9 files changed, 72 insertions(+), 43 deletions(-)

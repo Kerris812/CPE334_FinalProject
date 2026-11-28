@@ -1,0 +1,54 @@
+Issue 7.2 Phase 2 resumed verification — 28 November 2026 (Asia/Bangkok)
+Issue: https://github.com/Kerris812/CPE334_FinalProject/issues/52
+Branch: feature/lab7-shared-operators
+Committed RED tests / current HEAD: faf4bb779e146924c7510375c5c7e93b579c38de
+Original unchanged application business logic baseline: fc178ed639619e3e74a37724a0373e990839a0e8
+Implementation: working tree only, not committed or deployed. This evidence is from newly executed tests after resumption; the previous undone Phase 2 evidence remains in /private/tmp/lab7-phase2-undone-yvuw791s.
+
+IMPLEMENTATION
+Only production-source change: server/prisma/seed.ts. Both A and B receive persisted R/S assignments via transactional idempotent upserts. Roles remain validated. Unexpected assignments of these seeded operators outside R/S fail atomically and are not deleted. Existing accounts/password hashes/flags, sessions, queue state/counters, assignments, entries and historical events are preserved. No schema/migration change, authorization bypass, service ownership field, state-machine/concurrency/audit logic rewrite or frontend implementation change.
+
+REGRESSION UPDATES
+Server API database/authorization/permission-guards/party-routing tests now expect four approved pairs and use independent unassigned users for denial assertions. The outside-scope seed fixture uses a new non-R/S queue and snapshots after deliberate fixture setup. No denial/security/domain assertion is weakened.
+Client party-routing and sprint1 E2E tests expect both R/S options and explicitly select the intended queue; the denied operator is genuinely unassigned. All three existing browser journeys accept an external capture directory, preventing overwrite of historical evidence.
+The Phase 1 UI helper removes one unsupported exact option from Testing Library findByRole. String name matching and all test assertions remain unchanged. Original text and hashes are retained; the exact RED API/provisioning/helper and browser files are byte-for-byte unchanged.
+
+RED/GREEN
+Phase 1 actual API RED: 2 passed, 21 failed, 0 skipped. Current same test file/helper: 23 passed, 0 failed/skipped.
+Phase 1 actual browser RED: 0 passed, 2 failed/skipped 0 due to missing S selector option. Current exact same browser file: 2 passed, 0 failed/skipped, with actual A/B/A and B/A/B handoffs completed and actors checked.
+Phase 1 evidence files were verified unchanged by SHA-256. The GREEN API report is phase2/red-results.json because the original reporter argument uses that basename; success counts are real current results.
+
+FINAL RESULTS
+same-RED-API: 23 passed, 0 failed, 0 skipped; red-results.json
+all-API: 123 passed, 0 failed, 0 skipped; api-all-results.json
+UI: 79 passed, 0 failed, 0 skipped; ui-results.json
+browser: 2 passed, 0 failed, 0 skipped; browser-results.json
+browser-regression: 3 passed, 0 failed, 0 skipped; browser-regression-results.json
+unit: 10 passed, 0 failed, 0 skipped; unit.txt
+Server and client npm run build: both exit 0. Current run had no unexpected test or build failures.
+All L7-001–020 and L7-AC-01–15 retain coverage. Seed repeatability tests run setup twice and check four unique pairs and unchanged operational data; full API suite includes actual restart persistence, backend role/scope denial, invalid/terminal states, FIFO/routing/numbering, one active customer, one queue service slot, conflicting-call/start/complete safety, independent queue locks and audit rollback/actual actor attribution.
+
+COMMANDS
+Each *-run.json contains exact command/args, working directory, start/end UTC, current committed RED SHA and uncommitted implementation state. Raw outputs are unchanged runner output files.
+
+DATABASE / LIMITS
+A fresh isolated database lab7_phase2_test was created on the retained temporary PostgreSQL cluster at localhost:55473 and both existing migrations were applied successfully. API and browser runs were sequential on that database. No old test database, shared/production data, cloud service or deployed version was modified. API environment uses the synthetic credentials recorded in Phase 1 environment.json; only the database name changes to lab7_phase2_test. Browser API/UI ports are 3457/5487.
+No unresolved defect is known in selected scope. Browser verification covers the two changed-behavior tests and three relevant existing journeys, not the entire unrelated browser suite. Live environments will require reviewed assignment provisioning later; no deployment is part of Issue 7.2.
+
+REVIEW CHECKPOINT
+Nine tracked files are modified: one seed source and eight test files. Reviewed Lab 7 contracts and all original Sprint 1 contracts remain unchanged. Current RED test commit is separate from the uncommitted implementation. No stage/commit/push/merge/branch switch/fetch/pull/GitHub mutation/deployment/metrics/final-PDF action was performed by the assistant.
+User: inspect changes/evidence, commit the implementation and legitimate regression updates, push, open a PR to lab7/maintenance and request teammate review. Stop here before integration/deployment.
+
+ client/tests/e2e/operator-workflow.spec.ts     |  5 ++--
+ client/tests/e2e/party-routing.spec.ts         |  9 ++++----
+ client/tests/e2e/sprint1-journey.spec.ts       | 12 ++++++----
+ client/tests/ui/lab7-shared-operators.test.tsx |  2 +-
+ server/prisma/seed.ts                          |  8 ++++---
+ server/tests/api/authorization.test.ts         | 32 +++++++++++++++-----------
+ server/tests/api/database.test.ts              |  8 +++++--
+ server/tests/api/party-routing.test.ts         | 32 +++++++++++++++-----------
+ server/tests/api/permission-guards.test.ts     |  7 +++++-
+ 9 files changed, 72 insertions(+), 43 deletions(-)
+
+
+Temporary PostgreSQL cluster stopped after verification; both previous test data and fresh lab7_phase2_test are retained under /private/tmp/lab7-red-postgres.OCM3Gc/data.

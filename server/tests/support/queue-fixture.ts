@@ -1,5 +1,5 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import { PrismaClient, type EntryStatus, type Queue } from '@prisma/client';
+import { PrismaClient, type EntryStatus, type Queue, type QueueEntry } from '@prisma/client';
 import { testDatabaseUrl } from '../../src/infrastructure/test-database.js';
 import { seed } from '../../prisma/seed.js';
 export const origin = 'http://127.0.0.1:5173';
@@ -23,9 +23,10 @@ export async function fixture() {
   async function seeded(code: string) { const row = await db.queue.findUniqueOrThrow({ where: { code } }); if (!snapshots.has(row.id)) snapshots.set(row.id, row); return row; }
   const f = {
     customer, queue: initial, actor, newQueue: queue,
-    async useR() { f.queue = await seeded('R'); },
+    async useR(): Promise<void> { f.queue = await seeded('R'); },
     async useS() { return seeded('S'); },
-    async entry(status: EntryStatus = 'WAITING', who = customer, target = f.queue, sequence = 1n) {
+    async entry(status: EntryStatus = 'WAITING', who = customer, target?: Queue, sequence = 1n): Promise<QueueEntry> {
+      target ??= f.queue;
       return db.queueEntry.create({ data: { customerId: who.id, queueId: target.id, partySize: 4, status, sequence, displayNumber: `${target.code}-${sequence.toString().padStart(4, '0')}` } });
     },
     async state() {

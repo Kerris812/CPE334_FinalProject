@@ -1,0 +1,83 @@
+{
+  "testFiles": {
+    "server/tests/support/lab7-fixture.ts": {
+      "sha256": "38531fbaf3dae358c9fc0f2c10b75c8804605cbccee6094c948c8ae943c3a16f",
+      "lines": 67
+    },
+    "server/tests/api/lab7-provisioning.test.ts": {
+      "sha256": "74d961621a9cbfdd43e2496d5d12f196c980b63ddd06e147007a6973aa46b4cc",
+      "lines": 84
+    },
+    "server/tests/api/lab7-regression.test.ts": {
+      "sha256": "f338bd3206b98031990adb03fb46cb39435d16ee0b5e16d52238a6442614cf4f",
+      "lines": 280
+    },
+    "client/tests/ui/lab7-shared-operators.test.tsx": {
+      "sha256": "d49c748cdd42297d2430949b8bca33684aaa8ecefc24ffc52ac84c0190d082c8",
+      "lines": 81
+    },
+    "client/tests/e2e/lab7-shared-operators.spec.ts": {
+      "sha256": "6268c5faaf30689fb4491239ade4d1fef1ba360f7c1c2cd3553f54f29c9a85fd",
+      "lines": 72
+    }
+  },
+  "unchangedApplicationAndContracts": {
+    "client/package.json": "28faa907be6d2501f9bb8fa70460223eb8302e4372988238fbd5a4362dab7180",
+    "client/src/App.tsx": "70e360088b9caff06c88ae72322105e7a6a6857afbe1eaf7e3f6a67bf90fa18a",
+    "client/src/AppHeader.tsx": "71605586fc9de862c96c885eec93110b6aa265c1878c8893402197b70e689837",
+    "client/src/CustomerQueues.tsx": "1eebfe2f08bbbbfbdd6b3d418363fbb3a7b88eb0aca891bfe225a28f2b3a5aa6",
+    "client/src/OperatorDesk.tsx": "ec84c430d8c67e16686f62c809a613fb53181acc0f6aa0819bd798b22a870f1a",
+    "client/src/PublicQueueBoard.tsx": "fe631dc5f73f093bb0889a2c935e87e9ecdc121ff33a0e171e2c3f3b3e4c4b3c",
+    "client/src/QueueNumberDisplay.tsx": "679efa6b2642ab5a7897c5209fb78bbca9e452e39b7a0f4085eaa5eef6cbbd3f",
+    "client/src/api-client.ts": "339215ff14a320c7da193771929c341cd9a0770385d9c8af79fe9289df118ffa",
+    "client/src/auth-api.ts": "00f2b851aafd5faddc4da7cdc22478162e149ce95e75db434ce3a08d08ee2c57",
+    "client/src/board-navigation.ts": "54da353202e9f900b5fa8ecd5ad691f6e8d903460d9af0f7c539c9f8dbacb1ca",
+    "client/src/components/ui.tsx": "2be07e83659550f05e6b5c44258077b2302d8e067826d814b74740f7ecbb86e7",
+    "client/src/main.tsx": "2fe4642d876463b795029ca172088c0aa819417c6aaedc08093c5df29e29202a",
+    "client/src/queue-api.ts": "4783ce06dfc35a03cee5762a41ab1c0b574ecd2c259d64931a7a26ff6e98d93c",
+    "client/src/style.css": "88050a424ec61b3bb24cd93a4a42ada982b9281fb2fa15f455cba53695f6e1a7",
+    "client/src/styles/shared.css": "8921174fbab869e538d31ae261fa6ad0e10244b933e91322c8a605b0c8f23155",
+    "client/src/styles/tokens.css": "f362f85b8f3ef86c535c8059c82ac64efadd14be29ed9762b47ecaefb2a49dfe",
+    "client/src/styles/typography.css": "e3c3e00d50e507b4609fdb25d54a6b351e72017fffac761dcc1426e57043eba0",
+    "client/src/useQueueResource.ts": "94c2d316b11f4ed3f0d15aaf3dce3ff2285045fb2d4608fb6f124c29afaac57c",
+    "docs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/lab7/README.md": "7fd3d4dd755b18e17310a9615642b6f9173acfab80e96385beb55a7abcdbbda3",
+    "docs/lab7/feature-sds-revision.md": "6aacca8a467bb64baa5c868711e71f62d67f065bd4a94302f2c6d0b487c50b4a",
+    "docs/lab7/impact-analysis.md": "fe842ddaa312cacbe2c431ec827f7ab31e12a9a766a41b94d5c4a006c11d2f78",
+    "docs/lab7/srs-revision.md": "d4025865aa97226d9a9c7d8dc4585fc3fb29d3b2692bcbff078f0b3ffc6f0175",
+    "docs/lab7/sts-revision.md": "45ee83f471852f77e9747a956aca045215884e81810ba123adfcfc3a337d24d6",
+    "docs/lab7/system-sds-revision.md": "d4441120a783eece8719078ce80b6a409898183f5da1399b43880322c75aa3f0",
+    "docs/labs/lab-05/deployment.md": "ab2b3284fc23a8fbb7585a410f5feefd8b369adae711d6eead07b431212b39ea",
+    "docs/releases/v0.1.0.md": "a4bdd0bb9cf22c4cae511c2b249a4a8d19d41a4675a992731e2c5543899dc8d3",
+    "docs/sprint-1/acceptance-coverage.md": "e334a009c195b4a9dc84f22bf64337c35cee68bfb1579f6b901f2d2602820204",
+    "docs/sprint-1/api-spec.md": "9341492d7cdda8534ac8e10320b1e73173389c3407ddb39499b66e8c9a8570cc",
+    "docs/sprint-1/release-verification.md": "1c843ac6d37ca7493c905f8c4a2da9242981e519ccb75e8a494bd3a230aa9792",
+    "docs/sprint-1/specification.md": "1185606b05e2f80caded6cbc19d3006287f83b2b279432e4406f3c6f4374058e",
+    "docs/sprint-1/tests.md": "9919279591b2b56a4cd0badd386780e9f8fecc015d2e798ccad59cce4ae4fc1b",
+    "docs/sprint-1/ui-spec.md": "a8a3efe266de2e618a0f8a496da360c7f1b025934516da66841747e61593309f",
+    "docs/ui-spec.md": "a795001f7507db78e17fc4585f536049bdfb626d77795e340d93885ea22f1c94",
+    "server/package.json": "7d78fd4d3cf6dcf4c31f3c901074dc85ef498b679376769e2e01b85564a555d8",
+    "server/prisma/migrations/0001_foundation/migration.sql": "2a42d09b4d896657d0ad6da9710608ef3d0133534b948ffdb8cfa72b7d642622",
+    "server/prisma/migrations/0002_immutable_queue_sequence/migration.sql": "aa737fdc15e3ae15b27b684a7c9e66a9d265543413bfac2f7487b5efb3e1df1c",
+    "server/prisma/migrations/migration_lock.toml": "1db17a8d051aa136110736752c5e1f8b7ed92b6ea8e803112fbbe2497047c210",
+    "server/prisma/schema.prisma": "90b3658f004fa657aa5c74c7c8a16fdb5b028910a9a305deac0adfe111d46d9f",
+    "server/prisma/seed.ts": "4ee97ca33a32e52949018e1dce15f1d82ed3ed1bf755248214942dc030072a7d",
+    "server/scripts/e2e-server.ts": "b72b81df70d213d3b1caa84bd58971b22bbfa3b257bf9aecb21f689ce0d93900",
+    "server/scripts/seed.ts": "81ed61db193a74ce2386f0ee9dffa578603dfb1672350244a7dcc7d3a9945432",
+    "server/scripts/test-api.ts": "00bc2891c55dc0f8fb3bf74fef45e47b060c8628c352e7f69e79771227c3d51a",
+    "server/src/app.ts": "9eb05d5fca92bae88e534c432b56737d4770a4e6b9574b69cc76cff266f550bf",
+    "server/src/auth/auth.ts": "b5e75fa64d6fab09dab587c6295108df9fab77596eacf0f14a8ccd035a8239a3",
+    "server/src/auth/session.ts": "562bfab57b3adaa0dcc8f271d0b26a9d1bcf7a2136113b89af7ffd677699f4dc",
+    "server/src/authorization/guards.ts": "6a2626e3c5405a73595e16a12b073df598dcb70864f11c2c26f158976801fef5",
+    "server/src/http/errors.ts": "ef85b310b3df20ff6d9feac8eedae636aa2f52af12799638f75f5bb452abfc19",
+    "server/src/index.ts": "688c6bb057e8efd8370bafc7a9d115c964c35a1268e603c6b75d8cab504f1ab0",
+    "server/src/infrastructure/database.ts": "31cbcd37dc4fdd683cbb7a850a1332052ab5a4e465481d56259dbf209203f87c",
+    "server/src/infrastructure/test-database.ts": "22a699724d40798fe430339607ca04fab8b24d626f4731f7464a0d10a53d47c3",
+    "server/src/operator/service.ts": "1d9e415f26af48b8c1cd4262778373c6e98b6f8674a4500158aeaf266c702888",
+    "server/src/public-board/dto.ts": "853d5e3c9ef9ecea919f50665259ca49c2a7e30c0c9462c0a2bb33f9612bbbcd",
+    "server/src/public-board/service.ts": "fa07b581523593d50eb65122430d19f0dbd61a6a9b50eb87d64a623422c50fb8",
+    "server/src/queues/routes.ts": "7985ac9cf72543421d4a6f707f9a979c4dd809200cad84100942b137f6a79e8f",
+    "server/src/queues/rules.ts": "c108dceef9424fc6e914f98d1ae540cf977b3343181659637d1e0620de108bc2",
+    "server/src/queues/service.ts": "b5839325eb17f6e74dfcbb27459bfc9030c2906efec6b32f7bc631ec11b90069"
+  }
+}

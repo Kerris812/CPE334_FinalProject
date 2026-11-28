@@ -1,0 +1,18 @@
+{
+  "command": [
+    "npx",
+    "prisma",
+    "migrate",
+    "deploy"
+  ],
+  "cwd": "server",
+  "startedAtUtc": "2026-11-28T05:10:59.310109+00:00",
+  "finishedAtUtc": "2026-11-28T05:11:00.386155+00:00",
+  "exitCode": 0,
+  "baseCommit": "faf4bb779e146924c7510375c5c7e93b579c38de",
+  "implementationState": "uncommitted Phase 2 seed change; see implementation.patch and source-manifest.json",
+  "prechangeBusinessLogicCommit": "fc178ed639619e3e74a37724a0373e990839a0e8",
+  "database": "new isolated /private/tmp cluster, localhost:55473/lab7_phase2_test",
+  "node": "v24.14.0",
+  "testState": "Phase 1 API/browser/helper files unchanged; UI test helper removes unsupported exact option (same name matching); existing expectations revised separately; RED tests committed as faf4bb779e146924c7510375c5c7e93b579c38de and Phase 2 changes uncommitted"
+}

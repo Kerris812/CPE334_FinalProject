@@ -1,0 +1,176 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/node_modules/.bin/playwright",
+      "test",
+      "tests/e2e/lab7-shared-operators.spec.ts",
+      "--reporter=line,json",
+      "--output=../artifacts/evidence/lab7/phase2/browser-output"
+    ],
+    "configFile": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/playwright.config.ts",
+    "rootDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase2/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase2/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "snapshotDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5487"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "lab7-shared-operators.spec.ts",
+      "file": "lab7-shared-operators.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2040,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-28T05:11:54.465Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4251d771eeda856e997-240a9a96b9935ac6f96e",
+          "file": "lab7-shared-operators.spec.ts",
+          "line": 17,
+          "column": 3
+        },
+        {
+          "title": "L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1755,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-28T05:11:57.229Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4251d771eeda856e997-a9ebfc3dd765ae37ca45",
+          "file": "lab7-shared-operators.spec.ts",
+          "line": 17,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-28T05:11:53.496Z",
+    "duration": 5561.829,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

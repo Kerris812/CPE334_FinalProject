@@ -1,0 +1,266 @@
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ × tests/api/lab7-provisioning.test.ts > L7-017 seeded Operator A lists both R and S after valid setup 23ms
+   → expected [ 'R' ] to deeply equal [ 'R', 'S' ]
+ × tests/api/lab7-provisioning.test.ts > L7-017 seeded Operator B lists both R and S after valid setup 7ms
+   → expected [ 'S' ] to deeply equal [ 'R', 'S' ]
+ × tests/api/lab7-provisioning.test.ts > L7-017 setup twice provisions exactly four distinct approved pairs without resetting history 159ms
+   → expected [ 'A/R', 'B/S' ] to deeply equal [ 'A/R', 'A/S', 'B/R', 'B/S' ]
+ × tests/api/lab7-provisioning.test.ts > L7-001 Operator A calls the FIFO head in Queue S using seeded assignments 14ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-002 Operator B calls the FIFO head in Queue R using seeded assignments 13ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-003 Operator A starts a Queue S customer called by B 10ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-004 Operator B completes a Queue R customer started by A 12ms
+   → expected 403 to be 200 // Object.is equality
+ ✓ tests/api/lab7-provisioning.test.ts > L7-005 seeded AAA handoff in Queue R retains each actual actor 17ms
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded AAB handoff in Queue R retains each actual actor 13ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded ABA handoff in Queue R retains each actual actor 9ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded ABB handoff in Queue R retains each actual actor 9ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BAA handoff in Queue R retains each actual actor 6ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BAB handoff in Queue R retains each actual actor 6ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BBA handoff in Queue R retains each actual actor 6ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BBB handoff in Queue R retains each actual actor 5ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded AAA handoff in Queue S retains each actual actor 5ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded AAB handoff in Queue S retains each actual actor 5ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded ABA handoff in Queue S retains each actual actor 5ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded ABB handoff in Queue S retains each actual actor 5ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BAA handoff in Queue S retains each actual actor 8ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BAB handoff in Queue S retains each actual actor 7ms
+   → expected 403 to be 200 // Object.is equality
+ × tests/api/lab7-provisioning.test.ts > L7-005 seeded BBA handoff in Queue S retains each actual actor 9ms
+   → expected 403 to be 200 // Object.is equality
+ ✓ tests/api/lab7-provisioning.test.ts > L7-005 seeded BBB handoff in Queue S retains each actual actor 12ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-017 seeded Operator A lists both R and S after valid setup
+AssertionError: expected [ 'R' ] to deeply equal [ 'R', 'S' ]
+
+- Expected
++ Received
+
+  [
+    "R",
+-   "S",
+  ]
+
+ ❯ tests/api/lab7-provisioning.test.ts:17:69
+     15|     const response = await get('/operator/queues', letter === 'A' ? a …
+     16|     expect(response.status).toBe(200);
+     17|     expect(response.body.data.map((q: { code: string }) => q.code)).to…
+       |                                                                     ^
+     18|   });
+     19| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-017 seeded Operator B lists both R and S after valid setup
+AssertionError: expected [ 'S' ] to deeply equal [ 'R', 'S' ]
+
+- Expected
++ Received
+
+  [
+-   "R",
+    "S",
+  ]
+
+ ❯ tests/api/lab7-provisioning.test.ts:17:69
+     15|     const response = await get('/operator/queues', letter === 'A' ? a …
+     16|     expect(response.status).toBe(200);
+     17|     expect(response.body.data.map((q: { code: string }) => q.code)).to…
+       |                                                                     ^
+     18|   });
+     19| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-017 setup twice provisions exactly four distinct approved pairs without resetting history
+AssertionError: expected [ 'A/R', 'B/S' ] to deeply equal [ 'A/R', 'A/S', 'B/R', 'B/S' ]
+
+- Expected
++ Received
+
+  [
+    "A/R",
+-   "A/S",
+-   "B/R",
+    "B/S",
+  ]
+
+ ❯ tests/api/lab7-provisioning.test.ts:34:89
+     32|   for (const assignment of before.assignments) expect(once.assignments…
+     33|   const pairs = await db.operatorQueueAssignment.findMany({ where: { o…
+     34|   expect(pairs.map(p => `${p.operatorId === a.id ? 'A' : 'B'}/${p.queu…
+       |                                                                                         ^
+     35| });
+     36| test('L7-001 Operator A calls the FIFO head in Queue S using seeded as…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-001 Operator A calls the FIFO head in Queue S using seeded assignments
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:40:27
+     38|   await f.join(f.s, 8);
+     39|   const response = await call(f.s.id, a);
+     40|   expect(response.status).toBe(200);
+       |                           ^
+     41|   expect(response.body.data).toMatchObject({ id: head.entry.id, status…
+     42|   expect(await db.queueEvent.count({ where: { entryId: head.entry.id, …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-002 Operator B calls the FIFO head in Queue R using seeded assignments
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:48:27
+     46|   await f.join(f.r, 4);
+     47|   const response = await call(f.r.id, b);
+     48|   expect(response.status).toBe(200);
+       |                           ^
+     49|   expect(response.body.data).toMatchObject({ id: head.entry.id, status…
+     50|   expect(await db.queueEvent.count({ where: { entryId: head.entry.id, …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-003 Operator A starts a Queue S customer called by B
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:56:27
+     54|   expect((await call(f.s.id, b)).status).toBe(200);
+     55|   const response = await action(entry.id, 'start-service', a);
+     56|   expect(response.status).toBe(200);
+       |                           ^
+     57|   expect(response.body.data.status).toBe('SERVING');
+     58|   expect(await db.queueEvent.findFirst({ where: { entryId: entry.id, e…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-004 Operator B completes a Queue R customer started by A
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:65:27
+     63|   expect((await action(entry.id, 'start-service', a)).status).toBe(200…
+     64|   const response = await action(entry.id, 'complete', b);
+     65|   expect(response.status).toBe(200);
+       |                           ^
+     66|   expect(response.body.data.status).toBe('COMPLETED');
+     67|   expect(await db.queueEvent.findFirst({ where: { entryId: entry.id, e…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded AAB handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BBA handoff in Queue S retains each actual actor
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:77:70
+     75|       expect((await call(queue.id, actors[0])).status).toBe(200);
+     76|       expect((await action(entry.id, 'start-service', actors[1])).stat…
+     77|       expect((await action(entry.id, 'complete', actors[2])).status).t…
+       |                                                                      ^
+     78|       const events = await db.queueEvent.findMany({ where: { entryId: …
+     79|       for (const [i, eventType] of ['CALLED', 'STARTED', 'COMPLETED'].…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded ABA handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded ABB handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BAA handoff in Queue S retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BAB handoff in Queue S retains each actual actor
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:76:75
+     74|       const { customer, entry } = await f.join(queue);
+     75|       expect((await call(queue.id, actors[0])).status).toBe(200);
+     76|       expect((await action(entry.id, 'start-service', actors[1])).stat…
+       |                                                                           ^
+     77|       expect((await action(entry.id, 'complete', actors[2])).status).t…
+     78|       const events = await db.queueEvent.findMany({ where: { entryId: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/21]⎯
+
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BAA handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BAB handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BBA handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded BBB handoff in Queue R retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded AAA handoff in Queue S retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded AAB handoff in Queue S retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded ABA handoff in Queue S retains each actual actor
+ FAIL  tests/api/lab7-provisioning.test.ts > L7-005 seeded ABB handoff in Queue S retains each actual actor
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/api/lab7-provisioning.test.ts:75:56
+     73|       const actors = [...triple].map(letter => letter === 'A' ? a : b);
+     74|       const { customer, entry } = await f.join(queue);
+     75|       expect((await call(queue.id, actors[0])).status).toBe(200);
+       |                                                        ^
+     76|       expect((await action(entry.id, 'start-service', actors[1])).stat…
+     77|       expect((await action(entry.id, 'complete', actors[2])).status).t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/21]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  21 failed | 2 passed (23)
+   Start at  04:06:57
+   Duration  656ms (tests 76%, import 18%, transform 6%)
+
+JSON report written to /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/red-results.json

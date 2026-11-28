@@ -20,7 +20,7 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
   }
   expect(await db.user.count()).toBe(4);
   expect(await db.queue.count()).toBe(2);
-  expect(await db.operatorQueueAssignment.count()).toBe(2);
+  expect(await db.operatorQueueAssignment.count()).toBe(4);
   const queue = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
   expect(queue.state).toBe('OPEN');
   const users = await db.user.findMany({ orderBy: { email: 'asc' } });
@@ -28,7 +28,11 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
     expect(user.passwordHash).toMatch(/^\$argon2id\$/);
     expect(await verify(user.passwordHash, user.role === 'CUSTOMER' ? env.DEMO_CUSTOMER_PASSWORD : env.DEMO_OPERATOR_PASSWORD)).toBe(true);
   }
-  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ where: { queueId: queue.id }, include: { operator: true } });
+  const pairs = await db.operatorQueueAssignment.findMany({ include: { operator: true, queue: true } });
+  expect(pairs.map(row => `${row.operator.email}/${row.queue.code}`).sort()).toEqual([
+    'operator.a@example.test/R', 'operator.a@example.test/S', 'operator.b@example.test/R', 'operator.b@example.test/S',
+  ]);
+  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ where: { queueId: queue.id, operator: { email: 'operator.a@example.test' } }, include: { operator: true } });
   expect(assignment.operator.email).toBe('operator.a@example.test');
   expect(assignment.queueId).toBe(queue.id);
   const before = users.map(u => [u.id, u.passwordHash]);

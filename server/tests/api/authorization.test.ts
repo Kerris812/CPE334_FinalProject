@@ -13,6 +13,7 @@ let queueId: string;
 let customerId: string;
 let entryId: string;
 let operatorId: string;
+let unassigned: { id: string; email: string };
 async function login(email: string) {
   const response = await request(app).post('/api/v1/auth/login').set('Origin', origin).send({
     email, password: email.startsWith('customer') ? process.env.DEMO_CUSTOMER_PASSWORD : process.env.DEMO_OPERATOR_PASSWORD,
@@ -41,29 +42,34 @@ beforeAll(async () => {
   await seed(db);
   queueId = (await db.queue.findUniqueOrThrow({ where: { code: 'R' } })).id;
   customerId = (await db.user.findUniqueOrThrow({ where: { email: 'customer.a@example.test' } })).id;
-  operatorId = (await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } })).id;
+  const assigned = await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } });
+  operatorId = assigned.id;
+  unassigned = await db.user.create({ data: { email: `unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned operator', role: 'OPERATOR', passwordHash: assigned.passwordHash } });
   const entry = await db.queueEntry.create({ data: { queueId, customerId, sequence: 700001n, displayNumber: `AUTH-${randomUUID().slice(0, 20)}`, partySize: 4 } });
   entryId = entry.id;
 });
 afterEach(async () => { await db.session.deleteMany({ where: { id: { in: sessions.splice(0) } } }); });
-afterAll(async () => { if (entryId) await db.queueEntry.delete({ where: { id: entryId } }); await db.$disconnect(); });
+afterAll(async () => { if (entryId) await db.queueEntry.delete({ where: { id: entryId } }); if (unassigned) await db.user.delete({ where: { id: unassigned.id } }); await db.$disconnect(); });
 
-test('TEST-010 assigned operator receives only assigned queue public metadata', async () => {
-  const cookie = await login('operator.a@example.test');
-  const before = await state();
-  const response = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie);
-  expect(response.status).toBe(200);
-  expect(response.body).toEqual({ data: [{ id: queueId, code: 'R', name: 'Restaurant Waiting Queue', state: 'OPEN' }] });
-  expect(await state()).toEqual(before);
+test('TEST-010 both seeded operators receive R/S assigned queue public metadata', async () => {
+  const expected = await db.queue.findMany({ where: { code: { in: ['R', 'S'] } }, select: { id: true, code: true, name: true, state: true }, orderBy: { code: 'asc' } });
+  expect(expected.map(q => q.code)).toEqual(['R', 'S']);
+  for (const email of ['operator.a@example.test', 'operator.b@example.test']) {
+    const cookie = await login(email);
+    const before = await state();
+    const response = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie);
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ data: expected });
+    expect(await state()).toEqual(before);
+  }
 });
 
-test('TEST-011 operator B lists S and cannot inspect or mutate R', async () => {
-  const cookie = await login('operator.b@example.test');
+test('TEST-011 genuinely unassigned operator cannot inspect or mutate R despite forged identity', async () => {
+  const cookie = await login(unassigned.email);
   const before = await state();
   const list = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie).set('operatorId', operatorId).query({ operatorId });
   expect(list.status).toBe(200);
-  const s = await db.queue.findUniqueOrThrow({ where: { code: 'S' } });
-  expect(list.body).toEqual({ data: [{ id: s.id, code: 'S', name: s.name, state: 'OPEN' }] });
+  expect(list.body).toEqual({ data: [] });
   denied(await request(app).get(`/api/v1/operator/queues/${queueId}/desk`).set('Cookie', cookie), 403, 'QUEUE_ACCESS_DENIED');
   for (const path of [`queues/${queueId}/call-next`, `entries/${entryId}/start-service`, `entries/${entryId}/complete`]) {
     denied(await request(app).post(`/api/v1/operator/${path}`).set('Cookie', cookie).set('Origin', origin).send({ operatorId }), 403, 'QUEUE_ACCESS_DENIED');

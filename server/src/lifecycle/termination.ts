@@ -61,3 +61,40 @@ export async function cancelEntry(
     throw error;
   }
 }
+
+export async function markNoShow(db: PrismaClient, operatorId: string, entryId: string, body: unknown, now: () => Date) {
+  try {
+    return await db.$transaction(async tx => {
+      const missing = () => new ApiError(404, 'ENTRY_NOT_FOUND', 'Queue entry not found.');
+      const target = await tx.queueEntry.findUnique({ where: { id: entryId }, select: { queueId: true } });
+      if (!target) throw missing();
+      await tx.$queryRaw`SELECT id FROM queues WHERE id = ${target.queueId}::uuid FOR UPDATE`;
+      await authorizeOperator(tx, operatorId, target.queueId);
+      if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length) {
+        throw new ApiError(422, 'VALIDATION_ERROR', 'Check the submitted fields.', { fields: { form: 'Send an empty JSON object.' } });
+      }
+      const entry = await tx.queueEntry.findUnique({ where: { id: entryId } });
+      if (!entry) throw missing();
+      if (entry.status !== 'CALLED' || !entry.calledAt) {
+        throw new ApiError(409, 'INVALID_TRANSITION', 'This queue entry cannot be moved to that status.');
+      }
+      const at = now();
+      const eligibleAt = new Date(entry.calledAt.getTime() + 300_000);
+      if (at < eligibleAt) {
+        throw new ApiError(409, 'NO_SHOW_TOO_EARLY', 'This entry is not eligible for no-show yet.', { eligibleAt: eligibleAt.toISOString() });
+      }
+      // Until #19, the status update releases the queue's single service slot.
+      const updated = await tx.queueEntry.update({
+        where: { id: entryId, status: 'CALLED' },
+        data: { status: 'NO_SHOW', noShowAt: at },
+      });
+      await tx.queueEvent.create({ data: { entryId, actorId: operatorId, eventType: 'NO_SHOW', fromStatus: 'CALLED', toStatus: 'NO_SHOW', occurredAt: at } });
+      return { ...entryDto(updated), counterId: null, cancelledAt: updated.cancelledAt, noShowAt: updated.noShowAt };
+    }, { maxWait: 10000, timeout: 10000 });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && ['P2025', 'P2034'].includes(error.code)) {
+      throw new ApiError(409, 'CONCURRENT_UPDATE', 'The queue changed. Refresh and try again.');
+    }
+    throw error;
+  }
+}

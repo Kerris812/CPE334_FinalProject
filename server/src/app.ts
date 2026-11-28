@@ -6,7 +6,7 @@ import { authentication } from './auth/auth.js';
 import { requireRole, requireQueueAssignment, requireEntryAssignment, currentUser } from './authorization/guards.js';
 import { queueRoutes, customerEntryRoutes, publicBoardRoutes } from './queues/routes.js';
 import { operate, readDesk } from './operator/service.js';
-import { cancelEntry } from './lifecycle/termination.js';
+import { cancelEntry, markNoShow } from './lifecycle/termination.js';
 import { ApiError, sendError } from './http/errors.js';
 
 interface AppOptions {
@@ -57,6 +57,7 @@ export function createApp(options: AppOptions = {}) {
   app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'SERVING' }) }); });
   app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'COMPLETED' }) }); });
   app.post('/api/v1/operator/entries/:entryId/cancel', requireEntryAssignment(db), async (req, res) => { res.json({ data: await cancelEntry(db, { id: currentUser(res).id, role: 'OPERATOR' }, req.params.entryId, req.body, now) }); });
+  app.post('/api/v1/operator/entries/:entryId/no-show', requireEntryAssignment(db), async (req, res) => { res.json({ data: await markNoShow(db, currentUser(res).id, String(req.params.entryId), req.body, now) }); });
   app.use((_req, res) => sendError(res, new ApiError(404, 'NOT_FOUND', 'Resource not found.')));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
     if (error instanceof ApiError) { sendError(res, error); return; }

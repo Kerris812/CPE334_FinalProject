@@ -21,9 +21,11 @@ export async function seed(db: PrismaClient, env: NodeJS.ProcessEnv = process.en
       const user = await tx.user.upsert({ where: { email }, update: {}, create: { email, displayName, role, passwordHash } });
       if (user.role !== role) throw new Error('Seed account role conflicts with existing data.');
       if (role === 'OPERATOR') {
-        const designated = email === 'operator.a@example.test' ? queue : largeQueue;
-        if (await tx.operatorQueueAssignment.findFirst({ where: { operatorId: user.id, queueId: { not: designated.id } } })) throw new Error('Seed operator assignment conflicts with the approved queue scope; existing assignments were preserved.');
-        await tx.operatorQueueAssignment.upsert({ where: { operatorId_queueId: { operatorId: user.id, queueId: designated.id } }, update: {}, create: { operatorId: user.id, queueId: designated.id } });
+        const approved = [queue, largeQueue];
+        if (await tx.operatorQueueAssignment.findFirst({ where: { operatorId: user.id, queueId: { notIn: approved.map(target => target.id) } } })) throw new Error('Seed operator assignment conflicts with the approved queue scope; existing assignments were preserved.');
+        for (const target of approved) {
+          await tx.operatorQueueAssignment.upsert({ where: { operatorId_queueId: { operatorId: user.id, queueId: target.id } }, update: {}, create: { operatorId: user.id, queueId: target.id } });
+        }
       }
     }
   });

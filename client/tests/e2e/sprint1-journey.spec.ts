@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { PrismaClient } from '../../../server/node_modules/@prisma/client/index.js';
 import { testDatabaseUrl } from '../../../server/src/infrastructure/test-database';
@@ -7,7 +7,7 @@ const local = Object.fromEntries(readFileSync('../server/.env', 'utf8').split('\
 const db = new PrismaClient({ datasourceUrl: testDatabaseUrl(process.env.TEST_DATABASE_URL ?? local.TEST_DATABASE_URL, process.env.DATABASE_URL ?? local.DATABASE_URL) });
 const customerPassword = process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOMER_PASSWORD;
 const operatorPassword = process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD;
-const evidence = '../artifacts/evidence/sprint1';
+const evidence = process.env.LAB7_EVIDENCE_DIR ?? '../artifacts/evidence/sprint1';
 test.afterAll(() => db.$disconnect());
 function publicShape(body: unknown) {
   const paths: string[] = [];
@@ -29,6 +29,7 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
   const operatorA = await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } });
   const contexts: BrowserContext[] = []; const sessions: string[] = [];
   let entryId: string | undefined;
+  let unassignedId: string | undefined;
   async function page(width: number) { const context = await browser.newContext({ baseURL, viewport: { width, height: 1000 } }); contexts.push(context); return context.newPage(); }
   async function login(target: Page, email: string, password: string) {
     await target.goto('/login'); await target.getByLabel('Email').fill(email); await target.getByLabel('Password', { exact: true }).fill(password); await target.getByRole('button', { name: 'Sign in', exact: true }).click();
@@ -48,7 +49,7 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
     await expect(customer.getByText('R-0001', { exact: true })).toBeVisible();
     const duplicate = await customer.request.post(`/api/v1/queues/${queue.id}/entries`, { headers: { Origin: origin }, data: { partySize: 4 } }); const duplicateBody = await duplicate.json(); expect(duplicate.status()).toBe(409); expect(duplicateBody.error.code).toBe('DUPLICATE_ACTIVE_ENTRY');
     await customer.getByRole('link', { name: 'View my queue' }).click(); await expect(customer.getByText('WAITING', { exact: true })).toBeVisible();
-    await login(host, operatorA.email, operatorPassword); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(1); await expect(host.getByLabel('Assigned queue').locator('option')).toContainText('R');
+    await login(host, operatorA.email, operatorPassword); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(2); await host.getByLabel('Assigned queue').selectOption(queue.id);
     await host.getByRole('button', { name: 'Call Next', exact: true }).click(); await expect(host.getByText('CALLED', { exact: true })).toBeVisible();
     await customer.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(customer.getByText('CALLED', { exact: true })).toBeVisible();
     await board.goto('/board/R'); await expect(board.getByText('R-0001', { exact: true })).toBeVisible();
@@ -67,7 +68,9 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
     expect((await board.context().cookies()).some(cookie => cookie.name === 'qs_session')).toBe(false); await expect(board.getByRole('button', { name: 'Log out' })).toHaveCount(0);
     await login(otherCustomer, 'customer.b@example.test', customerPassword); const foreign = await otherCustomer.request.get(`/api/v1/customer/entries/${entryId}`); const foreignBody = await foreign.json(); expect(foreign.status()).toBe(404); expect(foreignBody.error.code).toBe('ENTRY_NOT_FOUND');
     const before = await db.queueEntry.findUniqueOrThrow({ where: { id: entryId } }); const beforeEvents = await db.queueEvent.findMany({ where: { entryId }, orderBy: { occurredAt: 'asc' } });
-    await login(otherOperator, 'operator.b@example.test', operatorPassword); await expect(otherOperator.getByLabel('Assigned queue').locator('option')).toContainText('S');
+    const unassigned = await db.user.create({ data: { email: `journey-unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned journey host', role: 'OPERATOR', passwordHash: operatorA.passwordHash } });
+    unassignedId = unassigned.id;
+    await login(otherOperator, unassigned.email, operatorPassword); await expect(otherOperator.getByText('No assigned queues.')).toBeVisible();
     expect((await otherOperator.request.get(`/api/v1/operator/queues/${queue.id}/desk`)).status()).toBe(403);
     const denials: { path: string; status: number; code: string }[] = [];
     for (const path of [`/queues/${queue.id}/call-next`, `/entries/${entryId}/start-service`, `/entries/${entryId}/complete`]) { const denied = await otherOperator.request.post(`/api/v1/operator${path}`, { headers: { Origin: origin }, data: {} }); const deniedBody = await denied.json(); expect(denied.status()).toBe(403); expect(deniedBody.error.code).toBe('QUEUE_ACCESS_DENIED'); denials.push({ path, status: denied.status(), code: deniedBody.error.code }); }
@@ -80,5 +83,6 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
     // Clean only this test's saved entry/sessions; production never deletes history or resets counters.
     if (entryId) { await db.queueEvent.deleteMany({ where: { entryId } }); await db.queueEntry.delete({ where: { id: entryId } }); await db.queue.update({ where: { id: queue.id }, data: { lastSequence: queue.lastSequence } }); }
     await db.session.deleteMany({ where: { id: { in: sessions } } });
+    if (unassignedId) await db.user.delete({ where: { id: unassignedId } });
   }
 });

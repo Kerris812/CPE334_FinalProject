@@ -1,0 +1,18 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "test:unit",
+    "--",
+    "--reporter=verbose"
+  ],
+  "cwd": "server",
+  "startedAtUtc": "2026-11-28T04:04:25.771854+00:00",
+  "finishedAtUtc": "2026-11-28T04:04:26.347894+00:00",
+  "exitCode": 0,
+  "implementationCommit": "cad39ed5a990834e659583c15ca203545bfe1fad",
+  "prechangeBusinessLogicCommit": "fc178ed639619e3e74a37724a0373e990839a0e8",
+  "database": "new isolated /private/tmp cluster, localhost:55473/lab7_red_test",
+  "node": "v24.14.0",
+  "testState": "uncommitted new tests; application and contracts unchanged"
+}

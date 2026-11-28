@@ -1,0 +1,109 @@
+{
+  "L7-AC-01": {
+    "cases": [
+      "L7-017",
+      "L7-001",
+      "L7-002"
+    ],
+    "status": "tested against old code; positive shared provisioning/access remains RED"
+  },
+  "L7-AC-02": {
+    "cases": [
+      "L7-001",
+      "L7-002",
+      "L7-011",
+      "L7-013"
+    ],
+    "status": "tested against old code; positive shared provisioning/access remains RED"
+  },
+  "L7-AC-03": {
+    "cases": [
+      "L7-003",
+      "L7-005"
+    ],
+    "status": "tested against old code; positive shared provisioning/access remains RED"
+  },
+  "L7-AC-04": {
+    "cases": [
+      "L7-004",
+      "L7-005"
+    ],
+    "status": "tested against old code; positive shared provisioning/access remains RED"
+  },
+  "L7-AC-05": {
+    "cases": [
+      "L7-005"
+    ],
+    "status": "tested against old code; positive shared provisioning/access remains RED"
+  },
+  "L7-AC-06": {
+    "cases": [
+      "L7-008",
+      "L7-009",
+      "L7-018"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-07": {
+    "cases": [
+      "L7-010",
+      "L7-011"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-08": {
+    "cases": [
+      "L7-012",
+      "L7-020"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-09": {
+    "cases": [
+      "L7-013"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-10": {
+    "cases": [
+      "L7-014"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-11": {
+    "cases": [
+      "L7-011",
+      "L7-015",
+      "L7-019"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-12": {
+    "cases": [
+      "L7-006"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-13": {
+    "cases": [
+      "L7-007"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-14": {
+    "cases": [
+      "L7-016"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  },
+  "L7-AC-15": {
+    "cases": [
+      "L7-016",
+      "L7-017",
+      "L7-018",
+      "L7-019",
+      "L7-020"
+    ],
+    "status": "preserved-rule tests pass on unchanged code; not a Phase 2 GREEN claim"
+  }
+}

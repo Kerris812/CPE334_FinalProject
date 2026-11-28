@@ -1,0 +1,286 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/node_modules/.bin/playwright",
+      "test",
+      "tests/e2e/lab7-shared-operators.spec.ts",
+      "--reporter=line,json",
+      "--output=../artifacts/evidence/lab7/phase1/browser-output"
+    ],
+    "configFile": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/playwright.config.ts",
+    "rootDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "snapshotDir": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5487"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "lab7-shared-operators.spec.ts",
+      "file": "lab7-shared-operators.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6615,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n\n    at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70",
+                    "location": {
+                      "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                      "column": 70,
+                      "line": 38
+                    },
+                    "snippet": " \u001b[90m 36 |\u001b[39m       \u001b[36mawait\u001b[39m login(a\u001b[33m,\u001b[39m \u001b[32m'operator.a@example.test'\u001b[39m\u001b[33m,\u001b[39m process\u001b[33m.\u001b[39menv\u001b[33m.\u001b[39m\u001b[33mDEMO_OPERATOR_PASSWORD\u001b[39m\u001b[33m!\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m login(b\u001b[33m,\u001b[39m \u001b[32m'operator.b@example.test'\u001b[39m\u001b[33m,\u001b[39m process\u001b[33m.\u001b[39menv\u001b[33m.\u001b[39m\u001b[33mDEMO_OPERATOR_PASSWORD\u001b[39m\u001b[33m!\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m expect(a\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mlocator(\u001b[32m'option'\u001b[39m))\u001b[33m.\u001b[39mtoHaveText([\u001b[32m'R — Restaurant Waiting Queue'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'S — Large Party Waiting Queue'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \u001b[36mawait\u001b[39m expect(b\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mlocator(\u001b[32m'option'\u001b[39m))\u001b[33m.\u001b[39mtoHaveText([\u001b[32m'R — Restaurant Waiting Queue'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'S — Large Party Waiting Queue'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 40 |\u001b[39m       \u001b[36mfor\u001b[39m (\u001b[36mconst\u001b[39m page \u001b[36mof\u001b[39m [a\u001b[33m,\u001b[39m b]) \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mselectOption(queue\u001b[33m.\u001b[39mid)\u001b[33m;\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mconst\u001b[39m caller \u001b[33m=\u001b[39m code \u001b[33m===\u001b[39m \u001b[32m'R'\u001b[39m \u001b[33m?\u001b[39m a \u001b[33m:\u001b[39m b\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                        "column": 70,
+                        "line": 38
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n\n\n  36 |       await login(a, 'operator.a@example.test', process.env.DEMO_OPERATOR_PASSWORD!);\n  37 |       await login(b, 'operator.b@example.test', process.env.DEMO_OPERATOR_PASSWORD!);\n> 38 |       await expect(a.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);\n     |                                                                      ^\n  39 |       await expect(b.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);\n  40 |       for (const page of [a, b]) await page.getByLabel('Assigned queue').selectOption(queue.id);\n  41 |       const caller = code === 'R' ? a : b;\n    at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-28T04:05:59.467Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-3.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-2.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/error-context.md"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                    "column": 70,
+                    "line": 38
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "d4251d771eeda856e997-240a9a96b9935ac6f96e",
+          "file": "lab7-shared-operators.spec.ts",
+          "line": 17,
+          "column": 3
+        },
+        {
+          "title": "L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6602,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n\n    at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70",
+                    "location": {
+                      "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                      "column": 70,
+                      "line": 38
+                    },
+                    "snippet": " \u001b[90m 36 |\u001b[39m       \u001b[36mawait\u001b[39m login(a\u001b[33m,\u001b[39m \u001b[32m'operator.a@example.test'\u001b[39m\u001b[33m,\u001b[39m process\u001b[33m.\u001b[39menv\u001b[33m.\u001b[39m\u001b[33mDEMO_OPERATOR_PASSWORD\u001b[39m\u001b[33m!\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m login(b\u001b[33m,\u001b[39m \u001b[32m'operator.b@example.test'\u001b[39m\u001b[33m,\u001b[39m process\u001b[33m.\u001b[39menv\u001b[33m.\u001b[39m\u001b[33mDEMO_OPERATOR_PASSWORD\u001b[39m\u001b[33m!\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m expect(a\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mlocator(\u001b[32m'option'\u001b[39m))\u001b[33m.\u001b[39mtoHaveText([\u001b[32m'R — Restaurant Waiting Queue'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'S — Large Party Waiting Queue'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \u001b[36mawait\u001b[39m expect(b\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mlocator(\u001b[32m'option'\u001b[39m))\u001b[33m.\u001b[39mtoHaveText([\u001b[32m'R — Restaurant Waiting Queue'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'S — Large Party Waiting Queue'\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 40 |\u001b[39m       \u001b[36mfor\u001b[39m (\u001b[36mconst\u001b[39m page \u001b[36mof\u001b[39m [a\u001b[33m,\u001b[39m b]) \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m'Assigned queue'\u001b[39m)\u001b[33m.\u001b[39mselectOption(queue\u001b[33m.\u001b[39mid)\u001b[33m;\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mconst\u001b[39m caller \u001b[33m=\u001b[39m code \u001b[33m===\u001b[39m \u001b[32m'R'\u001b[39m \u001b[33m?\u001b[39m a \u001b[33m:\u001b[39m b\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                        "column": 70,
+                        "line": 38
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Assigned queue').locator('option')\nTimeout: 5000ms\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 0\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"R — Restaurant Waiting Queue\",\u001b[22m\n\u001b[32m-   \"S — Large Party Waiting Queue\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByLabel('Assigned queue').locator('option') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Assigned queue').locator('option')\u001b[22m\n\u001b[2m    14 × locator resolved to 1 element\u001b[22m\n\n\n  36 |       await login(a, 'operator.a@example.test', process.env.DEMO_OPERATOR_PASSWORD!);\n  37 |       await login(b, 'operator.b@example.test', process.env.DEMO_OPERATOR_PASSWORD!);\n> 38 |       await expect(a.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);\n     |                                                                      ^\n  39 |       await expect(b.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);\n  40 |       for (const page of [a, b]) await page.getByLabel('Assigned queue').selectOption(queue.id);\n  41 |       const caller = code === 'R' ? a : b;\n    at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-28T04:06:08.430Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-2.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-3.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/error-context.md"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts",
+                    "column": 70,
+                    "line": 38
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "d4251d771eeda856e997-a9ebfc3dd765ae37ca45",
+          "file": "lab7-shared-operators.spec.ts",
+          "line": 17,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-28T04:05:57.916Z",
+    "duration": 17475.647,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

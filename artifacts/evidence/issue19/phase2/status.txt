@@ -1,0 +1,12 @@
+PHASE 2 COMPLETE: schema and transactional migration only; intermediate state must not be deployed.
+Files: server/prisma/schema.prisma, new 0003_service_counters/migration.sql, server/tests/database/issue19-migration.test.ts, this evidence.
+Traceability: approved design 2, S2-TEST-16/18; queue slot retained, dedicated composite FK, active-only counter uniqueness, active-counter CHECK, historical terminal associations allowed.
+Actual commands: prisma validate --schema=server/prisma/schema.prisma; npm --prefix server run db:generate; npm --prefix server run typecheck; from server, npx vitest run tests/database/issue19-migration.test.ts --maxWorkers=1 --no-file-parallelism.
+Results: 4 database cases pass; Prisma validation/generation and backend typecheck exit 0. Actual before/after counts, counter IDs and sequences are in migration.txt. Tests create and drop only uniquely named disposable issue19_migration_*_test databases, populated with synthetic legacy rows and all six states. Previous migrations are unchanged.
+Preserved counts and full row equality are asserted for users/sessions/queues/assignments/entries/events; active R/R and S/S associations are checked. Missing called_at or serving_at fully rolls back. Direct writes verify unique codes, required active counters, queue FK, active capacity, WAITING restrictions and retained history.
+Independent verification: source the safe temporary environment, then run the commands above with TEST_DATABASE_URL pointing only to a disposable local _test database; the migration suite allocates its own fresh databases and requires local CREATE DATABASE and psql.
+Read-only inspection after migration: SELECT code,name,queue_id FROM service_counters ORDER BY code; SELECT status,counter_id FROM queue_entries ORDER BY sequence; SELECT indexname,indexdef FROM pg_indexes WHERE tablename='queue_entries';
+Compatibility: old call writers omit counter_id and would fail new constraints. No runtime lifecycle or seed implementation in this phase. Existing fixture writers also require counter data before later regression execution. Phase 1 backend/UI tests are not claimed GREEN.
+Evidence to capture: migration.txt preservation output, successful cases, schema diff. No screenshots required for database-only work.
+Failures: none in applicable schema checks. Limitation: intermediate old writers are incompatible; no deployment performed.
+Ready for commit: yes. Recommended commit: feat(#19): add persistent service counters and safe migration

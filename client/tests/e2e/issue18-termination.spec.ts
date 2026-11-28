@@ -26,11 +26,11 @@ test('S2-TEST-26: customer and operator cancellation, manual no-show and rejoin'
       await expect(customer.getByText('WAITING', { exact: true })).toBeVisible();
     }
     await join();
-    await customer.getByRole('button', { name: 'Cancel queue entry' }).click();
+    await customer.getByRole('button', { name: 'Cancel Queue' }).click();
     await expect(customer.getByRole('dialog')).toContainText('lose your current position');
     await customer.getByRole('button', { name: 'Back', exact: true }).click();
-    await expect(customer.getByRole('button', { name: 'Cancel queue entry' })).toBeFocused();
-    await customer.getByRole('button', { name: 'Cancel queue entry' }).click();
+    await expect(customer.getByRole('button', { name: 'Cancel Queue' })).toBeFocused();
+    await customer.getByRole('button', { name: 'Cancel Queue' }).click();
     await customer.getByRole('button', { name: 'Confirm cancellation' }).click();
     await expect(customer.getByText('CANCELLED', { exact: true })).toBeVisible();
 

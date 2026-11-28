@@ -22,7 +22,7 @@ form button[type=submit] { font-size: 1.125rem; }
 .desk-card h3 { font-size: 1.35rem; }
 
 /* Public-board text pairs and measured contrast ratios are documented in ui-spec.md. */
-.app-shell--public .app-wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; letter-spacing: -.02em; }
+.app-wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
 .board-navigation a { font-size: 14px; font-weight: 650; }
 .board-navigation > .board-back { font-size: 14px; }
 .public-display-title { font-size: 20px; font-weight: 600; }
@@ -42,7 +42,6 @@ form button[type=submit] { font-size: 1.125rem; }
 .board-error p { font-size: 16px; }
 
 /* Contrast pairs and ratios: see ui-spec.md, Customer status visual refinement. */
-.customer-wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 3.5vw, 28px); line-height: 1.2; font-weight: 700; }
 .customer-initials { font-size: 14px; font-weight: 700; }
 .customer-user-details strong { font-size: 14px; font-weight: 650; }
 .customer-user-role { font-size: 13px; line-height: 1.4; text-transform: uppercase; letter-spacing: .08em; }
@@ -66,7 +65,6 @@ form button[type=submit] { font-size: 1.125rem; }
 .header-account .customer-user-role { font-size: 16px; font-weight: 400; }
 .app-shell--customer-status .customer-user-role { font-size: 13px; }
 .app-shell--customer-status .header-logout { font-size: 14px; }
-.app-shell--customer-status .app-wordmark { font-size: clamp(24px, 3.5vw, 28px); font-family: Georgia, 'Times New Roman', serif; font-weight: 700; }
 .ui-card-badge { font-size: 16px; }
 .operator-desk .ui-stat > span { font-size: 16px; }
 .operator-desk .queue-ticket > p { font-size: 16px; }

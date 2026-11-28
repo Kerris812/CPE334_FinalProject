@@ -36,6 +36,7 @@ form { display: grid; gap: var(--space-3); }
 .ui-button:disabled { cursor: not-allowed; background: var(--burgundy-50); color: var(--taupe-text); border-color: var(--burgundy-100); box-shadow: none; }
 .ui-button-label { padding-left: var(--space-4); }
 .public-board .board-error .ui-button-label { padding-inline: var(--space-2); }
+.public-board-actions .ui-button-label { padding-inline: 0; text-align: center; }
 .ui-spinner { position: absolute; left: var(--space-2); width: 12px; height: 12px; border: 1px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: ui-spin 800ms linear infinite; }
 .ui-back-label { display: inline-flex; align-items: center; gap: var(--space-2); }
 .ui-back-link, .ui-ghost-link, .board-link { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; color: var(--burgundy-700); text-underline-offset: var(--space-1); }
@@ -86,8 +87,16 @@ form { display: grid; gap: var(--space-3); }
 .ui-grid > .ui-card > .ui-card-body { display: flex; flex: 1; flex-direction: column; }
 .ui-grid > .ui-card .ui-state, .ui-grid > .ui-card .public-call { flex: 1; }
 .public-call { display: flex; flex-direction: column; align-items: center; gap: var(--space-6); }
-.customer-queue-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.customer-queue-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); padding-bottom: var(--space-4); }
 .customer-queue-actions > button { width: 100%; }
+.customer-queue-actions > button .ui-button-label { padding-inline: 0; text-align: center; }
+.customer-queue-actions > .ui-back-link { margin-left: auto; }
+.customer-cancel .ui-button-label { padding-inline: 0; text-align: center; }
+.termination-dialog { width: 440px; max-width: calc(100vw - var(--space-8)); max-height: calc(100dvh - var(--space-8)); padding: var(--space-6); border: 0; border-radius: var(--radius-card); background: var(--surface); color: var(--espresso); box-shadow: 0 16px 48px rgba(47,38,38,.2); }
+.termination-dialog::backdrop { background: rgba(47,38,38,.2); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.termination-dialog form { gap: var(--space-4); }
+.termination-dialog h3, .termination-dialog p { margin: 0; }
+.termination-dialog .ui-button-label { padding-inline: 0; text-align: center; }
 .login-card { margin-top: var(--space-6); }
 .login-card .ui-card-description { margin: 0 0 var(--space-6); color: var(--taupe-text); }
 .login-card form button[type=submit] { width: 100%; }
@@ -98,9 +107,17 @@ form { display: grid; gap: var(--space-3); }
 .queue-skeleton span:nth-child(2) { height: 112px; }
 .availability { display: inline-block; padding: var(--space-1) var(--space-3); border-radius: var(--radius-badge); color: var(--burgundy-700); background: var(--burgundy-50); }
 .desk-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin: var(--space-6) 0; }
-.desk-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-.desk-actions button { flex: 1 1 12rem; }
-.desk-refresh { margin: var(--space-4) 0; }
+.desk-counter { margin-bottom: var(--space-6); }
+.desk-call-row, .service-actions { margin-top: auto; }
+.desk-call-row { display: flex; padding-top: var(--space-4); }
+.desk-call { flex: 1; }
+.desk-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.desk-actions--called { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.desk-actions > p { grid-column: 1 / -1; order: -1; }
+.desk-actions > .ui-button { padding-inline: var(--space-2); }
+.desk-call .ui-button-label, .desk-actions > .ui-button .ui-button-label { padding-inline: 0; text-align: center; white-space: nowrap; }
+.desk-refresh { margin: 0; }
+.desk-refresh-slot { display: inline-flex; }
 .operator-desk .desk-refresh .ui-button-label { padding-inline: var(--space-2); }
 .assigned-queue-control { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
 .assigned-queue-select { position: relative; display: inline-grid; min-width: 0; max-width: 100%; }
@@ -115,6 +132,7 @@ form { display: grid; gap: var(--space-3); }
 @media (min-width: 600px) { .customer-queue-actions > button { width: auto; } }
 @media (min-width: 1024px) { .public-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1280px) { .desk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .desk-actions { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 400px) { .app-header-inner, .app-content { padding: var(--space-4); } .app-brand { gap: var(--space-2); } .app-logo { width: 32px; height: 40px; } .ui-card-header, .ui-card-body, .ui-card-footer { padding: var(--space-4); } .header-account { gap: var(--space-2); } }
 
 @media (max-width: 400px) { .ui-footer-meta > .ui-button { background: var(--surface); color: var(--burgundy-700); box-shadow: none; } }

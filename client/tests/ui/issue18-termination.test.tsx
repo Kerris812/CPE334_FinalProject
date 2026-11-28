@@ -21,7 +21,7 @@ test('S2-TEST-26: customer confirms cancellation and sees refreshed terminal sta
   });
   vi.stubGlobal('fetch', fetcher);
   render(<CustomerQueues myQueue onUnauthenticated={vi.fn()} />);
-  fireEvent.click(await screen.findByRole('button', { name: 'Cancel queue entry' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Cancel Queue' }));
   const dialog = screen.getByRole('dialog');
   expect(within(dialog).getByText(/lose your current position/i)).toBeTruthy();
   fireEvent.click(within(dialog).getByRole('button', { name: 'Confirm cancellation' }));

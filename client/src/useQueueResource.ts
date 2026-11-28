@@ -10,6 +10,7 @@ export function useQueueResource<T>(load: () => Promise<T>, poll = false) {
     let active = true;
     let pending = false;
     let retryQueued = false;
+    let hasSnapshot = false;
     let timer: number | undefined;
     async function refresh(background = false) {
       if (!active) return;
@@ -19,10 +20,10 @@ export function useQueueResource<T>(load: () => Promise<T>, poll = false) {
       }
       pending = true;
       setRefreshing(true);
-      if (!background) setLoading(true);
+      if (!hasSnapshot) setLoading(true);
       try {
         const value = await load();
-        if (active && !retryQueued) { setData(value); setError(null); }
+        if (active && !retryQueued) { hasSnapshot = true; setData(value); setError(null); }
       } catch (failure) {
         if (active && !retryQueued) setError(failure);
       } finally {

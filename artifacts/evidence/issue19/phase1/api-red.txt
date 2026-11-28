@@ -1,0 +1,410 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "issue19_red_complete_test", schema "public" at "127.0.0.1:55489"
+
+2 migrations found in prisma/migrations
+
+Applying migration `0001_foundation`
+Applying migration `0002_immutable_queue_sequence`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 0001_foundation/
+    └─ migration.sql
+  └─ 0002_immutable_queue_sequence/
+    └─ migration.sql
+
+All migrations have been successfully applied.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/api/issue19-counters.test.ts (19 tests | 18 failed) 1505ms
+   × S2-TEST-19/25: Operator A reserves a persistent counter through legacy call in R 94ms
+   × S2-TEST-19/25: Operator A reserves a persistent counter through legacy call in S 53ms
+   × S2-TEST-19/25: Operator B reserves a persistent counter through legacy call in R 53ms
+   × S2-TEST-19/25: Operator B reserves a persistent counter through legacy call in S 56ms
+   × S2-TEST-19: nonexistent selected counter is denied without consuming the FIFO head 47ms
+   × S2-TEST-19: invalid counter selection payload {"counterId":"invalid"} is rejected before any writes 44ms
+   × S2-TEST-19: invalid counter selection payload {"expectedEntryId":"10000000-0000-0000-0000-000000000001"} is rejected before any writes 49ms
+   × S2-TEST-19: invalid counter selection payload {"counterId":"10000000-0000-0000-0000-000000000001","actorId":"forged"} is rejected before any writes 90ms
+   × S2-TEST-12: cross-operator start retains the reserved counter 94ms
+   × S2-TEST-13/14: simultaneous calls to the same counter have one winner and one audit event 53ms
+   × S2-TEST-15/17: completion releases occupancy, retains history and preserves FIFO 51ms
+   × S2-TEST-06/17: manual no-show frees only its counter and retains historical association 70ms
+   × S2-TEST-05: cancelling a waiting peer does not release an occupied counter 50ms
+   × S2-TEST-19: a counter from the other queue is rejected without writes 59ms
+   × S2-TEST-20: R and S reserve independently and a busy R does not block S 89ms
+   × S2-TEST-19: stale FIFO preview is rejected without reserving a counter 42ms
+   × S2-TEST-27: audit persistence failure rolls back call and counter occupancy 76ms
+   × S2-TEST-27: audit persistence failure rolls back complete and counter occupancy 59ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19/25: Operator A reserves a persistent counter through legacy call in R
+AssertionError: expected { …(7) } to match object { …(3) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "counterId": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    "id": "85d4475d-6e28-42a6-bb32-c4bb863b0368",
+    "status": "CALLED",
+  }
+
+ ❯ tests/api/issue19-counters.test.ts:27:32
+     25|     const response = await call(queue.id, operator);
+     26|     expect(response.status).toBe(200);
+     27|     expect(response.body.data).toMatchObject({ id: entry.id, status: '…
+       |                                ^
+     28|     const [stored] = await db.$queryRaw<{ row: Record<string, unknown>…
+     29|     expect(stored.row).toMatchObject({ status: 'CALLED', counter_id: r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19/25: Operator A reserves a persistent counter through legacy call in S
+AssertionError: expected { …(7) } to match object { …(3) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "counterId": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    "id": "c30c6e13-2edf-401d-9700-5cf77ec3da62",
+    "status": "CALLED",
+  }
+
+ ❯ tests/api/issue19-counters.test.ts:27:32
+     25|     const response = await call(queue.id, operator);
+     26|     expect(response.status).toBe(200);
+     27|     expect(response.body.data).toMatchObject({ id: entry.id, status: '…
+       |                                ^
+     28|     const [stored] = await db.$queryRaw<{ row: Record<string, unknown>…
+     29|     expect(stored.row).toMatchObject({ status: 'CALLED', counter_id: r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19/25: Operator B reserves a persistent counter through legacy call in R
+AssertionError: expected { …(7) } to match object { …(3) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "counterId": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    "id": "bb44cdcc-73c3-42b2-9dcb-e03373b1b19b",
+    "status": "CALLED",
+  }
+
+ ❯ tests/api/issue19-counters.test.ts:27:32
+     25|     const response = await call(queue.id, operator);
+     26|     expect(response.status).toBe(200);
+     27|     expect(response.body.data).toMatchObject({ id: entry.id, status: '…
+       |                                ^
+     28|     const [stored] = await db.$queryRaw<{ row: Record<string, unknown>…
+     29|     expect(stored.row).toMatchObject({ status: 'CALLED', counter_id: r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19/25: Operator B reserves a persistent counter through legacy call in S
+AssertionError: expected { …(7) } to match object { …(3) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "counterId": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    "id": "461817b8-25e0-4c93-bf1a-d975a864ae38",
+    "status": "CALLED",
+  }
+
+ ❯ tests/api/issue19-counters.test.ts:27:32
+     25|     const response = await call(queue.id, operator);
+     26|     expect(response.status).toBe(200);
+     27|     expect(response.body.data).toMatchObject({ id: entry.id, status: '…
+       |                                ^
+     28|     const [stored] = await db.$queryRaw<{ row: Record<string, unknown>…
+     29|     expect(stored.row).toMatchObject({ status: 'CALLED', counter_id: r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: nonexistent selected counter is denied without consuming the FIFO head
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ rejected tests/support/lab7-fixture.ts:33:27
+     31|   const before = await snapshot();
+     32|   const response = await run();
+     33|   expect(response.status).toBe(status);
+       |                           ^
+     34|   expect(response.body.error).toEqual({ code, message: expect.any(Stri…
+     35|   expect(await snapshot()).toEqual(before);
+ ❯ tests/api/issue19-counters.test.ts:39:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: invalid counter selection payload {"counterId":"invalid"} is rejected before any writes
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: invalid counter selection payload {"expectedEntryId":"10000000-0000-0000-0000-000000000001"} is rejected before any writes
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: invalid counter selection payload {"counterId":"10000000-0000-0000-0000-000000000001","actorId":"forged"} is rejected before any writes
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ rejected tests/support/lab7-fixture.ts:33:27
+     31|   const before = await snapshot();
+     32|   const response = await run();
+     33|   expect(response.status).toBe(status);
+       |                           ^
+     34|   expect(response.body.error).toEqual({ code, message: expect.any(Stri…
+     35|   expect(await snapshot()).toEqual(before);
+ ❯ tests/api/issue19-counters.test.ts:49:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-12: cross-operator start retains the reserved counter
+AssertionError: expected undefined to deeply equal StringMatching{…}
+
+- Expected:
+StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
++ Received:
+undefined
+
+ ❯ tests/api/issue19-counters.test.ts:58:38
+     56|   const called = await call(f.r.id, a);
+     57|   expect(called.status).toBe(200);
+     58|   expect(called.body.data.counterId).toEqual(counterId);
+       |                                      ^
+     59|   const started = await action(entry.id, 'start-service', b);
+     60|   expect(started.status).toBe(200);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-13/14: simultaneous calls to the same counter have one winner and one audit event
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:86:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-15/17: completion releases occupancy, retains history and preserves FIFO
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:98:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-06/17: manual no-show frees only its counter and retains historical association
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:111:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-05: cancelling a waiting peer does not release an occupied counter
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:124:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: a counter from the other queue is rejected without writes
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "S",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter S",
+  "queueId": "68ba8510-4c22-4ff6-9167-3f84c78bceef",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:130:84
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-20: R and S reserve independently and a busy R does not block S
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:137:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-19: stale FIFO preview is rejected without reserving a counter
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:144:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/18]⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-27: audit persistence failure rolls back call and counter occupancy
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-27: audit persistence failure rolls back complete and counter occupancy
+AssertionError: expected undefined to match object { id: StringMatching{…}, …(3) }
+
+- Expected:
+{
+  "code": "R",
+  "id": StringMatching /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  "name": "Counter R",
+  "queueId": "15a0839a-e6dd-48e9-9987-9efee13729be",
+}
+
++ Received:
+undefined
+
+ ❯ counter tests/api/issue19-counters.test.ts:16:38
+     14|   const response = await get(`/operator/queues/${queue.id}/desk`, oper…
+     15|   expect(response.status).toBe(200);
+     16|   expect(response.body.data.counter).toMatchObject({ id: counterId, co…
+       |                                      ^
+     17|   return response.body.data.counter as { id: string; status: string; o…
+     18| }
+ ❯ tests/api/issue19-counters.test.ts:151:78
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/18]⎯
+
+
+ Test Files  1 failed | 16 passed (17)
+      Tests  18 failed | 135 passed (153)
+   Start at  18:42:56
+   Duration  12.94s (tests 86%, import 10%, transform 3%)
+
+    Isolate  17 workers spawned · ~59ms startup each (spawn + environment, per file)
+             at least ~938ms faster with isolate: false — reuses workers across files instead of one per file
+

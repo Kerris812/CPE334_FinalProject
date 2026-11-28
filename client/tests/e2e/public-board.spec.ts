@@ -1,3 +1,4 @@
+import { assertPublicBoard as assertPublic } from './public-board-assertions';
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -24,16 +25,7 @@ test.afterEach(async () => {
   if (queue) { await db.serviceCounter.deleteMany({ where: { queueId: queue.id } }); await db.queue.delete({ where: { id: queue.id } }); }
 });
 test.afterAll(() => db.$disconnect());
-function assertPublic(body: unknown) {
-  const paths: string[] = [];
-  function visit(value: unknown, path: string) {
-    if (value !== null && typeof value === 'object') {
-      expect(Array.isArray(value)).toBe(false);
-      for (const [key, child] of Object.entries(value)) { const next = path ? `${path}.${key}` : key; paths.push(next); visit(child, next); }
-    }
-  }
-  visit(body, ''); expect(paths.sort()).toEqual(['data', 'data.calledNumber', 'data.queueCode', 'data.serviceState', 'data.waitingCount'].sort());
-}
+
 test('TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors', async ({ page, context }) => {
   const bodies: Promise<unknown>[] = [];
   page.on('response', response => { if (response.url().endsWith(`/queues/${queue.id}/board`) && response.status() === 200) bodies.push(response.json()); });

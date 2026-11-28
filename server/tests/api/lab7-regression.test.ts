@@ -1,3 +1,4 @@
+import { legacyBoard, assertPublicBoard } from '../support/public-board-assertions.js';
 import { createHash } from 'node:crypto';
 import { PrismaClient, type EntryStatus } from '@prisma/client';
 import { afterAll, afterEach, beforeAll, beforeEach, expect, test } from 'vitest';
@@ -204,7 +205,7 @@ test('L7-016 customer isolation, duplicate-active prevention, exact public DTO a
   await rejected(() => get(`/customer/entries/${entry.id}`, stranger), 'ENTRY_NOT_FOUND', 404);
   expect((await call(f.r.id, g)).status).toBe(200);
   const board = await get(`/public/queues/${f.r.id}/board`);
-  expect(board.body.data).toEqual({ queueCode: 'R', calledNumber: entry.displayNumber, serviceState: 'CALLED', waitingCount: 0 });
+  assertPublicBoard(board.body); expect(legacyBoard(board.body.data)).toEqual({ queueCode: 'R', calledNumber: entry.displayNumber, serviceState: 'CALLED', waitingCount: 0 });
   expect((await action(entry.id, 'start-service', h)).status).toBe(200);
   expect((await action(entry.id, 'complete', g)).status).toBe(200);
   const before = await snapshot();

@@ -15,10 +15,10 @@ No pending migrations to apply.
 
 
  Test Files  20 passed (20)
-      Tests  169 passed (169)
-   Start at  18:58:32
-   Duration  13.76s (tests 89%, import 10%, transform 1%)
+      Tests  170 passed (170)
+   Start at  19:03:00
+   Duration  15.81s (tests 90%, import 9%, transform 1%)
 
-    Isolate  20 workers spawned · ~55ms startup each (spawn + environment, per file)
-             at least ~1.05s faster with isolate: false — reuses workers across files instead of one per file
+    Isolate  20 workers spawned · ~54ms startup each (spawn + environment, per file)
+             at least ~1.04s faster with isolate: false — reuses workers across files instead of one per file
 

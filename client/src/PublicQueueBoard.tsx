@@ -8,13 +8,13 @@ import { QueueNumberDisplay } from './QueueNumberDisplay';
 interface PublicTab { route: string; code: string }
 const approvedCodes = ['R', 'S'];
 
-/** Every displayed API value is taken explicitly from the four-field public DTO. */
+/** Every displayed API value is taken explicitly from the public DTO allowlist. */
 export function PublicQueueBoard({ queueId, onAvailable, onMissing }: { queueId: string; onAvailable?: (route: string, code: string) => void; onMissing?: (route: string, code?: string) => void }) {
   const titleId = useId();
   const [updatedAt, setUpdatedAt] = useState<Date>();
   const load = useCallback(async () => {
     const result = await queueRequest<PublicBoard>(`/public/queues/${encodeURIComponent(queueId)}/board`);
-    const value: PublicBoard = { queueCode: result.queueCode, calledNumber: result.calledNumber, serviceState: result.serviceState, waitingCount: result.waitingCount };
+    const value: PublicBoard = { queueCode: result.queueCode, calledNumber: result.calledNumber, serviceState: result.serviceState, waitingCount: result.waitingCount, ...(result.activeEntries !== undefined ? { activeEntries: result.activeEntries.map(row => ({ displayNumber: row.displayNumber, counterLabel: row.counterLabel, serviceState: row.serviceState })) } : {}) };
     setUpdatedAt(new Date()); // Local receipt time, never a private database timestamp.
     return value;
   }, [queueId]);
@@ -25,9 +25,10 @@ export function PublicQueueBoard({ queueId, onAvailable, onMissing }: { queueId:
   }, [queueId, resource.data, resource.error, onAvailable, onMissing]);
   const unavailable = resource.error instanceof QueueError && resource.error.status === 404;
   const code = resource.data?.queueCode ?? (approvedCodes.includes(queueId) ? queueId : undefined);
+  const entries = resource.data?.activeEntries ?? (resource.data?.calledNumber ? [{ displayNumber: resource.data.calledNumber, serviceState: resource.data.serviceState, counterLabel: null }] : []);
   return <Card headerClassName="public-board-header" badgeClassName={`board-code${code && code.length > 3 ? ' board-code-long' : ''}`} className="public-board" aria-labelledby={titleId} title={code ? `Queue ${code}` : 'Public queue'} titleId={titleId} badge={code ?? '—'} footer={<FooterMeta className="public-board-actions" updatedAt={updatedAt} action={<Button onClick={resource.retry} disabled={resource.refreshing} pending={resource.refreshing}>Refresh</Button>} />}>
     {resource.loading ? <p role="status">Loading public queue status…</p> : resource.error ? <ErrorState className="board-error" title={unavailable ? "This queue isn't available" : "We couldn't load this. Please try again."} helper={unavailable ? 'Please try again or choose another queue.' : 'Please check your connection and try again.'} onRetry={resource.retry} pending={resource.refreshing} /> : resource.data && <>
-      {resource.data.calledNumber ? <QueueNumberDisplay number={resource.data.calledNumber} status={resource.data.serviceState} publicDisplay /> : <><EmptyState className="board-empty" title="No one is being called yet" helper="The next called number will appear here." /><Divider /></>}
+      {entries.length ? entries.map(entry => <div key={entry.displayNumber}><QueueNumberDisplay number={entry.displayNumber} status={entry.serviceState} publicDisplay />{entry.counterLabel && <p>{entry.counterLabel}</p>}</div>) : <><EmptyState className="board-empty" title="No one is being called yet" helper="The next called number will appear here." /><Divider /></>}
       <StatBlock value={resource.data.waitingCount} label="guests waiting" live />
     </>}
   </Card>;

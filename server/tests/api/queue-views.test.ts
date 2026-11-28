@@ -1,3 +1,4 @@
+import { legacyBoard, assertPublicBoard } from '../support/public-board-assertions.js';
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, expect, test } from 'vitest';
@@ -34,24 +35,24 @@ test('TEST-027 anonymous and operator requests cannot read private customer rout
     const response = await detail(id, cookie); expect(response.status).toBe(status); expect(response.body.error.code).toBe(status === 401 ? 'UNAUTHENTICATED' : 'FORBIDDEN');
   }
 });
-test('TEST-028 anonymous board returns exact four-field allowlist and WAITING-only count', async () => {
+test('TEST-028 anonymous board returns exact public allowlist and WAITING-only count', async () => {
   const called = await f.entry('CALLED'); await f.entry('WAITING', await f.actor(), f.queue, 2n); await f.entry('WAITING', await f.actor(), f.queue, 3n);
   const response = await board(); expect(response.status).toBe(200); expect(response.headers['cache-control']).toContain('no-store');
-  expect(response.body).toEqual({ data: { queueCode: f.queue.code, calledNumber: called.displayNumber, serviceState: 'CALLED', waitingCount: 2 } });
+  assertPublicBoard(response.body); expect({ data: legacyBoard(response.body.data) }).toEqual({ data: { queueCode: f.queue.code, calledNumber: called.displayNumber, serviceState: 'CALLED', waitingCount: 2 } });
 });
 test('TEST-029 board reflects CALLED/SERVING fixtures and nulls the completed service slot', async () => {
-  expect((await board()).body).toEqual({ data: { queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 } });
+  expect({ data: legacyBoard((await board()).body.data) }).toEqual({ data: { queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 } });
   const entry = await f.entry('CALLED'); await f.entry('WAITING', await f.actor(), f.queue, 2n);
   for (const status of ['CALLED', 'SERVING', 'COMPLETED'] as const) {
     await db.queueEntry.update({ where: { id: entry.id }, data: { status, counterId: f.counterId } });
-    expect((await board()).body).toEqual({ data: { queueCode: f.queue.code, calledNumber: status === 'COMPLETED' ? null : entry.displayNumber, serviceState: status === 'COMPLETED' ? null : status, waitingCount: 1 } });
+    expect({ data: legacyBoard((await board()).body.data) }).toEqual({ data: { queueCode: f.queue.code, calledNumber: status === 'COMPLETED' ? null : entry.displayNumber, serviceState: status === 'COMPLETED' ? null : status, waitingCount: 1 } });
   }
 });
 test('TEST-031 public board never serializes nested private account, entry or event fields', async () => {
   const entry = await f.entry('CALLED');
   await db.queueEvent.create({ data: { entryId: entry.id, actorId: f.customer.id, eventType: 'JOINED', toStatus: 'CALLED', reason: 'Private fixture detail' } });
   const response = await board(); expect(response.status).toBe(200);
-  expect(Object.keys(response.body.data).sort()).toEqual(['calledNumber', 'queueCode', 'serviceState', 'waitingCount']);
+  expect(Object.keys(response.body.data).sort()).toEqual(['activeEntries', 'calledNumber', 'queueCode', 'serviceState', 'waitingCount']);
   const serialized = JSON.stringify(response.body);
   for (const value of [f.customer.id, entry.id, 'Private fixture detail', 'customerId', 'email', 'passwordHash', 'partySize', 'joinedAt', 'events', 'actorId']) expect(serialized.includes(value)).toBe(false);
 });

@@ -3,6 +3,7 @@ import { mkdirSync } from 'node:fs';
 import { fixture } from '../../../server/tests/support/queue-fixture';
 import { PrismaClient } from '../../../server/node_modules/@prisma/client/index.js';
 import { testDatabaseUrl } from '../../../server/src/infrastructure/test-database';
+import { assertPublicBoard } from './public-board-assertions';
 const db = new PrismaClient({ datasourceUrl: testDatabaseUrl(process.env.TEST_DATABASE_URL, process.env.DATABASE_URL) });
 test.afterAll(() => db.$disconnect());
 
@@ -34,6 +35,14 @@ for (const width of [320, 1280]) test(`S2-TEST-11/12/20: dedicated counters, han
       expect(await host.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     if (evidence) await hostB.screenshot({ path: `${evidence}/occupied-s-${width}.png`, fullPage: true });
+    const publicContext = await browser.newContext({ viewport: { width, height: 1000 } }); contexts.push(publicContext);
+    const publicPage = await publicContext.newPage(); await publicPage.goto('/board/R');
+    await expect(publicPage.getByText('Counter R', { exact: true })).toBeVisible();
+    await expect(publicPage.getByText(rEntry.displayNumber, { exact: true })).toBeVisible();
+    await expect(publicPage.getByText(sEntry.displayNumber, { exact: true })).toHaveCount(0);
+    assertPublicBoard(await (await publicPage.request.get('/api/v1/public/queues/R/board')).json());
+    expect(await publicPage.locator('body').textContent()).not.toContain(rEntry.id);
+    if (evidence) await publicPage.screenshot({ path: `${evidence}/public-counter-r-${width}.png`, fullPage: true });
     const cr = await db.serviceCounter.findUniqueOrThrow({ where: { code: 'R' } });
     const denied = await hostB.request.post(`/api/v1/operator/queues/${f.queue.id}/call-next`, { headers: { Origin: baseURL! }, data: { counterId: cr.id, expectedEntryId: rEntry.id } });
     expect(denied.status()).toBe(409); expect((await denied.json()).error.code).toBe('SERVICE_SLOT_BUSY');

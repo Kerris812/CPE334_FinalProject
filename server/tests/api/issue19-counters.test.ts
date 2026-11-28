@@ -41,6 +41,17 @@ test('S2-TEST-19: nonexistent selected counter is denied without consuming the F
   await rejected(() => post(`/operator/queues/${f.r.id}/call-next`, operator, { counterId: randomUUID(), expectedEntryId: entry.id }), 'COUNTER_ACCESS_DENIED', 403);
 });
 
+test('S2-TEST-24: public active projection exposes only number, configured counter label and state, then clears on release', async () => {
+  const operator = await f.seeded('a'); const { entry } = await f.join(); await f.join();
+  await call(f.r.id, operator);
+  const response = await get(`/public/queues/${f.r.id}/board`);
+  expect(response.status).toBe(200);
+  expect(response.body.data).toEqual({ queueCode: 'R', calledNumber: entry.displayNumber, serviceState: 'CALLED', waitingCount: 1, activeEntries: [{ displayNumber: entry.displayNumber, counterLabel: 'Counter R', serviceState: 'CALLED' }] });
+  await action(entry.id, 'start-service', operator); await action(entry.id, 'complete', operator);
+  const released = await get(`/public/queues/${f.r.id}/board`);
+  expect(released.body.data).toEqual({ queueCode: 'R', calledNumber: null, serviceState: null, waitingCount: 1, activeEntries: [] });
+});
+
 test('S2-TEST-19: absent legacy JSON body resolves the dedicated counter', async () => {
   const operator = await f.seeded('a'); const { entry } = await f.join();
   const response = await request(app).post(`/api/v1/operator/queues/${f.r.id}/call-next`).set('Cookie', operator.cookie).set('Origin', origin).set('Content-Type', 'application/json');

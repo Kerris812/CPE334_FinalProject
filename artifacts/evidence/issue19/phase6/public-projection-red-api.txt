@@ -1,0 +1,39 @@
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/api/issue19-counters.test.ts (24 tests | 1 failed) 644ms
+   × S2-TEST-24: public active projection exposes only number, configured counter label and state, then clears on release 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/issue19-counters.test.ts > S2-TEST-24: public active projection exposes only number, configured counter label and state, then clears on release
+AssertionError: expected { queueCode: 'R', …(3) } to deeply equal { queueCode: 'R', …(4) }
+
+- Expected
++ Received
+
+  {
+-   "activeEntries": [
+-     {
+-       "counterLabel": "Counter R",
+-       "displayNumber": "R-0001",
+-       "serviceState": "CALLED",
+-     },
+-   ],
+    "calledNumber": "R-0001",
+    "queueCode": "R",
+    "serviceState": "CALLED",
+    "waitingCount": 1,
+  }
+
+ ❯ tests/api/issue19-counters.test.ts:49:30
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 passed (24)
+   Start at  19:01:11
+   Duration  884ms (tests 79%, import 13%, transform 7%)
+

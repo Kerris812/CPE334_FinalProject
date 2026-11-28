@@ -1,0 +1,23 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts issue18-cancellation
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "issue18_test", schema "public" at "127.0.0.1:55483"
+
+2 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/chanya/Desktop/CPE334_FinalProject/server
+
+
+ Test Files  15 passed (15)
+      Tests  128 passed (128)
+   Start at  17:28:15
+   Duration  7.83s (tests 89%, import 10%, transform 1%)
+
+    Isolate  15 workers spawned · ~42ms startup each (spawn + environment, per file)
+             at least ~589ms faster with isolate: false — reuses workers across files instead of one per file

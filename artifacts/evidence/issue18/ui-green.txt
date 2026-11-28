@@ -1,0 +1,12 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui issue18-termination
+
+
+ RUN  v5.1.0 /Users/chanya/Desktop/CPE334_FinalProject/client
+
+
+ Test Files  12 passed (12)
+      Tests  82 passed (82)
+   Start at  00:31:55
+   Duration  1.60s (environment 44%, tests 41%, import 11%, transform 4%)

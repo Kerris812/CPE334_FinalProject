@@ -1,6 +1,6 @@
 # Sprint 2 engineering specification
 
-> NaiCha · CPE334 Theme 9 · 28 November 2026 (Asia/Bangkok) · Proposed for review · Target `sprint-2`
+> NaiCha · CPE334 Theme 9 · 28 November 2026 (Asia/Bangkok) · Sprint 2 Engineering Contracts · Target `sprint-2`
 
 [API](api-spec.md) · [UI](ui-spec.md) · [STS](tests.md) · [Issue #17](https://github.com/Kerris812/CPE334_FinalProject/issues/17)
 
@@ -8,11 +8,11 @@
 
 ### Scope and maintained baseline
 
-F-06 through F-10 extend the existing React, Express and PostgreSQL system. Preserve authentication, server roles and queue assignments, shared A/B access to R and S, cross-operator handoff, OPEN-only joins/calls, R for parties 1–4 and S for 5–8, FIFO by immutable per-queue sequence, one active entry per customer across both queues, unique immutable display numbers, transactional persistence and actual-actor auditing. Own-entry reads remain private. The anonymous board retains its legacy scalar fields and WAITING-only count. A separately approved extension would allow a restricted list of active entries. Queue administration, priority, reporting, notifications, reservations, counter administration and automatic no-show processing are outside this increment.
+F-06 through F-10 extend the existing React, Express and PostgreSQL system. Preserve authentication, server roles and queue assignments, shared A/B access to R and S, cross-operator handoff, OPEN-only joins/calls, R for parties 1–4 and S for 5–8, FIFO by immutable per-queue sequence, one active entry per customer across both queues, unique immutable display numbers, transactional persistence and actual-actor auditing. Own-entry reads remain private. The anonymous board retains its legacy scalar fields and WAITING-only count. The board also lists active entries using public-safe fields. Queue administration, priority, reporting, notifications, reservations, counter administration and automatic no-show processing are outside this increment.
 
 | FR | Required outcome |
 | --- | --- |
-| FR-08 | Preserve the privacy-safe anonymous board and WAITING-only count. A proposed additive multi-entry projection is pending approval. |
+| FR-08 | Preserve the privacy-safe anonymous board and WAITING-only count. Include an additive active-entry list with only display number, counter label and service state. |
 | FR-13 | Owner or assigned operator may cancel WAITING. Persist cancellation time, actor and operator reason atomically. |
 | FR-14 | Assigned operator may manually mark an overdue CALLED entry NO_SHOW and release its counter atomically. |
 | FR-15 | See and act on all assigned queues in one dashboard, with independent waiting counts, all active entries and counter state. |
@@ -66,7 +66,7 @@ NFR-01/04/13 preserve identity and least-privilege DTOs, safe error messages and
 | S2-F07-AC-02 | Unauthorized, wrong-state, missing-call-time and repeated requests produce no writes. Start/no-show race commits one edge. Passage of time alone changes no persisted state. |
 | S2-F08-AC-01 | One dashboard shows all assigned queues, WAITING-only totals, all active entries and accurate occupancy. Unassigned queues and private occupant details stay hidden. Revoking one assignment removes that queue from subsequent reads and denies actions from the same session. |
 | S2-F08-AC-02 | Counters and lifecycle controls reflect server state. Success and conflicts refresh the snapshot. Loading, empty, error, responsive and keyboard paths follow UI specification. |
-| S2-F09-AC-01 | While A serves R-0001 at Counter 1, B can call and serve R-0002 at Counter 2. Repeat independently for S. Either operator may finish the other's service. If the public projection is approved, the board lists both active entries using only the public field allowlist. |
+| S2-F09-AC-01 | While A serves R-0001 at Counter 1, B can call and serve R-0002 at Counter 2. Repeat independently for S. Either operator may finish the other's service. The board lists both active entries using only the public field allowlist. |
 | S2-F09-AC-02 | Same-counter requests and same-preview requests have a single winner. Two eligible independent reservations serialize FIFO. PostgreSQL rejects duplicate occupancy, invalid linkage and active status without a counter. An audit insert failure rolls back a call and its reservation. |
 | S2-F09-AC-03 | Complete releases only its counter. Assignment, eligibility, numbering and audit history survive restart, migration and repeat seed. An invalid backfill fails without partial changes. An audit insert failure during completion leaves the counter occupied. |
 | S2-F09-AC-04 | Unassigned queue and ineligible counter requests are rejected without writes. Closed/paused queues reject new calls. Shared counter contention across queues cannot double-book. |
@@ -80,13 +80,13 @@ NFR-01/04/13 preserve identity and least-privilege DTOs, safe error messages and
 | F-01 Authentication | FR-01 | Users, sessions | Maintained release behavior |
 | F-02 Authorization, setup, health | FR-02–04/23/24 | F-01, DB | Maintained with CR-L7-01 shared assignments, F-09 extends seed |
 | F-03 Join and numbering | FR-05/06 | F-01/02 | Maintained, terminal cancellations/no-shows allow rejoin |
-| F-04 Private status and public board | FR-07/08 | F-01–03 | Maintained privacy, F-10 adds private fields, F-09 orders the public scalar deterministically and proposes an additive active list pending approval |
+| F-04 Private status and public board | FR-07/08 | F-01–03 | Maintained privacy, F-10 adds private fields, F-09 orders the public scalar deterministically and adds an active-entry list |
 | F-05 Service lifecycle | FR-09–12 | F-01–04 | Lab 7 handoff maintained, capacity and action projections revised under F-09 |
-| F-06 Cancellation | FR-13 | F-03/05 | Proposed, #18 |
-| F-07 Manual no-show | FR-14 | F-05/09 | Proposed, #18 |
-| F-08 Dashboard | FR-15/22 | F-05–07/09 | Proposed, #20 |
-| F-09 Counters | FR-16/24 | F-02/05 | Proposed revised scope, #19, TA confirmation pending |
-| F-10 Waiting experience | FR-17 | F-04/05/08/09 | Proposed, #20 |
+| F-06 Cancellation | FR-13 | F-03/05 | Planned, #18 |
+| F-07 Manual no-show | FR-14 | F-05/09 | Planned, #18 |
+| F-08 Dashboard | FR-15/22 | F-05–07/09 | Planned, #20 |
+| F-09 Counters | FR-16/24 | F-02/05 | Selected scope, implementation planned in #19 |
+| F-10 Waiting experience | FR-17 | F-04/05/08/09 | Planned, #20 |
 
 ## Part C — System-level SDS
 
@@ -122,11 +122,11 @@ erDiagram
 
 **Writer isolation.** Use PostgreSQL READ COMMITTED. Resolve stored queue identity for entry actions, lock the queue row first, revalidate actor and scope and hold the operator assignment through commit. Customer cancel locks its own user row before queue as join does. Call then locks the selected eligible counter row and rechecks availability in a subsequent statement after lock acquisition. Entry actions re-read stored status and counter under the queue lock, lock that counter where applicable, then perform a guarded update. For legacy calls with no selection, lock eligible counters in stable code order and choose first currently free. All counter writers take queue before counter, counter locks in code order when plural, and never acquire another queue after a counter. Operator paths need only read user state and hold assignment scope, with no customer-row lock. This permits concurrent service across requests and serializes competing claims, including across R/S on a shared counter. FIFO means committed assignment order, independent of HTTP response order. For stale preview, compare expected entry to fresh FIFO head. Never skip a locked FIFO head. Constraints provide a final check against duplicate occupancy. Commit entry, timestamps, occupancy and audit together. Roll back on error, translating known conflicts per API.
 
-**Read isolation.** Fetch dashboard (including history and head ETA), private entry and ETA, desk and public board as separate, internally consistent repeatable-read snapshots. Capture one server as-of time per read. Filter queues by assignments in that snapshot. For a shared counter occupied by an unassigned queue, report busy with occupant null. Compatible desk and board scalar projections use lowest active sequence. The public count always counts WAITING only. The scalar board cannot show a second active number even when two counters serve the queue. Subject to approval, read all active entries for the requested queue in ascending sequence from the same snapshot. Project only displayNumber, counterLabel and serviceState per entry, using the configured public counter name as the label. A separately allowlisted scalar-only response remains the compatibility contract if the proposal is deferred.
+**Read isolation.** Fetch dashboard (including history and head ETA), private entry and ETA, desk and public board as separate, internally consistent repeatable-read snapshots. Capture one server as-of time per read. Filter queues by assignments in that snapshot. For a shared counter occupied by an unassigned queue, report busy with occupant null. Compatible desk and board scalar projections use lowest active sequence. The public count always counts WAITING only. The scalar board cannot show a second active number even when two counters serve the queue. Read all active entries for the requested queue in ascending sequence from the same snapshot. Project only displayNumber, counterLabel and serviceState per entry, using the configured public counter name as the label. The UI supports scalar-only responses from legacy servers.
 
 **Migration and rollout.** Back up PostgreSQL and rehearse on a representative clone. Stop old writers and exclude mixed-version write traffic. Preflight that all active legacy rows belong to configured eligible queues, capacity covers them and CALLED/SERVING timestamps required for ongoing actions exist. In one transactional migration create configuration, backfill R→C1 and S→C2 for existing CALLED/SERVING entries, verify coverage, install constraints and remove `queue_entries_one_service_slot` last. Preserve existing numbers, timestamps, event history, assignments, sessions and WAITING/terminal rows. Abort on unexpected records or constraint failure. Provision stable counter codes and eligibility idempotently without reset or duplicate rows. Verify counts/IDs, constraints, baseline authentication/board smoke, and restart persistence before opening traffic. Follow [Lab 5 rollout and recovery](../labs/lab-05/deployment.md). A Cloud Run traffic rollback alone cannot reverse this migration. After cutover use a compatible build or an approved DB restoration/reconciliation plan. Once parallel service exists, the old one-slot model cannot accept that live state without reconciliation.
 
-**Unaffected components.** Authentication endpoints, session storage, role model, party routing, queue codes, join endpoint contract, queue numbering trigger, health endpoint and legacy public board fields are reused. The additional public allowlist is subject to approval.
+**Unaffected components.** Authentication endpoints, session storage, role model, party routing, queue codes, join endpoint contract, queue numbering trigger, health endpoint and legacy public board fields are reused.
 
 ## Part D — Change and approval record
 
@@ -138,12 +138,13 @@ erDiagram
 | Lab 6 | `1f2bc81` intentional defect and `af2e357` correction appear in isolated Lab 6 history at `478212e`. The correction commit is outside HEAD ancestry. HEAD independently has the correct WAITING-only count and API regression assertions in `server/tests/api/public-board.test.ts`. Current Sprint 2 execution is pending. |
 | CR-L7-01 | [Lab 7 revision 1.1.0](../lab7/README.md) records TA Prapatsorn Sangrod's approval on 23 November 2026. Source approval attachment and teammate contract sign-off remain unverified. `1bd6d75` contracts, `332dffb` shared provisioning, `75a1ff3` maintenance tip and `1a44362` integration establish maintained repository state. [Phase 2 evidence](../../artifacts/evidence/lab7/phase2/phase2-summary.txt) records historical working-tree runs, including 23 focused API, 123 total API, 79 UI and two handoff E2E passes. Those runs do not verify HEAD, deployment or Sprint 2. |
 | Previous F-09 | Sprint 1 D-07/D-26, FR-16 and feature inventory deferred persistent multiple counters per queue to Sprint 2. Issue nickname “multiple queues” describes scope already delivered for R/S. |
-| Revised F-09 | Explicitly replace Lab 7's queue slot with counter occupancy so one operator's active service does not block a second operator with an eligible free counter. Preserve R/S and handoff. Scope/TA approval pending. |
-| Proposed configuration | Two shared counters in total across the restaurant, C1/Counter 1 and C2/Counter 2. Both are eligible for both R and S, and either queue can use both at once. A/B may choose either free counter for an assigned queue and hand off service to one another. No fixed operator-to-counter ownership. Configuration confirmation is pending. Confirm count, shared eligibility, cross-queue capacity policy and operator assignment policy before implementation. |
-| Proposed public projection | Keep legacy scalars and WAITING-only counts. An additive activeEntries array would display simultaneous service while limiting each item to display number, counter label and service state. Approval pending. |
-| Proposed UX/ETA/API | Confirm ETA parameters, shared-capacity approximation, customer/operator reason handling and length, and backward-compatible call/desk/board projections. See Parts C/E and companions. Both teammates' review and approval pending. |
+| Revised F-09 | Explicitly replace Lab 7's queue slot with counter occupancy so one operator's active service does not block a second operator with an eligible free counter. Preserve R/S and handoff. |
+| Counter configuration | Two shared counters in total across the restaurant, C1/Counter 1 and C2/Counter 2. Both are eligible for both R and S, and either queue can use both at once. A/B may choose either free counter for an assigned queue and hand off service to one another. No fixed operator-to-counter ownership. |
+| Public projection | Keep legacy scalars and WAITING-only counts. The additive activeEntries array displays simultaneous service while limiting each item to display number, counter label and service state. |
+| UX, ETA and API decisions | The contract selects the Part E ETA parameters and shared-capacity approximation, the BR-18 cancellation reason rules, and the backward-compatible call, desk and board API projections. See Parts C/E and the companion specifications. |
+| Sprint 2 review | Both teammates must review and sign off on Issue #17 before feature implementation. Sign-off is pending. |
 
-**Impact and observed differences.** The existing schema contains terminal values and timestamps but the transition helper exposes only the service chain. There is no counter table, cancellation/no-show command, customer position or ETA. Desk reads one active entry and UI blocks all further calls until it clears. Public board currently does a scalar active lookup without ordering, safe under the single-slot invariant. Update D-07/D-26, FR-07–17/22/24, BR-07/08/16/17/19–21/26/28 and affected NFR evidence. Replace queue-idle and one-winner-per-queue assumptions in L7-FR-02/04/07, L7-PR-01/03, L7-AC-07/11 and impacted Sprint 1/Lab 7 cases in Part F. Preserve separate queue order, shared assignments and actual actor. Change operator service, projections, lifecycle helper, Prisma/migration/seed and operator/customer UI in implementation issues. The legacy board shows only the lowest-sequence active entry, so simultaneous service can be hidden from customers. The proposed array would show all active numbers in the requested queue while keeping the scalar selection rule. BR-12 still prohibits customer identities, private IDs, audit actors and reasons.
+**Impact and observed differences.** The existing schema contains terminal values and timestamps but the transition helper exposes only the service chain. There is no counter table, cancellation/no-show command, customer position or ETA. Desk reads one active entry and UI blocks all further calls until it clears. Public board currently does a scalar active lookup without ordering, safe under the single-slot invariant. Update D-07/D-26, FR-07–17/22/24, BR-07/08/16/17/19–21/26/28 and affected NFR evidence. Replace queue-idle and one-winner-per-queue assumptions in L7-FR-02/04/07, L7-PR-01/03, L7-AC-07/11 and impacted Sprint 1/Lab 7 cases in Part F. Preserve separate queue order, shared assignments and actual actor. Change operator service, projections, lifecycle helper, Prisma/migration/seed and operator/customer UI in implementation issues. The legacy board shows only the lowest-sequence active entry, so simultaneous service can be hidden from customers. The array shows all active numbers in the requested queue while keeping the scalar selection rule. BR-12 still prohibits customer identities, private IDs, audit actors and reasons.
 
 **Issue routing.** [#17 contracts](https://github.com/Kerris812/CPE334_FinalProject/issues/17), [#18 F-06/F-07](https://github.com/Kerris812/CPE334_FinalProject/issues/18), [#19 F-09](https://github.com/Kerris812/CPE334_FinalProject/issues/19), [#20 F-08/F-10](https://github.com/Kerris812/CPE334_FinalProject/issues/20), [#21 integration and release](https://github.com/Kerris812/CPE334_FinalProject/issues/21). #18 may design cancellation independently, but integrate no-show release with #19 before merging the end-to-end feature. #20 consumes both contracts. #21 records executed commands, SHAs, evidence and release approval. No separate tracked Sprint 2 contract directory was present before this work.
 
@@ -183,7 +184,7 @@ All commands use the identity, transaction, error handling and atomic audit conv
 
 ### F-09 — Service counters
 
-**Requirements and actors.** FR-09–12/16/24, BR-01/02/06/07/11/16/17/20/28. Assigned operator chooses an eligible free counter for an OPEN queue with a WAITING head. The proposed C1/C2 configuration is recorded in Part D.
+**Requirements and actors.** FR-09–12/16/24, BR-01/02/06/07/11/16/17/20/28. Assigned operator chooses an eligible free counter for an OPEN queue with a WAITING head. Part D defines the C1/C2 configuration.
 
 ```mermaid
 sequenceDiagram
@@ -202,7 +203,7 @@ sequenceDiagram
   end
 ```
 
-**Lifecycle.** Start retains the assignment. Complete and manual no-show capture its counter in the event and release only that assignment. A counter occupied by R is also busy for S under the proposed eligibility policy. Two requests specifying the same preview on different counters cannot silently consume successive entries. A queue-only legacy request calls the fresh head using the lowest free counter. Independent counter reservations using separate fresh heads remain legal. On simultaneous unconditioned calls success follows serialized FIFO.
+**Lifecycle.** Start retains the assignment. Complete and manual no-show capture its counter in the event and release only that assignment. A counter occupied by R is also busy for S under the shared eligibility policy in Part D. Two requests specifying the same preview on different counters cannot silently consume successive entries. A queue-only legacy request calls the fresh head using the lowest free counter. Independent counter reservations using separate fresh heads remain legal. On simultaneous unconditioned calls success follows serialized FIFO.
 
 **UI and failure.** Select a free counter against a queue with WAITING entries. The server makes the final eligibility and availability determination and UI refreshes on conflict. All database writes, migration and provisioning follow Part C.
 
@@ -212,7 +213,7 @@ sequenceDiagram
 
 **Requirements and actors.** FR-07/15/17, BR-01/10/11/12/21. Owner reads own entry, operator reads next WAITING ETA per assigned queue, public projection stays restricted. Estimate indicates elapsed time until call from server as-of, measured in rounded-up whole minutes.
 
-**Proposed deterministic estimator.** Use one as-of clock and database snapshot. Position is 1 plus smaller-sequence WAITING entries in the same queue. For service duration D in ms, select up to 20 most recent valid same-queue COMPLETED rows at or before as-of, sorted completedAt descending then ID ascending. Valid duration is positive completedAt minus servingAt. Use arithmetic mean of valid durations if at least five exist, otherwise D = 600,000 ms. Calculate D separately for each queue represented by busy eligible counters, using its completed history internally. Do not expose those inputs.
+**Deterministic estimator.** Use one as-of clock and database snapshot. Position is 1 plus smaller-sequence WAITING entries in the same queue. For service duration D in ms, select up to 20 most recent valid same-queue COMPLETED rows at or before as-of, sorted completedAt descending then ID ascending. Valid duration is positive completedAt minus servingAt. Use arithmetic mean of valid durations if at least five exist, otherwise D = 600,000 ms. Calculate D separately for each queue represented by busy eligible counters, using its completed history internally. Do not expose those inputs.
 
 ```mermaid
 flowchart TD
@@ -252,7 +253,7 @@ Feature criteria below use the full IDs from Part A. Every S2-TEST ID resolves t
 | F-07 | FR-14 | BR-08/11/16/19/26 | S2-F07-AC-02 | Guarded lifecycle | No-show, start-service | S2-TEST-07, S2-TEST-08 | #18, #19 |
 | F-02/08 | FR-02/03/15 | BR-07/11/12/20/28 | S2-F08-AC-01 | Scoped snapshot and assignment recheck | Dashboard, desk and operator actions | S2-TEST-09 | #20 |
 | F-08 | FR-15/22 | BR-16/18–20/28 | S2-F08-AC-02 | Resource controller and action dispatch | Dashboard and operator mutations | S2-TEST-10, S2-TEST-11 | #20 |
-| F-04/05/09 | FR-08–12/16 | BR-01/02/07/12/17/20 | S2-F09-AC-01 | Reservation, lifecycle, public scalar and conditional active list | Call-next, start-service, complete, board | S2-TEST-12, S2-TEST-24 | #19 |
+| F-04/05/09 | FR-08–12/16 | BR-01/02/07/12/17/20 | S2-F09-AC-01 | Reservation, lifecycle, public scalar and active list | Call-next, start-service, complete, board | S2-TEST-12, S2-TEST-24 | #19 |
 | F-05/09 | FR-09/16 | BR-01/02/07/16/17/20 | S2-F09-AC-02 | Locks, preview, constraints and audit rollback | Call-next and picker | S2-TEST-13, S2-TEST-14, S2-TEST-15, S2-TEST-16, S2-TEST-27 | #19 |
 | F-09 | FR-11/16/24 | BR-05/07/17/20 | S2-F09-AC-03 | Completion, migration and provisioning | Desk, complete and dashboard | S2-TEST-17, S2-TEST-18, S2-TEST-27 | #19 |
 | F-09 | FR-09/16 | BR-06/07/11/16/20/28 | S2-F09-AC-04 | Eligibility and OPEN guard | Call-next and picker | S2-TEST-19, S2-TEST-20 | #19 |
@@ -267,7 +268,7 @@ Carry forward the original [Sprint 1 Part B matrix](../sprint-1/specification.md
 | --- | --- | --- |
 | F-01/02 · FR-01–04/23/24 · BR-09/11/13/14/28 | AC/TEST-001–015, L7-AC-01/12–15 and corresponding Lab 7 cases | Retain auth, role, true unassignment, health and repeat provisioning. Use shared A/B seed expectations. Carry forward L7-007 with S2-TEST-09, including revocation with a live session. Extend seed and restart with S2-TEST-17/18/25. |
 | F-03 · FR-05/06 · BR-03–06/15/27 | AC/TEST-016–024, L7-AC-10/13/15 | Retain routing, joins, sequence and cross-queue duplicate prevention. Strengthen TEST-019/020 with a simultaneous R/S join by one customer in S2-TEST-25. Add cancellation rejoin in S2-TEST-01/02 and repeat join after NO_SHOW in S2-TEST-23. |
-| F-04 · FR-07/08/22 · BR-10/12 | AC/TEST-025–031 | Retain owner/foreign access and the legacy public field allowlist. If approved, verify the extended list against its separate allowlist in S2-TEST-24. Revise exact private DTO tests for additive nullable fields. Extend board occupancy and WAITING-only assertions with S2-TEST-23/24. |
+| F-04 · FR-07/08/22 · BR-10/12 | AC/TEST-025–031 | Retain owner/foreign access and the legacy public field allowlist. Verify the extended list against its separate allowlist in S2-TEST-24. Revise exact private DTO tests for additive nullable fields. Extend board occupancy and WAITING-only assertions with S2-TEST-23/24. |
 | F-05 · FR-09–12 · BR-01/02/06/08/09/11/17/26/28 | AC/TEST-032/033/035–039/041–044; L7-AC-02–06/08/09/12–14 | Retain valid service order, terminal immutability, OPEN guard, distinct actors and FIFO. Supply compatible counters. Update operator desk mocks/journeys, replace queue-selector and 0/1 assertions with both queue sections and per-counter state. Add S2-TEST-10/11/12/19. |
 | F-05/09 · FR-09/16 · BR-07/16/20 | AC/TEST-034/040, TEST-056, L7-AC-07/11 and L7-011/015 | Revise single-slot and one-winner-per-queue assertions to explicit same-counter contention. Test both independent counters and cross-queue shared contention. Revise stress variants to pin the same counter or assert capacity-bounded successes in FIFO order. S2-TEST-12–16/20. |
 | F-05/08/09 · FR-11/12/15/16/22 | TEST-043/057, L7-005/010/018/019/020 | Keep handoff, audit atomicity and independent-queue lock checks. Use distinct counters for independent-queue tests. Replace selected-queue stale desk assumptions with scoped dashboard refresh and entry-specific controls. S2-TEST-08/10–12/17/27. S2-TEST-27 extends TEST-041 and L7-020 with rollback assertions for counter reservation and release. |
@@ -280,10 +281,10 @@ Affected executable suites include `operator-workflow.test.ts`, `party-routing.t
 | --- | --- |
 | S2-AC-001 | Parts A–E and companion API/UI cover all five features. |
 | S2-AC-002 | Shared Lab 7 scope and actual-actor handoff specified and carried into tests. |
-| S2-AC-003 | Counter scope, rationale and pending TA confirmation recorded in Part D. |
+| S2-AC-003 | Part D records the selected F-09 scope and rationale. |
 | S2-AC-004 | Part A defines permissions, rules and state graph. |
 | S2-AC-005 | Part F maps all feature acceptance criteria to planned STS cases. |
 | S2-AC-006 | Part F carries forward Sprint 1 and Lab 7 traceability and records revisions. |
-| S2-AC-007 | Package ready for both teammates to review. GitHub issue approval criterion remains pending. |
+| S2-AC-007 | Contracts finalized for teammate review. Both teammates’ sign-off on Issue #17 is pending. |
 
-Reviewers should resolve Part D decisions, walk through same-counter contention, same-head races and shared-counter ETA, and check the migration/rollback boundary against real deployment assumptions. Record TA scope confirmation and both teammates’ sign-off on #17 before feature implementation. After review, commit the four documents for integration into `sprint-2`.
+Reviewers should check the Part D decisions, walk through same-counter contention, same-head races and shared-counter ETA, and check the migration/rollback boundary against real deployment assumptions. Record both teammates’ sign-off on #17 before feature implementation. After review, commit the four documents for integration into `sprint-2`.

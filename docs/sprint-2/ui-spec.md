@@ -1,6 +1,6 @@
 # Sprint 2 UI specification
 
-[Engineering specification](specification.md) · [API](api-spec.md) · [Sprint 1 UI](../sprint-1/ui-spec.md) · Proposed for review
+[Engineering specification](specification.md) · [API](api-spec.md) · [Sprint 1 UI](../sprint-1/ui-spec.md) · Sprint 2 Engineering Contracts
 
 ## Customer queue
 
@@ -35,4 +35,4 @@ Support 320 CSS px without horizontal page scroll and test 1280 CSS px on deskto
 
 The legacy board displays one active number and service state. While two counters serve the same queue, it shows only the lowest-sequence active entry. The WAITING-only count is independent of that display.
 
-**Proposed, pending approval.** When the API supplies `activeEntries`, render one row per active entry in API order with its display number, counter label and service state. When the array is empty, show the existing empty state. When the array is absent, use the legacy scalar display. Keep the WAITING-only count visible in every state. Only the allowlisted public fields appear, including in accessible text. Customer identities, private IDs, audit actors and reasons are excluded.
+When the API supplies `activeEntries`, render one row per active entry in API order with its display number, counter label and service state. When the array is empty, show the existing empty state. When the array is absent, use the legacy scalar display. Keep the WAITING-only count visible in every state. Only the allowlisted public fields appear, including in accessible text. Customer identities, private IDs, audit actors and reasons are excluded.

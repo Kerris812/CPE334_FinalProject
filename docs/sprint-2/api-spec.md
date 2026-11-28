@@ -1,6 +1,6 @@
 # Sprint 2 API specification
 
-[Engineering specification](specification.md) · [Sprint 1 API](../sprint-1/api-spec.md) · Proposed for review
+[Engineering specification](specification.md) · [Sprint 1 API](../sprint-1/api-spec.md) · Sprint 2 Engineering Contracts
 
 ## Common contract
 
@@ -105,7 +105,7 @@ For entry mutations use the same entry UUID under `/operator/entries/`, appendin
 
 ## Public compatibility projection
 
-`GET /public/queues/:queueId/board` is anonymous and accepts R/S or a queue UUID, with 404 QUEUE_NOT_FOUND otherwise. Count WAITING only. In one read snapshot pick the smallest sequence CALLED or SERVING, or return null for both scalar fields if none. The legacy response has exactly the four fields shown below and represents only one active number even when two counters serve the queue.
+`GET /public/queues/:queueId/board` is anonymous and accepts R/S or a queue UUID, with 404 QUEUE_NOT_FOUND otherwise. Count WAITING only. In one read snapshot pick the smallest sequence CALLED or SERVING, or return null for both scalar fields if none. The legacy response shown below has exactly four fields and represents one active number. The Sprint 2 response retains those fields and adds the active-entry list.
 
 ```http
 GET /api/v1/public/queues/R/board
@@ -115,9 +115,9 @@ GET /api/v1/public/queues/R/board
 {"data":{"queueCode":"R","calledNumber":"R-0001","serviceState":"SERVING","waitingCount":2}}
 ```
 
-### Proposed additive projection — approval pending
+### Sprint 2 active-entry projection
 
-If approved, the same endpoint also returns `activeEntries`, an array ordered by ascending queue sequence from the same snapshot as the scalar fields and count. Return `[]` when no entry is active. Each item has exactly `displayNumber` (string), `counterLabel` (configured public counter name, string) and `serviceState` (`CALLED` or `SERVING`). Include only entries in the requested queue. The scalar fields still represent the first item or are both null when empty. Neither projection exposes customer identities, private IDs (including entry, queue and counter IDs), audit actors, reasons or private timestamps.
+The same endpoint also returns `activeEntries`, an array ordered by ascending queue sequence from the same snapshot as the scalar fields and count. Return `[]` when no entry is active. Each item has exactly `displayNumber` (string), `counterLabel` (configured public counter name, string) and `serviceState` (`CALLED` or `SERVING`). Include only entries in the requested queue. The scalar fields still represent the first item or are both null when empty. Neither projection exposes customer identities, private IDs (including entry, queue and counter IDs), audit actors, reasons or private timestamps.
 
 ```json
 {"data":{"queueCode":"R","calledNumber":"R-0001","serviceState":"SERVING","waitingCount":2,"activeEntries":[{"displayNumber":"R-0001","counterLabel":"Counter 1","serviceState":"SERVING"},{"displayNumber":"R-0002","counterLabel":"Counter 2","serviceState":"CALLED"}]}}

@@ -3,7 +3,7 @@ import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, expect, test } from 'vitest';
 import { createApp } from '../../src/app.js';
 import { db, setup, fixture, origin, type Fixture } from '../support/queue-fixture.js';
-import { assertPublicBoard } from '../support/public-board-assertions.js';
+import { assertPublicBoard, legacyBoard } from '../support/public-board-assertions.js';
 const app = createApp({ db, webOrigin: origin }); let f: Fixture;
 beforeAll(setup); beforeEach(async () => { f = await fixture(); }); afterEach(() => f.clean()); afterAll(() => db.$disconnect());
 async function board(cookie?: string) {
@@ -11,28 +11,28 @@ async function board(cookie?: string) {
   const response = await (cookie ? pending.set('Cookie', cookie) : pending);
   expect(response.status).toBe(200); assertPublicBoard(response.body); return response;
 }
-test('TEST-028 anonymous board recursively exposes exactly four approved primitive fields', async () => {
+test('TEST-028 anonymous board recursively exposes the approved scalar and active-entry fields', async () => {
   const called = await f.entry('CALLED'); await f.entry('WAITING', await f.actor(), f.queue, 2n);
   const before = await f.state();
   for (const cookie of [undefined, 'qs_session=malformed']) {
     const response = await board(cookie);
-    expect(response.body).toEqual({ data: { queueCode: f.queue.code, calledNumber: called.displayNumber, serviceState: 'CALLED', waitingCount: 1 } });
+    expect({ data: legacyBoard(response.body.data) }).toEqual({ data: { queueCode: f.queue.code, calledNumber: called.displayNumber, serviceState: 'CALLED', waitingCount: 1 } });
     expect(response.headers['cache-control']).toContain('no-store'); expect(response.headers['set-cookie']).toBeUndefined();
   }
   expect(await f.state()).toEqual(before);
 });
 test('TEST-029 CALLED to SERVING, waiting changes, completion and empty queues reflect PostgreSQL', async () => {
-  expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 });
+  expect(legacyBoard((await board()).body.data)).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 });
   const current = await f.entry('CALLED'); const waiting = await f.entry('WAITING', await f.actor(), f.queue, 2n);
   const foreignQueue = await f.newQueue(); await f.entry('CALLED', await f.actor(), foreignQueue); await f.entry('WAITING', await f.actor(), foreignQueue, 2n);
-  expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: current.displayNumber, serviceState: 'CALLED', waitingCount: 1 });
+  expect(legacyBoard((await board()).body.data)).toEqual({ queueCode: f.queue.code, calledNumber: current.displayNumber, serviceState: 'CALLED', waitingCount: 1 });
   await db.queueEntry.update({ where: { id: current.id }, data: { status: 'SERVING' } });
   await f.entry('WAITING', await f.actor(), f.queue, 3n);
-  expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: current.displayNumber, serviceState: 'SERVING', waitingCount: 2 });
+  expect(legacyBoard((await board()).body.data)).toEqual({ queueCode: f.queue.code, calledNumber: current.displayNumber, serviceState: 'SERVING', waitingCount: 2 });
   await db.queueEntry.update({ where: { id: current.id }, data: { status: 'COMPLETED' } });
-  expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 2 });
-  await db.queueEntry.update({ where: { id: waiting.id }, data: { status: 'CALLED' } });
-  expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: waiting.displayNumber, serviceState: 'CALLED', waitingCount: 1 });
+  expect(legacyBoard((await board()).body.data)).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 2 });
+  await db.queueEntry.update({ where: { id: waiting.id }, data: { status: 'CALLED', counterId: f.counterId } });
+  expect(legacyBoard((await board()).body.data)).toEqual({ queueCode: f.queue.code, calledNumber: waiting.displayNumber, serviceState: 'CALLED', waitingCount: 1 });
 });
 test('TEST-031 deeply related customer, session, entry and audit data cannot leak through public JSON', async () => {
   const current = await f.entry('CALLED'); const waiting = await f.entry('WAITING', await f.actor(), f.queue, 2n);

@@ -64,7 +64,7 @@ test('TEST-043 real customer and operator workflow reflects on my-queue and publ
     await host.getByRole('button', { name: 'Complete Service', exact: true }).click(); await expect(host.getByText('Service completed.')).toBeVisible();
     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible(); await page.reload(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible();
     await board.reload(); await expect(board.getByText('No one is being called yet', { exact: true })).toBeVisible();
-    const response = await board.request.get(`/api/v1/public/queues/${queue.id}/board`); expect(Object.keys((await response.json()).data).sort()).toEqual(['calledNumber', 'queueCode', 'serviceState', 'waitingCount']);
+    const response = await board.request.get(`/api/v1/public/queues/${queue.id}/board`); expect(Object.keys((await response.json()).data).sort()).toEqual(['activeEntries', 'calledNumber', 'queueCode', 'serviceState', 'waitingCount']);
     const entry = await db.queueEntry.findFirstOrThrow({ where: { customerId: customer.id } }); expect(entry.status).toBe('COMPLETED'); expect(await db.queueEvent.count({ where: { entryId: entry.id } })).toBe(4);
   } finally { await hostContext.close(); await boardContext.close(); }
 });

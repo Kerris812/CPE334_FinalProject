@@ -1,0 +1,24 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "issue19_red_complete_test", schema "public" at "127.0.0.1:55489"
+
+3 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+
+ Test Files  20 passed (20)
+      Tests  170 passed (170)
+   Start at  19:03:00
+   Duration  15.81s (tests 90%, import 9%, transform 1%)
+
+    Isolate  20 workers spawned · ~54ms startup each (spawn + environment, per file)
+             at least ~1.04s faster with isolate: false — reuses workers across files instead of one per file
+

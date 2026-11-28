@@ -1,3 +1,4 @@
+import { assertPublicBoard as publicShape } from './public-board-assertions';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -9,11 +10,7 @@ const customerPassword = process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOM
 const operatorPassword = process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD;
 const evidence = process.env.LAB7_EVIDENCE_DIR ?? '../artifacts/evidence/sprint1';
 test.afterAll(() => db.$disconnect());
-function publicShape(body: unknown) {
-  const paths: string[] = [];
-  function visit(value: unknown, prefix = '') { if (value !== null && typeof value === 'object') { expect(Array.isArray(value)).toBe(false); for (const [key, child] of Object.entries(value)) { const path = prefix ? `${prefix}.${key}` : key; paths.push(path); visit(child, path); } } }
-  visit(body); expect(paths.sort()).toEqual(['data', 'data.calledNumber', 'data.queueCode', 'data.serviceState', 'data.waitingCount'].sort());
-}
+
 async function fits(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   for (const button of await page.getByRole('button').all()) {
@@ -64,7 +61,7 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
     await host.getByRole('button', { name: 'Complete Service', exact: true }).click(); await expect(host.getByText('Service completed.')).toBeVisible();
     await customer.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(customer.getByText('COMPLETED', { exact: true })).toBeVisible(); await customer.reload(); await expect(customer.getByText('COMPLETED', { exact: true })).toBeVisible(); await fits(customer);
     await customer.screenshot({ path: `${evidence}/customer-completed-mobile.png`, fullPage: true });
-    const boardResponse = await board.request.get('/api/v1/public/queues/R/board'); expect(boardResponse.status()).toBe(200); const publicBody = await boardResponse.json(); publicShape(publicBody); expect(publicBody.data).toEqual({ queueCode: 'R', calledNumber: null, serviceState: null, waitingCount: 0 });
+    const boardResponse = await board.request.get('/api/v1/public/queues/R/board'); expect(boardResponse.status()).toBe(200); const publicBody = await boardResponse.json(); publicShape(publicBody); expect(publicBody.data).toEqual({ queueCode: 'R', calledNumber: null, serviceState: null, waitingCount: 0, activeEntries: [] });
     expect((await board.context().cookies()).some(cookie => cookie.name === 'qs_session')).toBe(false); await expect(board.getByRole('button', { name: 'Log out' })).toHaveCount(0);
     await login(otherCustomer, 'customer.b@example.test', customerPassword); const foreign = await otherCustomer.request.get(`/api/v1/customer/entries/${entryId}`); const foreignBody = await foreign.json(); expect(foreign.status()).toBe(404); expect(foreignBody.error.code).toBe('ENTRY_NOT_FOUND');
     const before = await db.queueEntry.findUniqueOrThrow({ where: { id: entryId } }); const beforeEvents = await db.queueEvent.findMany({ where: { entryId }, orderBy: { occurredAt: 'asc' } });

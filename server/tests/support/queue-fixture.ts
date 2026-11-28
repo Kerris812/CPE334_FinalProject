@@ -15,19 +15,23 @@ export async function fixture(client = db) {
     return { id: user.id, cookie: `qs_session=${token}` };
   }
   async function queue() {
-    const row = await client.queue.create({ data: { code: `T${randomUUID().replaceAll('-', '').slice(0, 7).toUpperCase()}`, name: 'Queue fixture restaurant' } }); queues.push(row.id); return row;
+    const row = await client.queue.create({ data: { code: `T${randomUUID().replaceAll('-', '').slice(0, 7).toUpperCase()}`, name: 'Queue fixture restaurant' } }); queues.push(row.id);
+    await client.serviceCounter.create({ data: { code: row.code, name: `Counter ${row.code}`, queueId: row.id } });
+    return row;
   }
   const customer = await actor();
   const initial = await client.queue.findUniqueOrThrow({ where: { code: 'R' } });
+  const initialCounter = await client.serviceCounter.findFirstOrThrow({ where: { queueId: initial.id } });
   const snapshots = new Map<string, Queue>([[initial.id, initial]]);
   async function seeded(code: string) { const row = await client.queue.findUniqueOrThrow({ where: { code } }); if (!snapshots.has(row.id)) snapshots.set(row.id, row); return row; }
   const f = {
-    customer, queue: initial, actor, newQueue: queue,
+    customer, queue: initial, counterId: initialCounter.id, actor, newQueue: queue,
     async useR(): Promise<void> { f.queue = await seeded('R'); },
     async useS() { return seeded('S'); },
     async entry(status: EntryStatus = 'WAITING', who = customer, target?: Queue, sequence = 1n): Promise<QueueEntry> {
       target ??= f.queue;
-      return db.queueEntry.create({ data: { customerId: who.id, queueId: target.id, partySize: 4, status, sequence, displayNumber: `${target.code}-${sequence.toString().padStart(4, '0')}` } });
+      const counter = ['CALLED', 'SERVING'].includes(status) ? await client.serviceCounter.findFirstOrThrow({ where: { queueId: target.id } }) : null;
+      return client.queueEntry.create({ data: { customerId: who.id, queueId: target.id, counterId: counter?.id, partySize: 4, status, sequence, displayNumber: `${target.code}-${sequence.toString().padStart(4, '0')}` } });
     },
     async state() {
       return { queues: await client.queue.findMany({ where: { id: { in: [...snapshots.keys(), ...queues] } }, orderBy: { id: 'asc' } }), entries: await client.queueEntry.findMany({ where: { customerId: { in: users } }, orderBy: { id: 'asc' } }), events: await client.queueEvent.findMany({ where: { entry: { customerId: { in: users } } }, orderBy: { id: 'asc' } }) };
@@ -38,6 +42,7 @@ export async function fixture(client = db) {
       await client.session.deleteMany({ where: { userId: { in: users } } });
       await client.operatorQueueAssignment.deleteMany({ where: { operatorId: { in: users } } });
       await client.user.deleteMany({ where: { id: { in: users } } });
+      await client.serviceCounter.deleteMany({ where: { queueId: { in: queues } } });
       await client.queue.deleteMany({ where: { id: { in: queues } } });
       for (const row of snapshots.values()) await client.queue.update({ where: { id: row.id }, data: { lastSequence: row.lastSequence, state: row.state } });
     },

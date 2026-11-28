@@ -1,0 +1,36 @@
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ❯ tests/api/issue19-audit-errors.test.ts (2 tests | 2 failed) 275ms
+   × S2-TEST-27: audit unique violation during call is INTERNAL_ERROR with atomic rollback 69ms
+   × S2-TEST-27: audit unique violation during complete is INTERNAL_ERROR with atomic rollback 25ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/issue19-audit-errors.test.ts > S2-TEST-27: audit unique violation during call is INTERNAL_ERROR with atomic rollback
+ FAIL  tests/api/issue19-audit-errors.test.ts > S2-TEST-27: audit unique violation during complete is INTERNAL_ERROR with atomic rollback
+AssertionError: expected 409 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 409
+
+ ❯ rejected tests/support/lab7-fixture.ts:34:27
+     32|   const before = await snapshot();
+     33|   const response = await run();
+     34|   expect(response.status).toBe(status);
+       |                           ^
+     35|   expect(response.body.error).toEqual({ code, message: expect.any(Stri…
+     36|   expect(await snapshot()).toEqual(before);
+ ❯ tests/api/issue19-audit-errors.test.ts:15:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  18:54:33
+   Duration  497ms (tests 64%, import 25%, transform 10%)
+

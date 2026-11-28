@@ -1,0 +1,17 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+
+ Test Files  13 passed (13)
+      Tests  88 passed (88)
+   Start at  02:03:00
+   Duration  3.28s (environment 46%, tests 45%, import 8%, transform 2%)
+
+Environment  jsdom was created 13 times · 9.19s total, 46% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

@@ -1,5 +1,7 @@
 # Sprint 2 software test specification
 
+> **Issue #19 scope revision:** [Approved dedicated-counter design](issue-19-design-decision.md) supersedes conflicting F-09 capacity, linkage, API and test expectations below.
+
 [Engineering specification](specification.md) · [API](api-spec.md) · [UI](ui-spec.md) · [Sprint 1 STS](../sprint-1/tests.md) · [Lab 7 STS](../lab7/sts-revision.md)
 
 > Sprint 2 Engineering Contracts

@@ -49,6 +49,7 @@ for (const width of [360, 1440]) for (const name of pages) {
       if (!['error','loading','empty'].includes(state) || (name === 'login' && state === 'empty')) {
         const actual = await currentTypography(page, name);
         const expected = Object.fromEntries(Object.keys(actual).map(key => [key, reference[key]]));
+        if (actual.wordmark) expected.wordmark = { family: 'Georgia, \"Times New Roman\", serif', size: width === 360 ? '32px' : '48px', weight: '700' };
         writeFileSync(`${root}/typography-${name}-${width}.json`, JSON.stringify({ reference: expected, actual }, null, 2));
         expect(actual).toEqual(expected);
       }

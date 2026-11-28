@@ -1,5 +1,7 @@
 # Sprint 2 engineering specification
 
+> **Issue #19 scope revision:** [Approved dedicated-counter design](issue-19-design-decision.md) supersedes conflicting F-09 capacity, linkage, API and test expectations below.
+
 > NaiCha · CPE334 Theme 9 · 28 November 2026 (Asia/Bangkok) · Sprint 2 Engineering Contracts · Target `sprint-2`
 
 [API](api-spec.md) · [UI](ui-spec.md) · [STS](tests.md) · [Issue #17](https://github.com/Kerris812/CPE334_FinalProject/issues/17)

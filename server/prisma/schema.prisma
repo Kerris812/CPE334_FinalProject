@@ -58,7 +58,19 @@ model Queue {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   entries QueueEntry[]
   assignments OperatorQueueAssignment[]
+  counters ServiceCounter[]
   @@map("queues")
+}
+model ServiceCounter {
+  id String @id @default(uuid()) @db.Uuid
+  code String @unique @db.VarChar(8)
+  name String @db.VarChar(100)
+  queueId String @map("queue_id") @db.Uuid
+  queue Queue @relation(fields: [queueId], references: [id], onDelete: Restrict)
+  entries QueueEntry[]
+  @@unique([id, queueId])
+  @@index([queueId])
+  @@map("service_counters")
 }
 model OperatorQueueAssignment {
   operatorId String @map("operator_id") @db.Uuid
@@ -74,6 +86,7 @@ model QueueEntry {
   id String @id @default(uuid()) @db.Uuid
   queueId String @map("queue_id") @db.Uuid
   customerId String @map("customer_id") @db.Uuid
+  counterId String? @map("counter_id") @db.Uuid
   sequence BigInt
   displayNumber String @unique @map("display_number") @db.VarChar(32)
   partySize Int @map("party_size") @db.SmallInt
@@ -87,6 +100,7 @@ model QueueEntry {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   queue Queue @relation(fields: [queueId], references: [id], onDelete: Restrict)
   customer User @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  counter ServiceCounter? @relation(fields: [counterId, queueId], references: [id, queueId], onDelete: Restrict)
   events QueueEvent[]
   @@unique([queueId, sequence])
   @@index([queueId, status, sequence])

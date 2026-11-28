@@ -11,6 +11,21 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 async function mount() { await act(async () => { render(<PublicQueueBoard queueId="queue-id" />); }); }
+test('S2-TEST-24: public active list renders its counter label and strips private properties', async () => {
+  mock.mockResolvedValue(response(200, { data: { ...board, activeEntries: [{ displayNumber: 'R-10000', counterLabel: 'Counter R', serviceState: 'CALLED', entryId: 'private-entry', actor: 'private-actor' }] } }));
+  await mount();
+  expect(screen.getByText('Counter R')).toBeTruthy();
+  expect(screen.getByText('R-10000')).toBeTruthy();
+  expect(document.body.textContent).not.toContain('private-entry');
+  expect(document.body.textContent).not.toContain('private-actor');
+});
+test('S2-TEST-24: explicit empty active list overrides stale scalars and preserves waiting count', async () => {
+  mock.mockResolvedValue(response(200, { data: { ...board, activeEntries: [] } }));
+  await mount();
+  expect(screen.getByText('No one is being called yet')).toBeTruthy();
+  expect(screen.queryByText('R-10000')).toBeNull();
+  expect(screen.getByLabelText('Waiting guests').textContent).toBe('2');
+});
 test('TEST-028 anonymous board labels all four public values without showing extra private response data', async () => {
   mock.mockResolvedValueOnce(response(200, { data: { ...board, customer: { displayName: 'Private guest', email: 'private@example.test' }, partySize: 7 } }));
   await mount();

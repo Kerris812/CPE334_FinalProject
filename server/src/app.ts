@@ -53,7 +53,7 @@ export function createApp(options: AppOptions = {}) {
     res.json({ data: queues });
   });
   app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db), async (req, res) => { res.json({ data: await readDesk(db, currentUser(res).id, String(req.params.queueId), now) }); });
-  app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { queueId: String(req.params.queueId) }) }); });
+  app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { queueId: String(req.params.queueId), body: req.body }) }); });
   app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'SERVING' }) }); });
   app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'COMPLETED' }) }); });
   app.post('/api/v1/operator/entries/:entryId/cancel', requireEntryAssignment(db), async (req, res) => { res.json({ data: await cancelEntry(db, { id: currentUser(res).id, role: 'OPERATOR' }, req.params.entryId, req.body, now) }); });

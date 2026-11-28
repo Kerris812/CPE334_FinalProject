@@ -1,3 +1,4 @@
+import { assertPublicBoard as assertPublic } from './public-board-assertions';
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -13,26 +14,18 @@ test.beforeEach(async () => {
   const seeded = await db.user.findUniqueOrThrow({ where: { email: 'customer.a@example.test' } });
   for (let i = 0; i < 2; i++) customers.push(await db.user.create({ data: { email: `board-${randomUUID()}@example.test`, displayName: `Private board guest ${i}`, role: 'CUSTOMER', passwordHash: seeded.passwordHash } }));
   queue = await db.queue.create({ data: { code: `B${randomUUID().replaceAll('-', '').slice(0, 4).toUpperCase()}`, name: 'Private restaurant detail' } });
-  current = await db.queueEntry.create({ data: { queueId: queue.id, customerId: customers[0].id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED' } });
+  await db.serviceCounter.create({ data: { code: queue.code, name: 'Fixture counter', queueId: queue.id } });
+  current = await db.queueEntry.create({ data: { queueId: queue.id, customerId: customers[0].id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED', counterId: (await db.serviceCounter.findFirstOrThrow({ where: { queueId: queue.id } })).id } });
   waiting = await db.queueEntry.create({ data: { queueId: queue.id, customerId: customers[1].id, sequence: 10001n, displayNumber: `${queue.code}-10001`, partySize: 2, status: 'WAITING' } });
 });
 test.afterEach(async () => {
   const ids = customers.map(row => row.id);
   await db.queueEvent.deleteMany({ where: { entry: { customerId: { in: ids } } } }); await db.queueEntry.deleteMany({ where: { customerId: { in: ids } } });
   await db.session.deleteMany({ where: { userId: { in: ids } } }); await db.user.deleteMany({ where: { id: { in: ids } } }); customers = [];
-  if (queue) await db.queue.delete({ where: { id: queue.id } });
+  if (queue) { await db.serviceCounter.deleteMany({ where: { queueId: queue.id } }); await db.queue.delete({ where: { id: queue.id } }); }
 });
 test.afterAll(() => db.$disconnect());
-function assertPublic(body: unknown) {
-  const paths: string[] = [];
-  function visit(value: unknown, path: string) {
-    if (value !== null && typeof value === 'object') {
-      expect(Array.isArray(value)).toBe(false);
-      for (const [key, child] of Object.entries(value)) { const next = path ? `${path}.${key}` : key; paths.push(next); visit(child, next); }
-    }
-  }
-  visit(body, ''); expect(paths.sort()).toEqual(['data', 'data.calledNumber', 'data.queueCode', 'data.serviceState', 'data.waitingCount'].sort());
-}
+
 test('TEST-029 anonymous board polls real status/count changes, pauses when hidden and retries errors', async ({ page, context }) => {
   const bodies: Promise<unknown>[] = [];
   page.on('response', response => { if (response.url().endsWith(`/queues/${queue.id}/board`) && response.status() === 200) bodies.push(response.json()); });

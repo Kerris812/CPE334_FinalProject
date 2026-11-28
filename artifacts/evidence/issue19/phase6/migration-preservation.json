@@ -1,0 +1,58 @@
+{
+  "preservedCounts": {
+    "users": 8,
+    "sessions": 1,
+    "queues": 2,
+    "operator_queue_assignments": 4,
+    "queue_entries": 6,
+    "queue_events": 6
+  },
+  "countersBeforeRepeatedSeed": [
+    {
+      "id": "b3b7cf2e-76e6-4589-a170-a0de1fb69adf",
+      "code": "R",
+      "name": "Counter R",
+      "queueId": "e1e1d3d4-0573-127e-9ee0-480caf1283d6"
+    },
+    {
+      "id": "daac3e00-2da1-4a07-95d6-cdf898f800fb",
+      "code": "S",
+      "name": "Counter S",
+      "queueId": "5dbc98dc-c983-a707-28bd-082d1a47546e"
+    }
+  ],
+  "countersAfterRepeatedSeed": [
+    {
+      "id": "b3b7cf2e-76e6-4589-a170-a0de1fb69adf",
+      "code": "R",
+      "name": "Counter R",
+      "queueId": "e1e1d3d4-0573-127e-9ee0-480caf1283d6"
+    },
+    {
+      "id": "daac3e00-2da1-4a07-95d6-cdf898f800fb",
+      "code": "S",
+      "name": "Counter S",
+      "queueId": "5dbc98dc-c983-a707-28bd-082d1a47546e"
+    }
+  ],
+  "activeBackfill": [
+    {
+      "status": "CALLED",
+      "code": "R"
+    },
+    {
+      "status": "SERVING",
+      "code": "S"
+    }
+  ],
+  "sequences": [
+    {
+      "code": "R",
+      "last_sequence": "42"
+    },
+    {
+      "code": "S",
+      "last_sequence": "87"
+    }
+  ]
+}

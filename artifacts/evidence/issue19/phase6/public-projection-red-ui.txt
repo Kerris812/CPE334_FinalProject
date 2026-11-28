@@ -1,0 +1,296 @@
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ❯ tests/ui/public-board.test.tsx (10 tests | 2 failed) 200ms
+   × S2-TEST-24: public active list renders its counter label and strips private properties 45ms
+   × S2-TEST-24: explicit empty active list overrides stale scalars and preserves waiting count 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/public-board.test.tsx > S2-TEST-24: public active list renders its counter label and strips private properties
+TestingLibraryElementError: Unable to find an element with the text: Counter R. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-labelledby="_r_0_"
+      class="ui-card public-board"
+    >
+      <header
+        class="ui-card-header public-board-header"
+      >
+        <span
+          aria-hidden="true"
+          class="ui-card-badge board-code"
+        >
+          R
+        </span>
+        <h2
+          class="ui-card-title"
+          id="_r_0_"
+        >
+          Queue R
+        </h2>
+      </header>
+      <div
+        class="ui-card-body"
+      >
+        <section
+          aria-atomic="true"
+          aria-label="Public queue status"
+          aria-live="polite"
+          class="queue-ticket public-call"
+        >
+          <p
+            class="board-call-label"
+          >
+            NOW CALLING
+          </p>
+          <div
+            class="queue-ticket-content"
+          >
+            <strong
+              class="public-called-number"
+            >
+              R-10000
+            </strong>
+            <div
+              aria-hidden="true"
+              class="ui-divider"
+            >
+              <span>
+                ✦
+              </span>
+            </div>
+            <p
+              class="ui-status queue-status status-called board-status"
+            >
+              <span
+                aria-hidden="true"
+                class="status-marker"
+              />
+              CALLED
+            </p>
+          </div>
+        </section>
+        <div
+          class="ui-stat public-waiting"
+        >
+          <output
+            aria-label="Waiting guests"
+            aria-live="polite"
+            class="waiting-count"
+          >
+            2
+          </output>
+          <span>
+            guests waiting
+          </span>
+        </div>
+      </div>
+      <div
+        class="ui-card-footer"
+      >
+        <footer
+          class="ui-footer-meta public-board-actions"
+        >
+          <small>
+            <svg
+              aria-hidden="true"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="16"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
+              <path
+                d="M12 6v6l4 2"
+              />
+            </svg>
+            Updated
+            <time
+              datetime="2026-11-28T19:01:13.193Z"
+            >
+              02:01:13
+            </time>
+             · refreshes every 10 s
+          </small>
+          <button
+            class="ui-button ui-button--primary "
+          >
+            <span
+              class="ui-button-label"
+            >
+              Refresh
+            </span>
+          </button>
+        </footer>
+      </div>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/ui/public-board.test.tsx:17:17
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/public-board.test.tsx > S2-TEST-24: explicit empty active list overrides stale scalars and preserves waiting count
+TestingLibraryElementError: Unable to find an element with the text: No one is being called yet. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-labelledby="_r_1_"
+      class="ui-card public-board"
+    >
+      <header
+        class="ui-card-header public-board-header"
+      >
+        <span
+          aria-hidden="true"
+          class="ui-card-badge board-code"
+        >
+          R
+        </span>
+        <h2
+          class="ui-card-title"
+          id="_r_1_"
+        >
+          Queue R
+        </h2>
+      </header>
+      <div
+        class="ui-card-body"
+      >
+        <section
+          aria-atomic="true"
+          aria-label="Public queue status"
+          aria-live="polite"
+          class="queue-ticket public-call"
+        >
+          <p
+            class="board-call-label"
+          >
+            NOW CALLING
+          </p>
+          <div
+            class="queue-ticket-content"
+          >
+            <strong
+              class="public-called-number"
+            >
+              R-10000
+            </strong>
+            <div
+              aria-hidden="true"
+              class="ui-divider"
+            >
+              <span>
+                ✦
+              </span>
+            </div>
+            <p
+              class="ui-status queue-status status-called board-status"
+            >
+              <span
+                aria-hidden="true"
+                class="status-marker"
+              />
+              CALLED
+            </p>
+          </div>
+        </section>
+        <div
+          class="ui-stat public-waiting"
+        >
+          <output
+            aria-label="Waiting guests"
+            aria-live="polite"
+            class="waiting-count"
+          >
+            2
+          </output>
+          <span>
+            guests waiting
+          </span>
+        </div>
+      </div>
+      <div
+        class="ui-card-footer"
+      >
+        <footer
+          class="ui-footer-meta public-board-actions"
+        >
+          <small>
+            <svg
+              aria-hidden="true"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="16"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
+              <path
+                d="M12 6v6l4 2"
+              />
+            </svg>
+            Updated
+            <time
+              datetime="2026-11-28T19:01:13.228Z"
+            >
+              02:01:13
+            </time>
+             · refreshes every 10 s
+          </small>
+          <button
+            class="ui-button ui-button--primary "
+          >
+            <span
+              class="ui-button-label"
+            >
+              Refresh
+            </span>
+          </button>
+        </footer>
+      </div>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/ui/public-board.test.tsx:25:17
+     23|   mock.mockResolvedValue(response(200, { data: { ...board, activeEntri…
+     24|   await mount();
+     25|   expect(screen.getByText('No one is being called yet')).toBeTruthy();
+       |                 ^
+     26|   expect(screen.queryByText('R-10000')).toBeNull();
+     27|   expect(screen.getByLabelText('Waiting guests').textContent).toBe('2'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  02:01:12
+   Duration  810ms (environment 56%, tests 27%, import 12%, transform 5%)
+

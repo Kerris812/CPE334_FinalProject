@@ -47,7 +47,7 @@ test.each([299999, 300000, 300001])('S2-TEST-06: no-show boundary at %i ms', asy
     expect(await f.state()).toEqual(before);
   } else {
     expect(response.status).toBe(200);
-    expect(response.body.data).toMatchObject({ status: 'NO_SHOW', noShowAt: now.toISOString(), cancelledAt: null, counterId: null });
+    expect(response.body.data).toMatchObject({ status: 'NO_SHOW', noShowAt: now.toISOString(), cancelledAt: null, counterId: f.counterId });
     expect(await db.queueEvent.findMany({ where: { entryId: entry.id }, orderBy: { occurredAt: 'asc' } })).toMatchObject([
       { eventType: 'CALLED', actorId: caller.id },
       { eventType: 'NO_SHOW', actorId: operator.id, fromStatus: 'CALLED', toStatus: 'NO_SHOW', occurredAt: now },
@@ -74,7 +74,7 @@ test('S2-TEST-07: authorization, invalid states and missing call time produce no
   expect((await act(entry.id)).body.error.code).toBe('INVALID_TRANSITION');
   expect(await f.state()).toEqual(before);
   for (const status of ['WAITING', 'SERVING', 'COMPLETED', 'CANCELLED', 'NO_SHOW'] as const) {
-    await db.queueEntry.update({ where: { id: entry.id }, data: { status } });
+    await db.queueEntry.update({ where: { id: entry.id }, data: { status, counterId: status === 'WAITING' || status === 'CANCELLED' ? null : f.counterId } });
     const snapshot = await f.state();
     expect((await act(entry.id)).body.error.code).toBe('INVALID_TRANSITION');
     expect(await f.state()).toEqual(snapshot);

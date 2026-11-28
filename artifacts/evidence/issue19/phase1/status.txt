@@ -1,0 +1,15 @@
+PHASE 1 COMPLETE: design 2 approved by the user; continuation and local commits authorized, no push.
+Baseline af01e1d302b03940424b0e1d9bdcb48abd659135. Production implementation unchanged.
+The approved design revision is docs/sprint-2/issue-19-design-decision.md and takes precedence in all four contracts.
+19 API cases: 18 expected RED, one authorization case passes; all 134 baseline API cases pass (153 total).
+4 UI cases: all expected RED; all 82 baseline UI cases pass (86 total).
+Backend typecheck exit 0. No unexpected environment failures.
+Commands: source /tmp/cpe334-issue19-phase0.ZqEDOv/environment.sh; export TEST_DATABASE_URL=postgresql://phase0_local@127.0.0.1:55489/issue19_red_complete_test; npm --prefix server run test:api; npm --prefix client run test:ui; npm --prefix server run typecheck.
+Targeted verification: cd server; DATABASE_URL="$TEST_DATABASE_URL" npx vitest run tests/api/issue19-counters.test.ts --maxWorkers=1 --no-file-parallelism. In client: npx vitest run tests/ui/issue19-counters.test.tsx.
+Actual outputs: api-red.txt and ui-red.txt. Failures concern absent counter metadata/association, ignored validation and absent counter UI/payload; no missing-table or syntax errors are counted as RED.
+Traceability: S2-TEST-05/06/10/11/12/13/14/15/17/19/20/25/27, interpreted through the approved design decision. Covers shared A/B authorization, retained history, dedicated capacity, independent queues, FIFO, cancellation isolation, manual no-show, audit rollback and authoritative UI refresh.
+Schema-specific S2-TEST-16 integrity and S2-TEST-18 populated migration/provisioning are deferred immediately before Phase 2 implementation because the tables do not exist yet. Restart/concurrency extensions complete in Phase 6.
+Files: new API/UI tests, approved design revision, four contract precedence notices and actual RED evidence. No existing assertion weakened.
+Evidence to capture: runner failure summaries and clean production-code diff. UI screenshots pending Phase 5.
+Recommended commit: test(#19): define service counter management requirements
+Ready for commit: yes, expected RED phase. Later phases must make tests pass.

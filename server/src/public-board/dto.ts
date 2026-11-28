@@ -4,13 +4,14 @@ export interface PublicBoardDto {
   calledNumber: string | null;
   serviceState: 'CALLED' | 'SERVING' | null;
   waitingCount: number;
+  activeEntries: { displayNumber: string; counterLabel: string; serviceState: 'CALLED' | 'SERVING' }[];
 }
 export function publicBoardDto(
   queue: { code: string },
-  current: { displayNumber: string; status: string } | null,
+  current: { displayNumber: string; status: string; counterLabel: string } | null,
   waitingCount: number,
 ): PublicBoardDto {
   const serviceState = current?.status === 'CALLED' ? 'CALLED' : current?.status === 'SERVING' ? 'SERVING' : null;
   // Build every field explicitly. Spreading a Prisma object would cross this boundary.
-  return { queueCode: queue.code, calledNumber: serviceState === null ? null : current?.displayNumber ?? null, serviceState, waitingCount };
+  return { queueCode: queue.code, calledNumber: serviceState === null ? null : current?.displayNumber ?? null, serviceState, waitingCount, activeEntries: current && serviceState ? [{ displayNumber: current.displayNumber, counterLabel: current.counterLabel, serviceState }] : [] };
 }

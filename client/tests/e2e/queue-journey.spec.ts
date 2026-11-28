@@ -41,7 +41,7 @@ test('TEST-030 mobile empty, slow/error states, join and persisted my-queue relo
   await page.screenshot({ path: '../artifacts/evidence/f05-routing/customer-regression-my-queue-mobile.png', fullPage: true });
 });
 test('anonymous public board renders only fixture public values without login', async ({ page }) => {
-  await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED' } });
+  await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, status: 'CALLED', counterId: (await db.serviceCounter.findFirstOrThrow({ where: { queueId: queue.id } })).id } });
   await page.setViewportSize({ width: 360, height: 780 }); await page.goto(`/board/${queue.id}`);
   await expect(page.getByText(`${queue.code}-10000`, { exact: true })).toBeVisible(); await expect(page.getByText('CALLED', { exact: true })).toBeVisible(); expect(await page.getByLabel('Password').count()).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

@@ -23,6 +23,7 @@ export async function snapshot() {
     sessions: await db.session.findMany({ orderBy: { id: 'asc' } }),
     assignments: await db.operatorQueueAssignment.findMany({ orderBy: [{ operatorId: 'asc' }, { queueId: 'asc' }] }),
     queues: await db.queue.findMany({ orderBy: { id: 'asc' } }),
+    counters: await db.serviceCounter.findMany({ orderBy: { id: 'asc' } }),
     entries: await db.queueEntry.findMany({ orderBy: { id: 'asc' } }),
     events: await db.queueEvent.findMany({ orderBy: { id: 'asc' } }),
   };

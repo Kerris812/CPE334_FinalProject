@@ -1,0 +1,1338 @@
+
+> restaurant-queue-client@0.1.0 test:ui
+> vitest run tests/ui
+
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client
+
+ ❯ tests/ui/issue19-counters.test.tsx (4 tests | 4 failed) 2186ms
+   × S2-TEST-10/11: desk displays dedicated counter identity and authoritative availability 1040ms
+   × S2-TEST-10/13: occupied counter disables call even when scalar active entry is stale 86ms
+   × S2-TEST-10/19: call sends displayed counter and FIFO preview then refreshes occupancy 28ms
+   × S2-TEST-10/13: conflicting call refreshes authoritative occupancy before retry 1031ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/issue19-counters.test.tsx > S2-TEST-10/11: desk displays dedicated counter identity and authoritative availability
+TestingLibraryElementError: Unable to find an element with the text: Counter R. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      class="operator-desk"
+    >
+      <div
+        class="ui-page-header "
+      >
+        <h2
+          class=""
+        >
+          Operator desk
+        </h2>
+      </div>
+      <div
+        class="assigned-queue-control"
+      >
+        <label
+          for="assigned-queue"
+        >
+          Assigned queue
+        </label>
+        <span
+          class="assigned-queue-select"
+        >
+          <select
+            id="assigned-queue"
+          >
+            <option
+              value="queue-r"
+            >
+              R
+               —
+              Queue R
+            </option>
+          </select>
+          <svg
+            aria-hidden="true"
+            class="assigned-queue-chevron"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        aria-busy="false"
+      >
+        <button
+          class="ui-button ui-button--secondary secondary desk-refresh"
+        >
+          <span
+            class="ui-button-label"
+          >
+            Refresh
+          </span>
+        </button>
+        <div
+          class="desk-heading"
+        >
+          <h3>
+            Restaurant Queue
+            R
+          </h3>
+          <span
+            class="availability availability-open"
+          >
+            OPEN
+          </span>
+        </div>
+        <div
+          class="desk-grid ui-grid"
+        >
+          <section
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                R
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Waiting Parties
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Queue state:
+                OPEN
+              </p>
+              <div
+                class="ui-stat "
+              >
+                <strong
+                  class="waiting-count"
+                >
+                  1
+                </strong>
+                <span>
+                  Waiting parties
+                </span>
+              </div>
+              <p>
+                Next waiting number:
+                R-0001
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Cancel waiting entry
+                </span>
+              </button>
+              <dialog
+                aria-labelledby="_r_0_-title"
+              >
+                <form
+                  aria-busy="false"
+                >
+                  <h3
+                    id="_r_0_-title"
+                  >
+                    Cancel
+
+                    R-0001
+                    ?
+                  </h3>
+                  <p>
+                    This removes the entry from the waiting queue.
+                  </p>
+                  <label
+                    for="_r_0_-reason"
+                  >
+                    Cancellation reason
+                  </label>
+                  <input
+                    aria-invalid="false"
+                    id="_r_0_-reason"
+                    value=""
+                  />
+                  <button
+                    class="ui-button ui-button--secondary "
+                    type="button"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Back
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--primary "
+                    type="submit"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Confirm cancellation
+                    </span>
+                  </button>
+                </form>
+              </dialog>
+              <button
+                class="ui-button ui-button--primary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Call Next
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-live="polite"
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                1
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Active Service
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Active:
+                0
+                /1
+              </p>
+              <p>
+                No active service.
+              </p>
+              <div
+                class="service-actions"
+              >
+                <h3>
+                  Service Actions
+                </h3>
+                <div
+                  class="desk-actions"
+                >
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Start Service
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Complete Service
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      class="operator-desk"
+    >
+      <div
+        class="ui-page-header "
+      >
+        <h2
+          class=""
+        >
+          Operator desk
+        </h2>
+      </div>
+      <div
+        class="assigned-queue-control"
+      >
+        <label
+          for="assigned-queue"
+        >
+          Assigned queue
+        </label>
+        <span
+          class="assigned-queue-select"
+        >
+          <select
+            id="assigned-queue"
+          >
+            <option
+              value="queue-r"
+            >
+              R
+               —
+              Queue R
+            </option>
+          </select>
+          <svg
+            aria-hidden="true"
+            class="assigned-queue-chevron"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        aria-busy="false"
+      >
+        <button
+          class="ui-button ui-button--secondary secondary desk-refresh"
+        >
+          <span
+            class="ui-button-label"
+          >
+            Refresh
+          </span>
+        </button>
+        <div
+          class="desk-heading"
+        >
+          <h3>
+            Restaurant Queue
+            R
+          </h3>
+          <span
+            class="availability availability-open"
+          >
+            OPEN
+          </span>
+        </div>
+        <div
+          class="desk-grid ui-grid"
+        >
+          <section
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                R
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Waiting Parties
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Queue state:
+                OPEN
+              </p>
+              <div
+                class="ui-stat "
+              >
+                <strong
+                  class="waiting-count"
+                >
+                  1
+                </strong>
+                <span>
+                  Waiting parties
+                </span>
+              </div>
+              <p>
+                Next waiting number:
+                R-0001
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Cancel waiting entry
+                </span>
+              </button>
+              <dialog
+                aria-labelledby="_r_0_-title"
+              >
+                <form
+                  aria-busy="false"
+                >
+                  <h3
+                    id="_r_0_-title"
+                  >
+                    Cancel
+
+                    R-0001
+                    ?
+                  </h3>
+                  <p>
+                    This removes the entry from the waiting queue.
+                  </p>
+                  <label
+                    for="_r_0_-reason"
+                  >
+                    Cancellation reason
+                  </label>
+                  <input
+                    aria-invalid="false"
+                    id="_r_0_-reason"
+                    value=""
+                  />
+                  <button
+                    class="ui-button ui-button--secondary "
+                    type="button"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Back
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--primary "
+                    type="submit"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Confirm cancellation
+                    </span>
+                  </button>
+                </form>
+              </dialog>
+              <button
+                class="ui-button ui-button--primary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Call Next
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-live="polite"
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                1
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Active Service
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Active:
+                0
+                /1
+              </p>
+              <p>
+                No active service.
+              </p>
+              <div
+                class="service-actions"
+              >
+                <h3>
+                  Service Actions
+                </h3>
+                <div
+                  class="desk-actions"
+                >
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Start Service
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Complete Service
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/issue19-counters.test.tsx:25:16
+     23| test('S2-TEST-10/11: desk displays dedicated counter identity and auth…
+     24|   mock(); render(<OperatorDesk onUnauthenticated={vi.fn()} />);
+     25|   await screen.findByText('Counter R'); await screen.findByText('AVAIL…
+       |                ^
+     26| });
+     27| test('S2-TEST-10/13: occupied counter disables call even when scalar a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/ui/issue19-counters.test.tsx > S2-TEST-10/13: occupied counter disables call even when scalar active entry is stale
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/ui/issue19-counters.test.tsx:31:48
+     29|   render(<OperatorDesk onUnauthenticated={vi.fn()} />);
+     30|   const call = await screen.findByRole('button', { name: 'Call Next' }…
+     31|   expect((call as HTMLButtonElement).disabled).toBe(true);
+       |                                                ^
+     32| });
+     33| test('S2-TEST-10/19: call sends displayed counter and FIFO preview the…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/ui/issue19-counters.test.tsx > S2-TEST-10/19: call sends displayed counter and FIFO preview then refreshes occupancy
+AssertionError: expected {} to deeply equal { counterId: 'counter-r', …(1) }
+
+- Expected
++ Received
+
+- {
+-   "counterId": "counter-r",
+-   "expectedEntryId": "entry-r",
+- }
++ {}
+
+ ❯ tests/ui/issue19-counters.test.tsx:38:112
+     36|   fireEvent.click(call); fireEvent.click(call);
+     37|   await waitFor(() => expect(fetcher.mock.calls.filter(([, options]) =…
+     38|   expect(JSON.parse(fetcher.mock.calls.find(([, options]) => options?.…
+       |                                                                                                                ^
+     39|   await screen.findByText('OCCUPIED');
+     40| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/ui/issue19-counters.test.tsx > S2-TEST-10/13: conflicting call refreshes authoritative occupancy before retry
+TestingLibraryElementError: Unable to find an element with the text: OCCUPIED. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      class="operator-desk"
+    >
+      <div
+        class="ui-page-header "
+      >
+        <h2
+          class=""
+        >
+          Operator desk
+        </h2>
+      </div>
+      <div
+        class="assigned-queue-control"
+      >
+        <label
+          for="assigned-queue"
+        >
+          Assigned queue
+        </label>
+        <span
+          class="assigned-queue-select"
+        >
+          <select
+            id="assigned-queue"
+          >
+            <option
+              value="queue-r"
+            >
+              R
+               —
+              Queue R
+            </option>
+          </select>
+          <svg
+            aria-hidden="true"
+            class="assigned-queue-chevron"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        aria-busy="false"
+      >
+        <button
+          class="ui-button ui-button--secondary secondary desk-refresh"
+        >
+          <span
+            class="ui-button-label"
+          >
+            Refresh
+          </span>
+        </button>
+        <p
+          class="ui-notice "
+          role="alert"
+        >
+          <span
+            aria-hidden="true"
+          >
+            !
+          </span>
+          Finish the active service before calling next.
+        </p>
+        <div
+          class="desk-heading"
+        >
+          <h3>
+            Restaurant Queue
+            R
+          </h3>
+          <span
+            class="availability availability-open"
+          >
+            OPEN
+          </span>
+        </div>
+        <div
+          class="desk-grid ui-grid"
+        >
+          <section
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                R
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Waiting Parties
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Queue state:
+                OPEN
+              </p>
+              <div
+                class="ui-stat "
+              >
+                <strong
+                  class="waiting-count"
+                >
+                  1
+                </strong>
+                <span>
+                  Waiting parties
+                </span>
+              </div>
+              <p>
+                Next waiting number:
+                R-0001
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Cancel waiting entry
+                </span>
+              </button>
+              <dialog
+                aria-labelledby="_r_4_-title"
+              >
+                <form
+                  aria-busy="false"
+                >
+                  <h3
+                    id="_r_4_-title"
+                  >
+                    Cancel
+
+                    R-0001
+                    ?
+                  </h3>
+                  <p>
+                    This removes the entry from the waiting queue.
+                  </p>
+                  <label
+                    for="_r_4_-reason"
+                  >
+                    Cancellation reason
+                  </label>
+                  <input
+                    aria-invalid="false"
+                    id="_r_4_-reason"
+                    value=""
+                  />
+                  <button
+                    class="ui-button ui-button--secondary "
+                    type="button"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Back
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--primary "
+                    type="submit"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Confirm cancellation
+                    </span>
+                  </button>
+                </form>
+              </dialog>
+              <p>
+                Finish the active service before calling next.
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+                disabled=""
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Call Next
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-live="polite"
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                1
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Active Service
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Active:
+                1
+                /1
+              </p>
+              <section
+                aria-atomic="true"
+                aria-label="Your queue entry"
+                aria-live="polite"
+                class="queue-ticket "
+              >
+                <p>
+                  Current queue number
+                </p>
+                <div
+                  class="queue-ticket-content"
+                >
+                  <strong
+                    class="queue-number"
+                  >
+                    R-0001
+                  </strong>
+                  <div
+                    aria-hidden="true"
+                    class="ui-divider"
+                  >
+                    <span>
+                      ✦
+                    </span>
+                  </div>
+                  <p
+                    class="ui-status queue-status status-called "
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="status-marker"
+                    />
+                    CALLED
+                  </p>
+                </div>
+              </section>
+              <p>
+                Party size:
+                4
+              </p>
+              <div
+                class="service-actions"
+              >
+                <h3>
+                  Service Actions
+                </h3>
+                <button
+                  class="ui-button ui-button--secondary "
+                  disabled=""
+                >
+                  <span
+                    class="ui-button-label"
+                  >
+                    Mark no-show
+                  </span>
+                </button>
+                <dialog
+                  aria-labelledby="_r_5_-title"
+                >
+                  <form
+                    aria-busy="false"
+                  >
+                    <h3
+                      id="_r_5_-title"
+                    >
+                      Mark
+
+                      R-0001
+                       as no-show
+                      ?
+                    </h3>
+                    <p>
+                      This releases the current service slot.
+                    </p>
+                    <button
+                      class="ui-button ui-button--secondary "
+                      type="button"
+                    >
+                      <span
+                        class="ui-button-label"
+                      >
+                        Back
+                      </span>
+                    </button>
+                    <button
+                      class="ui-button ui-button--primary "
+                      disabled=""
+                      type="submit"
+                    >
+                      <span
+                        class="ui-button-label"
+                      >
+                        Confirm no-show
+                      </span>
+                    </button>
+                  </form>
+                </dialog>
+                <div
+                  class="desk-actions"
+                >
+                  <button
+                    class="ui-button ui-button--primary "
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Start Service
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Complete Service
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      class="operator-desk"
+    >
+      <div
+        class="ui-page-header "
+      >
+        <h2
+          class=""
+        >
+          Operator desk
+        </h2>
+      </div>
+      <div
+        class="assigned-queue-control"
+      >
+        <label
+          for="assigned-queue"
+        >
+          Assigned queue
+        </label>
+        <span
+          class="assigned-queue-select"
+        >
+          <select
+            id="assigned-queue"
+          >
+            <option
+              value="queue-r"
+            >
+              R
+               —
+              Queue R
+            </option>
+          </select>
+          <svg
+            aria-hidden="true"
+            class="assigned-queue-chevron"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        aria-busy="false"
+      >
+        <button
+          class="ui-button ui-button--secondary secondary desk-refresh"
+        >
+          <span
+            class="ui-button-label"
+          >
+            Refresh
+          </span>
+        </button>
+        <p
+          class="ui-notice "
+          role="alert"
+        >
+          <span
+            aria-hidden="true"
+          >
+            !
+          </span>
+          Finish the active service before calling next.
+        </p>
+        <div
+          class="desk-heading"
+        >
+          <h3>
+            Restaurant Queue
+            R
+          </h3>
+          <span
+            class="availability availability-open"
+          >
+            OPEN
+          </span>
+        </div>
+        <div
+          class="desk-grid ui-grid"
+        >
+          <section
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                R
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Waiting Parties
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Queue state:
+                OPEN
+              </p>
+              <div
+                class="ui-stat "
+              >
+                <strong
+                  class="waiting-count"
+                >
+                  1
+                </strong>
+                <span>
+                  Waiting parties
+                </span>
+              </div>
+              <p>
+                Next waiting number:
+                R-0001
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Cancel waiting entry
+                </span>
+              </button>
+              <dialog
+                aria-labelledby="_r_4_-title"
+              >
+                <form
+                  aria-busy="false"
+                >
+                  <h3
+                    id="_r_4_-title"
+                  >
+                    Cancel
+
+                    R-0001
+                    ?
+                  </h3>
+                  <p>
+                    This removes the entry from the waiting queue.
+                  </p>
+                  <label
+                    for="_r_4_-reason"
+                  >
+                    Cancellation reason
+                  </label>
+                  <input
+                    aria-invalid="false"
+                    id="_r_4_-reason"
+                    value=""
+                  />
+                  <button
+                    class="ui-button ui-button--secondary "
+                    type="button"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Back
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--primary "
+                    type="submit"
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Confirm cancellation
+                    </span>
+                  </button>
+                </form>
+              </dialog>
+              <p>
+                Finish the active service before calling next.
+              </p>
+              <button
+                class="ui-button ui-button--secondary "
+                disabled=""
+              >
+                <span
+                  class="ui-button-label"
+                >
+                  Call Next
+                </span>
+              </button>
+            </div>
+          </section>
+          <section
+            aria-live="polite"
+            class="ui-card desk-card"
+          >
+            <header
+              class="ui-card-header "
+            >
+              <span
+                aria-hidden="true"
+                class="ui-card-badge "
+              >
+                1
+              </span>
+              <h3
+                class="ui-card-title"
+              >
+                Active Service
+              </h3>
+            </header>
+            <div
+              class="ui-card-body"
+            >
+              <p>
+                Active:
+                1
+                /1
+              </p>
+              <section
+                aria-atomic="true"
+                aria-label="Your queue entry"
+                aria-live="polite"
+                class="queue-ticket "
+              >
+                <p>
+                  Current queue number
+                </p>
+                <div
+                  class="queue-ticket-content"
+                >
+                  <strong
+                    class="queue-number"
+                  >
+                    R-0001
+                  </strong>
+                  <div
+                    aria-hidden="true"
+                    class="ui-divider"
+                  >
+                    <span>
+                      ✦
+                    </span>
+                  </div>
+                  <p
+                    class="ui-status queue-status status-called "
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="status-marker"
+                    />
+                    CALLED
+                  </p>
+                </div>
+              </section>
+              <p>
+                Party size:
+                4
+              </p>
+              <div
+                class="service-actions"
+              >
+                <h3>
+                  Service Actions
+                </h3>
+                <button
+                  class="ui-button ui-button--secondary "
+                  disabled=""
+                >
+                  <span
+                    class="ui-button-label"
+                  >
+                    Mark no-show
+                  </span>
+                </button>
+                <dialog
+                  aria-labelledby="_r_5_-title"
+                >
+                  <form
+                    aria-busy="false"
+                  >
+                    <h3
+                      id="_r_5_-title"
+                    >
+                      Mark
+
+                      R-0001
+                       as no-show
+                      ?
+                    </h3>
+                    <p>
+                      This releases the current service slot.
+                    </p>
+                    <button
+                      class="ui-button ui-button--secondary "
+                      type="button"
+                    >
+                      <span
+                        class="ui-button-label"
+                      >
+                        Back
+                      </span>
+                    </button>
+                    <button
+                      class="ui-button ui-button--primary "
+                      disabled=""
+                      type="submit"
+                    >
+                      <span
+                        class="ui-button-label"
+                      >
+                        Confirm no-show
+                      </span>
+                    </button>
+                  </form>
+                </dialog>
+                <div
+                  class="desk-actions"
+                >
+                  <button
+                    class="ui-button ui-button--primary "
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Start Service
+                    </span>
+                  </button>
+                  <button
+                    class="ui-button ui-button--secondary "
+                    disabled=""
+                  >
+                    <span
+                      class="ui-button-label"
+                    >
+                      Complete Service
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/ui/issue19-counters.test.tsx:44:16
+     42|   const fetcher = mock(false, true); render(<OperatorDesk onUnauthenti…
+     43|   fireEvent.click(await screen.findByRole('button', { name: 'Call Next…
+     44|   await screen.findByText('OCCUPIED');
+       |                ^
+     45|   expect((screen.getByRole('button', { name: 'Call Next' }) as HTMLBut…
+     46|   expect(fetcher.mock.calls.filter(([url, options]) => url.endsWith('/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed | 12 passed (13)
+      Tests  4 failed | 82 passed (86)
+   Start at  01:42:55
+   Duration  5.33s (tests 56%, environment 34%, import 8%, transform 2%)
+
+Environment  jsdom was created 13 times · 8.26s total, 34% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

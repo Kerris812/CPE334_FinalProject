@@ -9,20 +9,28 @@ export function useQueueResource<T>(load: () => Promise<T>, poll = false) {
   useEffect(() => {
     let active = true;
     let pending = false;
+    let retryQueued = false;
     let timer: number | undefined;
     async function refresh(background = false) {
-      if (!active || pending) return;
+      if (!active) return;
+      if (pending) {
+        if (!background) retryQueued = true;
+        return;
+      }
       pending = true;
       setRefreshing(true);
       if (!background) setLoading(true);
       try {
         const value = await load();
-        if (active) { setData(value); setError(null); }
+        if (active && !retryQueued) { setData(value); setError(null); }
       } catch (failure) {
-        if (active) setError(failure);
+        if (active && !retryQueued) setError(failure);
       } finally {
         pending = false;
-        if (active) { setLoading(false); setRefreshing(false); }
+        if (active && retryQueued) {
+          retryQueued = false;
+          void refresh();
+        } else if (active) { setLoading(false); setRefreshing(false); }
       }
     }
     refreshRef.current = refresh;

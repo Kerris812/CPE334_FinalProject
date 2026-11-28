@@ -3,8 +3,9 @@ import { HttpError, requestData } from './api-client';
 import type { QueueInfo, QueueEntry } from './queue-api';
 import { useQueueResource } from './useQueueResource';
 import { Button, Card, EmptyState, ErrorState, InlineNotice, PageHeader, StatBlock } from './components/ui';
+import { NoShowControl, TerminationControl } from './components/TerminationControl';
 import { QueueNumberDisplay } from './QueueNumberDisplay';
-interface Desk { queue: QueueInfo; waitingCount: number; activeEntry: QueueEntry | null; nextWaiting: Pick<QueueEntry, 'id' | 'displayNumber' | 'partySize' | 'status'> | null }
+interface Desk { asOf?: string; queue: QueueInfo; waitingCount: number; activeEntry: QueueEntry | null; nextWaiting: Pick<QueueEntry, 'id' | 'displayNumber' | 'partySize' | 'status'> | null }
 function errorText(error: unknown) {
   if (error instanceof HttpError) {
     if (error.status === 403) return 'You do not have permission to access this queue.';
@@ -28,16 +29,26 @@ export function OperatorDesk({ onUnauthenticated }: { onUnauthenticated: () => v
   </section>;
 }
 function ServiceDesk({ queueId, onUnauthenticated }: { queueId: string; onUnauthenticated: () => void }) {
-  const load = useCallback(async () => (await requestData<Desk>(`/operator/queues/${queueId}/desk`))!, [queueId]);
+  const serverSample = useRef<{ at: number; received: number } | undefined>(undefined);
+  const load = useCallback(async () => {
+    const desk = (await requestData<Desk>(`/operator/queues/${queueId}/desk`))!;
+    serverSample.current = { at: desk.asOf ? Date.parse(desk.asOf) : Date.now(), received: performance.now() };
+    return desk;
+  }, [queueId]);
+  const serverTime = useCallback(() => {
+    const sample = serverSample.current;
+    return sample ? sample.at + performance.now() - sample.received : Date.now();
+  }, []);
   const resource = useQueueResource(load, true);
   const [pending, setPending] = useState(false);
   const gate = useRef(false);
   const [message, setMessage] = useState('');
   const [failure, setFailure] = useState<unknown>(null);
+  const [terminationFailure, setTerminationFailure] = useState('');
   useEffect(() => { if (resource.error instanceof HttpError && resource.error.status === 401) onUnauthenticated(); }, [resource.error, onUnauthenticated]);
   async function act(name: 'call-next' | 'start-service' | 'complete') {
     if (gate.current || !resource.data || resource.loading || resource.error) return;
-    gate.current = true; setPending(true); setMessage(''); setFailure(null);
+    gate.current = true; setPending(true); setMessage(''); setFailure(null); setTerminationFailure('');
     const entry = resource.data.activeEntry;
     try {
       await requestData(name === 'call-next' ? `/operator/queues/${queueId}/call-next` : `/operator/entries/${entry!.id}/${name}`, {});
@@ -47,19 +58,25 @@ function ServiceDesk({ queueId, onUnauthenticated }: { queueId: string; onUnauth
   }
   const data = resource.data;
   const blocked = pending || resource.refreshing;
+  const terminationProps = {
+    disabled: blocked, onUnauthenticated, onRefresh: resource.retry,
+    onSuccess: (message: string) => { setFailure(null); setTerminationFailure(''); setMessage(message); },
+    onFailure: (message: string) => { setMessage(''); setFailure(null); setTerminationFailure(message); },
+  };
   return <div aria-busy={pending || resource.loading}>
     <Button variant="secondary" className="secondary desk-refresh" disabled={blocked} onClick={resource.retry} pending={resource.refreshing}>Refresh</Button>
     {pending && <p role="status">Saving service update…</p>}
-    {message && <p role="status">{message}</p>}{failure != null && <InlineNotice>{errorText(failure)}</InlineNotice>}
+    {message && <p role="status">{message}</p>}{failure != null && <InlineNotice>{errorText(failure)}</InlineNotice>}{terminationFailure && <InlineNotice>{terminationFailure}</InlineNotice>}
     {resource.loading ? <p role="status">Loading operator desk…</p> : resource.error ? <ErrorState title={errorText(resource.error)} onRetry={resource.retry} /> : data && <><div className="desk-heading"><h3>Restaurant Queue {data.queue.code}</h3><span className={`availability availability-${data.queue.state.toLowerCase()}`}>{data.queue.state}</span></div><div className="desk-grid ui-grid">
       <Card className="desk-card" title="Waiting Parties" titleAs="h3" badge={data.queue.code}><p>Queue state: {data.queue.state}</p><StatBlock value={data.waitingCount} label="Waiting parties" strong />
         {data.nextWaiting ? <p>Next waiting number: {data.nextWaiting.displayNumber}</p> : <p>No waiting customers.</p>}
+        {data.nextWaiting && <TerminationControl key={data.nextWaiting.id} {...terminationProps} action="operator-cancel" entry={data.nextWaiting} />}
         {data.activeEntry && <p>Finish the active service before calling next.</p>}
         {data.queue.state !== 'OPEN' && <p>This queue is not open for new calls.</p>}
         <Button variant={data.activeEntry ? 'secondary' : 'primary'} pending={pending} disabled={blocked || data.queue.state !== 'OPEN' || data.waitingCount === 0 || !!data.activeEntry} onClick={() => void act('call-next')}>Call Next</Button>
       </Card>
       <Card className="desk-card" aria-live="polite" title="Active Service" titleAs="h3" badge="1"><p>Active: {data.activeEntry ? 1 : 0}/1</p>{data.activeEntry ? <><QueueNumberDisplay label="Current queue number" number={data.activeEntry.displayNumber} status={data.activeEntry.status} /><p>Party size: {data.activeEntry.partySize}</p></> : <p>No active service.</p>}
-      <div className="service-actions"><h3>Service Actions</h3><div className="desk-actions"><Button variant={data.activeEntry?.status === 'CALLED' ? 'primary' : 'secondary'} pending={pending && data.activeEntry?.status === 'CALLED'} disabled={blocked || data.activeEntry?.status !== 'CALLED'} onClick={() => void act('start-service')}>Start Service</Button><Button variant={data.activeEntry?.status === 'SERVING' ? 'primary' : 'secondary'} pending={pending && data.activeEntry?.status === 'SERVING'} disabled={blocked || data.activeEntry?.status !== 'SERVING'} onClick={() => void act('complete')}>Complete Service</Button></div></div></Card>
+      <div className="service-actions"><h3>Service Actions</h3>{data.activeEntry?.status === 'CALLED' && <NoShowControl key={data.activeEntry.id} {...terminationProps} entry={data.activeEntry} serverTime={serverTime} />}<div className="desk-actions"><Button variant={data.activeEntry?.status === 'CALLED' ? 'primary' : 'secondary'} pending={pending && data.activeEntry?.status === 'CALLED'} disabled={blocked || data.activeEntry?.status !== 'CALLED'} onClick={() => void act('start-service')}>Start Service</Button><Button variant={data.activeEntry?.status === 'SERVING' ? 'primary' : 'secondary'} pending={pending && data.activeEntry?.status === 'SERVING'} disabled={blocked || data.activeEntry?.status !== 'SERVING'} onClick={() => void act('complete')}>Complete Service</Button></div></div></Card>
     </div></>}
   </div>;
 }

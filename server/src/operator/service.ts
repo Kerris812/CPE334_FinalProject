@@ -13,14 +13,14 @@ export async function authorizeOperator(tx: Prisma.TransactionClient, operatorId
   const assignments = await tx.$queryRaw<{ queueId: string }[]>`SELECT queue_id AS "queueId" FROM operator_queue_assignments WHERE operator_id = ${operatorId}::uuid AND queue_id = ${queueId}::uuid FOR SHARE`;
   if (!assignments.length) throw denied();
 }
-export async function readDesk(db: PrismaClient, operatorId: string, queueId: string) {
+export async function readDesk(db: PrismaClient, operatorId: string, queueId: string, now: () => Date = () => new Date()) {
   return db.$transaction(async tx => {
     await authorizeOperator(tx, operatorId, queueId);
     const queue = await tx.queue.findUniqueOrThrow({ where: { id: queueId }, select: { id: true, code: true, state: true } });
     const waitingCount = await tx.queueEntry.count({ where: { queueId, status: 'WAITING' } });
     const activeEntry = await tx.queueEntry.findFirst({ where: { queueId, status: { in: ['CALLED', 'SERVING'] } }, select: operationalSelect });
     const nextWaiting = await tx.queueEntry.findFirst({ where: { queueId, status: 'WAITING' }, orderBy: { sequence: 'asc' }, select: { id: true, displayNumber: true, partySize: true, status: true } });
-    return { queue, waitingCount, activeEntry, nextWaiting };
+    return { queue, waitingCount, activeEntry, nextWaiting, asOf: now() };
   }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
 }
 /** All service writers lock the queue first, matching join's queue lock. */

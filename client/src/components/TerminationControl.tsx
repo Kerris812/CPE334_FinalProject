@@ -6,7 +6,7 @@ type Action = 'customer-cancel' | 'operator-cancel' | 'no-show';
 
 export function TerminationControl({ action, entry, disabled, onUnauthenticated, onRefresh, onSuccess, onFailure }: {
   action: Action;
-  entry: { id: string; displayNumber: string };
+  entry: { id: string; displayNumber: string; counterName?: string };
   disabled?: boolean;
   onUnauthenticated: () => void;
   onRefresh: () => void;
@@ -70,7 +70,7 @@ export function TerminationControl({ action, entry, disabled, onUnauthenticated,
     <dialog ref={dialog} aria-labelledby={`${id}-title`} onCancel={event => { if (sending.current) event.preventDefault(); }}>
       <form onSubmit={submit} aria-busy={pending}>
         <h3 id={`${id}-title`}>{noShow ? 'Mark' : 'Cancel'} {entry.displayNumber}{noShow ? ' as no-show' : ''}?</h3>
-        <p>{noShow ? 'This releases the current service slot.' : operatorReason ? 'This removes the entry from the waiting queue.' : 'You will lose your current position in the queue.'}</p>
+        <p>{noShow ? (entry.counterName ? `This releases ${entry.counterName}.` : 'This releases the current service slot.') : operatorReason ? 'This removes the entry from the waiting queue.' : 'You will lose your current position in the queue.'}</p>
         {operatorReason && <FormField id={`${id}-reason`} label="Cancellation reason" error={error} errorId={`${id}-error`}>
           <input id={`${id}-reason`} value={reason} disabled={pending} onChange={event => setReason(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} />
         </FormField>}

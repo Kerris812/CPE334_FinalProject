@@ -1,0 +1,28 @@
+
+> restaurant-queue-client@0.1.0 test:e2e
+> playwright test issue19-counters issue18-termination lab7-shared-operators operator-workflow customer-status --output=/tmp/cpe334-issue19-phase0.ZqEDOv/phase5-playwright
+
+[WebServer] (node:5021) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5022) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:5051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/customer-status.spec.ts:27:1 › TEST-030 360px private status supports loading, empty, retry, all persisted stages and reload (1.6s)
+  ✓  2 tests/e2e/customer-status.spec.ts:95:1 › TEST-030 a revoked private session returns the status page to login (373ms)
+  ✓  3 tests/e2e/customer-status.spec.ts:110:1 › customer status keeps R-10000 intact with palette badges and quiet actions at every width (859ms)
+  ✓  4 tests/e2e/issue18-termination.spec.ts:10:1 › S2-TEST-26: customer and operator cancellation, manual no-show and rejoin (1.6s)
+  ✓  5 tests/e2e/issue19-counters.spec.ts:9:34 › S2-TEST-11/12/20: dedicated counters, handoff and historical release at 320px (803ms)
+  ✓  6 tests/e2e/issue19-counters.spec.ts:9:34 › S2-TEST-11/12/20: dedicated counters, handoff and historical release at 1280px (885ms)
+  ✓  7 tests/e2e/operator-workflow.spec.ts:29:1 › TEST-043 real customer and operator workflow reflects on my-queue and public board (1.5s)
+(node:5133) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  8 tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R (1.6s)
+  ✓  9 tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S (1.6s)
+
+  9 passed (13.2s)

@@ -1,0 +1,18 @@
+PHASE 5 COMPLETE: minimum counter identity, occupancy and service controls in the existing operator desk.
+Files: client/src/OperatorDesk.tsx, queue-api.ts, components/TerminationControl.tsx; new issue19-counters.spec.ts; existing browser fixtures adapted to valid active associations; new UI test harness GET filtering corrected to count actual GET requests; phase5 genuine evidence/screenshots.
+Traceability: approved design 2, S2-TEST-10/11/12/13/19/20/26. Display code/name/queue/status and reservation from authoritative desk data, include counter/head in calls, disable occupied or missing-config calls, refresh on success/conflicts, no auto-replay. Existing queue selection/shared access and scalar-only compatibility remain. No full dashboard/ETA redesign.
+Commands: npm --prefix client run test:ui; npm --prefix client run build; npm --prefix client run test:e2e -- issue19-counters issue18-termination lab7-shared-operators operator-workflow customer-status --output=/tmp/cpe334-issue19-phase0.ZqEDOv/phase5-playwright.
+Results: all 86 UI tests pass, all 9 relevant E2E tests pass, client production build exit 0. Genuine new browser coverage at 320/1280 px verifies independent occupied R/S, duplicate-call rejection, A/B handoff and actor attribution, completion/no-show release and historical linkage. Screenshot occupied-s-320.png was visually inspected: counter identity/state and reservation are legible with no horizontal overflow.
+Verification used a fresh migrated/seeded issue19_e2e_test at loopback 55489; unchanged source snapshot under /tmp prevents overwriting tracked historical screenshots. Initial attempts exposed fixture-only missing counters and two new UI test selector/method assumptions; corrected to valid data/actual GET counting with no production assertions weakened.
+Independent reproduction: source the synthetic environment, set TEST_DATABASE_URL to a fresh disposable _test DB; DATABASE_URL="$TEST_DATABASE_URL" npm --prefix server run db:migrate and db:seed; then run the UI/build/E2E commands above. Set ISSUE19_EVIDENCE_DIR to a new local screenshot directory to capture real browser output.
+Manual scenarios:
+1. Sign in A/B in separate contexts, select R and S, confirm each counter AVAILABLE.
+2. Join a party 1-4, call R; verify Counter R OCCUPIED and reservation number.
+3. Join a party 5-8, call S concurrently; both counters remain OCCUPIED independently.
+4. B selects R, starts A's CALLED entry; A refreshes and completes it.
+5. Confirm R AVAILABLE and retained counter_id on COMPLETED entry.
+6. Call S, wait at least 300 seconds, refresh, confirm manual no-show identifies Counter S; verify AVAILABLE and retained historical linkage. Automated fixture ages calledAt instead of waiting.
+7. While R occupied its Call Next is disabled; a direct duplicate request gets SERVICE_SLOT_BUSY with no extra event.
+8. Hold stale view in A, mutate from B, attempt stale action then verify contextual message and refreshed state before retry. UI conflict test independently asserts post-conflict GET and disabled call.
+Existing cancellation confirmations/ownership/reason behavior remains verified. Screenshots in screenshots/ are actual automated captures, not manual evidence or production.
+Failures remaining: none. Ready for commit: yes. Commit: feat(#19): display counter occupancy and service controls

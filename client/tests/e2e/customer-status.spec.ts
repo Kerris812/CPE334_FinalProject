@@ -11,6 +11,7 @@ test.beforeEach(async () => {
   const seeded = await db.user.findUniqueOrThrow({ where: { email: 'customer.a@example.test' } });
   customer = await db.user.create({ data: { email: `status-${randomUUID()}@example.test`, displayName: 'Status fixture customer', role: 'CUSTOMER', passwordHash: seeded.passwordHash } });
   queue = await db.queue.create({ data: { code: `S${randomUUID().replaceAll('-', '').slice(0, 7).toUpperCase()}`, name: 'Private status fixture' } });
+  await db.serviceCounter.create({ data: { code: queue.code, name: 'Fixture counter', queueId: queue.id } });
 });
 test.afterEach(async () => {
   if (customer) {
@@ -19,7 +20,7 @@ test.afterEach(async () => {
     await db.session.deleteMany({ where: { userId: customer.id } });
     await db.user.delete({ where: { id: customer.id } });
   }
-  if (queue) await db.queue.delete({ where: { id: queue.id } });
+  if (queue) { await db.serviceCounter.deleteMany({ where: { queueId: queue.id } }); await db.queue.delete({ where: { id: queue.id } }); }
 });
 test.afterAll(() => db.$disconnect());
 
@@ -52,7 +53,7 @@ test('TEST-030 360px private status supports loading, empty, retry, all persiste
   const historical = await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 1n, displayNumber: `${queue.code}-0001`, partySize: 2, status: 'COMPLETED', joinedAt: new Date('2026-11-05T08:00:00Z'), completedAt: new Date('2026-11-05T09:00:00Z') } });
   const saved = await db.queueEntry.create({ data: { customerId: customer.id, queueId: queue.id, sequence: 10000n, displayNumber: `${queue.code}-10000`, partySize: 4, joinedAt: new Date('2026-11-06T08:00:00Z') } });
   for (const status of ['WAITING', 'CALLED', 'SERVING', 'COMPLETED'] as const) {
-    await db.queueEntry.update({ where: { id: saved.id }, data: { status,
+    await db.queueEntry.update({ where: { id: saved.id }, data: { status, counterId: status === 'WAITING' ? null : (await db.serviceCounter.findFirstOrThrow({ where: { queueId: queue.id } })).id,
       calledAt: status === 'WAITING' ? null : new Date('2026-11-06T08:05:00Z'),
       servingAt: ['SERVING', 'COMPLETED'].includes(status) ? new Date('2026-11-06T08:10:00Z') : null,
       completedAt: status === 'COMPLETED' ? new Date('2026-11-06T09:00:00Z') : null,
@@ -116,7 +117,7 @@ test('customer status keeps R-10000 intact with palette badges and quiet actions
   await page.goto('/my-queue');
   const colors = { WAITING: ['rgb(47, 38, 38)', 'rgb(255, 252, 247)'], CALLED: ['rgb(251, 243, 230)', 'rgb(111, 14, 34)'], SERVING: ['rgb(47, 38, 38)', 'rgb(215, 177, 93)'], COMPLETED: ['rgb(251, 243, 230)', 'rgb(46, 107, 79)'] } as const;
   for (const status of ['WAITING', 'CALLED', 'SERVING', 'COMPLETED'] as const) {
-    await db.queueEntry.update({ where: { id: saved.id }, data: { status } });
+    await db.queueEntry.update({ where: { id: saved.id }, data: { status, counterId: status === 'WAITING' ? null : (await db.serviceCounter.findFirstOrThrow({ where: { queueId: restaurant.id } })).id } });
     await page.getByRole('button', { name: 'Refresh status' }).click();
     const badge = page.locator('.queue-status'); await expect(badge).toHaveText(status);
     await expect(badge).toHaveCSS('color', colors[status][0]); await expect(badge).toHaveCSS('background-color', colors[status][1]);

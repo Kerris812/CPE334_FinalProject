@@ -43,5 +43,6 @@ test('S2-TEST-10/13: conflicting call refreshes authoritative occupancy before r
   fireEvent.click(await screen.findByRole('button', { name: 'Call Next' }));
   await screen.findByText('OCCUPIED');
   expect((screen.getByRole('button', { name: 'Call Next' }) as HTMLButtonElement).disabled).toBe(true);
-  expect(fetcher.mock.calls.filter(([url, options]) => url.endsWith('/desk') && !options?.method).length).toBeGreaterThanOrEqual(2);
+  expect(fetcher.mock.calls.filter(([url, options]) => url.endsWith('/desk') && options?.method !== 'POST').length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByRole('alert').textContent).toContain('Finish the active service before calling next.');
 });

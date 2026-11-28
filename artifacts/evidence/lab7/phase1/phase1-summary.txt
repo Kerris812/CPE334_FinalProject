@@ -1,0 +1,39 @@
+Issue 7.2 Phase 1 RED checkpoint — 28 November 2026 (Asia/Bangkok)
+Issue: https://github.com/Kerris812/CPE334_FinalProject/issues/52
+Branch: feature/lab7-shared-operators
+Tested application/HEAD: cad39ed5a990834e659583c15ca203545bfe1fad
+Original business-logic baseline: fc178ed639619e3e74a37724a0373e990839a0e8
+Relationship: baseline is an ancestor; changes through HEAD are six Lab 7 contract files only. No server/client behavior changes.
+Working state: five new uncommitted test/support files plus evidence; no modified tracked files. Source hashes are in source-manifest.json. The first RED log is retained as initial-red.txt; final red.txt corresponds to final helper source.
+
+Exact final API RED summary (from red.txt):
+ Test Files  1 failed (1)
+      Tests  21 failed | 2 passed (23)
+Skipped/todo: 0 (see JSON report).
+
+RED failure breakdown:
+- L7-017: A lists R only; B lists S only; expected both R/S. Four-pair assertion receives A/R and B/S only, after valid setup twice and preservation assertions.
+- L7-001/002: crossed calls return 403 QUEUE_ACCESS_DENIED instead of expected 200.
+- L7-003/004: crossed start/complete return 403 instead of expected 200 after valid designated-operator preceding stages.
+- L7-005: 14 of 16 seeded A/B triples fail at their first unauthorized crossed stage; AAA on R and BBB on S pass. No bogus setup, import, compile or DB error is used as RED evidence.
+- Real browser: 2 failed, 0 passed, 0 skipped. Both fail because A's actual Assigned queue selector contains R only, missing expected S. Handoff steps after this assertion were not reached and are NOT claimed executed for seeded browser users. Screenshots, traces and exact assertion differences are retained in browser-output/ and browser.txt.
+
+Already passing on unchanged code (not implementation GREEN):
+- New generic API regression: 20 passed, 0 failed, 0 skipped. Disposable G/H have real assignments, exercising generic handoff, customer/unassigned/revoked scope denial, state guards, mixed-operator same-stage races/calls, event identity despite spoofing, FIFO, routing boundaries/types, slot invariant, session rejection, privacy, duplicate prevention, reconnect/seed persistence, historical terminal behavior, queue-lock independence and audit-failure rollback.
+- Existing API regression: 80 passed, 0 failed, 0 skipped, including actual API restart/persistence. Old exclusive-seed assertions remain untouched for Phase 2 revision.
+- Server unit suite: 10 passed, 0 failed, 0 skipped.
+- Client UI suite: 79 passed, 0 failed, 0 skipped (75 existing plus 4 new). New mocked UI cases verify supplied R/S list rendering, correct queue/action URLs, stale-state refresh and safe 401/403. They do not prove backend provisioning.
+
+Coverage: named automated scenarios cover L7-001 through L7-020; acceptance-coverage.json maps all L7-AC-01–15. Required shared setup/seeded A/B positives remain RED. No behavior was implemented and no Phase 2 GREEN claim is made.
+
+Environment: only newly created local lab7_red_test in a /private/tmp PostgreSQL cluster. Existing schema migrations and seed succeeded before assertions. Sandbox restrictions on Docker/shared memory/local sockets were resolved with approved local execution; no test was counted as RED for an environment failure. No production/shared persistent database or deployed GCP service touched.
+
+Commands and timestamps: see each *-run.json. API commands are the same migrate + npx Vitest pipeline used by server/scripts/test-api.ts, scoped by explicit files to avoid executing new RED tests in the old-suite health run. Unit/UI use package.json scripts. Browser uses existing Playwright configuration with isolated port overrides. Reproduction variables (synthetic test accounts only) are in environment.json. These variables must override ignored local env values for this retained temporary DB.
+
+Manual checkpoint:
+1. Inspect tests and exact logs/reports/screenshots.
+2. Commit the tests yourself, preserving this real RED evidence and test commit SHA.
+3. Explicitly instruct: Continue Issue 7.2 Phase 2.
+No seed/source/schema/migration/frontend/contract/existing-test edit, Git write or deployment was performed. Stop before implementation.
+
+Temporary PostgreSQL cluster stopped after testing; its data is retained at /private/tmp/lab7-red-postgres.OCM3Gc/data. It may be restarted for inspection/Phase 2; no database was dropped.

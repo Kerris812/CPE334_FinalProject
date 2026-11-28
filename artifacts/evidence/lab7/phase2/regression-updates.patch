@@ -1,0 +1,303 @@
+diff --git a/client/tests/e2e/operator-workflow.spec.ts b/client/tests/e2e/operator-workflow.spec.ts
+index 2ca4b34..0721fe4 100644
+--- a/client/tests/e2e/operator-workflow.spec.ts
++++ b/client/tests/e2e/operator-workflow.spec.ts
+@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
+ import { PrismaClient } from '../../../server/node_modules/@prisma/client/index.js';
+ import { testDatabaseUrl } from '../../../server/src/infrastructure/test-database';
+ const local = Object.fromEntries(readFileSync('../server/.env', 'utf8').split('\n').filter(line => line && !line.startsWith('#')).map(line => { const i = line.indexOf('='); return [line.slice(0, i), line.slice(i + 1)]; }));
++const evidence = process.env.LAB7_EVIDENCE_DIR ?? '../artifacts/evidence/f05-routing';
+ const db = new PrismaClient({ datasourceUrl: testDatabaseUrl(process.env.TEST_DATABASE_URL ?? local.TEST_DATABASE_URL, process.env.DATABASE_URL ?? local.DATABASE_URL) });
+ let operator: { id: string; email: string };
+ let savedQueue: { lastSequence: bigint; state: 'OPEN' | 'PAUSED' | 'CLOSED' };
+@@ -54,12 +55,12 @@ test('TEST-043 real customer and operator workflow reflects on my-queue and publ
+     await host.getByRole('button', { name: 'Call Next', exact: true }).click(); await expect(host.getByText('CALLED', { exact: true })).toBeVisible();
+     await board.goto(`/board/${queue.id}`); await expect(board.getByText(`${queue.code}-0001`, { exact: true })).toBeVisible();
+     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('CALLED', { exact: true })).toBeVisible();
+-    await host.screenshot({ path: '../artifacts/evidence/f05-routing/workflow-regression-desk-desktop.png', fullPage: true });
++    await host.screenshot({ path: `${evidence}/workflow-regression-desk-desktop.png`, fullPage: true });
+     await host.getByRole('button', { name: 'Start Service', exact: true }).click(); await expect(host.getByText('SERVING', { exact: true })).toBeVisible();
+     await board.reload(); await expect(board.getByText('SERVING', { exact: true })).toBeVisible();
+     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('SERVING', { exact: true })).toBeVisible();
+     await host.setViewportSize({ width: 360, height: 780 }); expect(await host.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+-    await host.screenshot({ path: '../artifacts/evidence/f05-routing/workflow-regression-desk-mobile.png', fullPage: true });
++    await host.screenshot({ path: `${evidence}/workflow-regression-desk-mobile.png`, fullPage: true });
+     await host.getByRole('button', { name: 'Complete Service', exact: true }).click(); await expect(host.getByText('Service completed.')).toBeVisible();
+     await page.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible(); await page.reload(); await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible();
+     await board.reload(); await expect(board.getByText('No one is being called yet', { exact: true })).toBeVisible();
+diff --git a/client/tests/e2e/party-routing.spec.ts b/client/tests/e2e/party-routing.spec.ts
+index c15e4a9..9c747fc 100644
+--- a/client/tests/e2e/party-routing.spec.ts
++++ b/client/tests/e2e/party-routing.spec.ts
+@@ -4,6 +4,7 @@ import { createHash, randomUUID } from 'node:crypto';
+ import { PrismaClient } from '../../../server/node_modules/@prisma/client/index.js';
+ import { testDatabaseUrl } from '../../../server/src/infrastructure/test-database';
+ const local = Object.fromEntries(readFileSync('../server/.env', 'utf8').split('\n').filter(line => line && !line.startsWith('#')).map(line => { const i = line.indexOf('='); return [line.slice(0, i), line.slice(i + 1)]; }));
++const evidence = process.env.LAB7_EVIDENCE_DIR ?? '../artifacts/evidence/f05-routing';
+ const db = new PrismaClient({ datasourceUrl: testDatabaseUrl(process.env.TEST_DATABASE_URL ?? local.TEST_DATABASE_URL, process.env.DATABASE_URL ?? local.DATABASE_URL) });
+ test.afterAll(() => db.$disconnect());
+ test('TEST-057 both assigned operators independently complete real R/S workflows', async ({ browser }) => {
+@@ -19,17 +20,17 @@ test('TEST-057 both assigned operators independently complete real R/S workflows
+       await guest.setViewportSize({ width: 360, height: 780 }); await login(guest, customer.email, process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOMER_PASSWORD);
+       await expect(guest.getByText('Parties of 1–4 use Queue R; parties of 5–8 use Queue S.')).toBeVisible(); await guest.getByLabel('Party size').fill(i === 0 ? '4' : '5'); await expect(guest.getByText(`Queue ${queue.code} · OPEN`, { exact: true })).toBeVisible(); await guest.getByRole('button', { name: 'Join queue', exact: true }).click(); await guest.getByRole('link', { name: 'View my queue' }).click(); await expect(guest.getByText('WAITING', { exact: true })).toBeVisible();
+       const hostContext = await browser.newContext(); contexts.push(hostContext); const host = await hostContext.newPage(); hosts.push(host); await host.setViewportSize({ width: i === 0 ? 1440 : 360, height: 900 });
+-      await login(host, `operator.${i === 0 ? 'a' : 'b'}@example.test`, process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(1); await expect(host.getByLabel('Assigned queue').locator('option')).toContainText(queue.code); await expect(host.getByText('Active: 0/1')).toBeVisible();
++      await login(host, `operator.${i === 0 ? 'a' : 'b'}@example.test`, process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(2); await host.getByLabel('Assigned queue').selectOption(queue.id); await expect(host.getByText('Active: 0/1')).toBeVisible();
+     }
+     await Promise.all(hosts.map(host => host.getByRole('button', { name: 'Call Next', exact: true }).click()));
+     const boardContext = await browser.newContext(); contexts.push(boardContext); const board = await boardContext.newPage(); await board.goto('/board');
+     for (const [i, queue] of queues.entries()) { const number = `${queue.code}-${String(Number(queue.lastSequence) + 1).padStart(4, '0')}`; await expect(hosts[i].getByText('CALLED', { exact: true })).toBeVisible(); await expect(hosts[i].getByText('Active: 1/1')).toBeVisible(); await expect(board.getByText(number, { exact: true })).toBeVisible(); }
+-    await board.screenshot({ path: '../artifacts/evidence/f05-routing/boards-desktop.png', fullPage: true });
++    await board.screenshot({ path: `${evidence}/boards-desktop.png`, fullPage: true });
+     await Promise.all(hosts.map(host => host.getByRole('button', { name: 'Start Service', exact: true }).click()));
+-    for (const [i, host] of hosts.entries()) { await expect(host.getByText('SERVING', { exact: true })).toBeVisible(); expect(await host.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await host.screenshot({ path: `../artifacts/evidence/f05-routing/operator-${i === 0 ? 'a-desktop' : 'b-mobile'}.png`, fullPage: true }); }
++    for (const [i, host] of hosts.entries()) { await expect(host.getByText('SERVING', { exact: true })).toBeVisible(); expect(await host.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await host.screenshot({ path: `${evidence}/operator-${i === 0 ? 'a-desktop' : 'b-mobile'}.png`, fullPage: true }); }
+     await Promise.all(hosts.map(host => host.getByRole('button', { name: 'Complete Service', exact: true }).click()));
+     for (const [i, guest] of guests.entries()) { await guest.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(guest.getByText('COMPLETED', { exact: true })).toBeVisible(); await guest.reload(); await expect(guest.getByText('COMPLETED', { exact: true })).toBeVisible(); const entry = await db.queueEntry.findFirstOrThrow({ where: { customerId: customers[i].id } }); const events = await db.queueEvent.findMany({ where: { entryId: entry.id }, orderBy: { occurredAt: 'asc' } }); expect(events.map(e => e.eventType)).toEqual(['JOINED', 'CALLED', 'STARTED', 'COMPLETED']); }
+-    await board.reload(); await expect(board.getByText('No one is being called yet', { exact: true })).toHaveCount(2); await board.setViewportSize({ width: 360, height: 780 }); expect(await board.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await board.screenshot({ path: '../artifacts/evidence/f05-routing/boards-mobile.png', fullPage: true });
++    await board.reload(); await expect(board.getByText('No one is being called yet', { exact: true })).toHaveCount(2); await board.setViewportSize({ width: 360, height: 780 }); expect(await board.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await board.screenshot({ path: `${evidence}/boards-mobile.png`, fullPage: true });
+     for (const queue of queues) { const response = await board.request.get(`/api/v1/public/queues/${queue.code}/board`); expect(response.status()).toBe(200); expect(Object.keys((await response.json()).data).sort()).toEqual(['calledNumber', 'queueCode', 'serviceState', 'waitingCount']); }
+   } finally {
+     for (const context of contexts) await context.close(); const ids = customers.map(c => c.id);
+diff --git a/client/tests/e2e/sprint1-journey.spec.ts b/client/tests/e2e/sprint1-journey.spec.ts
+index 65934ce..21fd433 100644
+--- a/client/tests/e2e/sprint1-journey.spec.ts
++++ b/client/tests/e2e/sprint1-journey.spec.ts
+@@ -1,5 +1,5 @@
+ import { expect, test, type BrowserContext, type Page } from '@playwright/test';
+-import { createHash } from 'node:crypto';
++import { createHash, randomUUID } from 'node:crypto';
+ import { readFileSync, writeFileSync } from 'node:fs';
+ import { PrismaClient } from '../../../server/node_modules/@prisma/client/index.js';
+ import { testDatabaseUrl } from '../../../server/src/infrastructure/test-database';
+@@ -7,7 +7,7 @@ const local = Object.fromEntries(readFileSync('../server/.env', 'utf8').split('\
+ const db = new PrismaClient({ datasourceUrl: testDatabaseUrl(process.env.TEST_DATABASE_URL ?? local.TEST_DATABASE_URL, process.env.DATABASE_URL ?? local.DATABASE_URL) });
+ const customerPassword = process.env.DEMO_CUSTOMER_PASSWORD ?? local.DEMO_CUSTOMER_PASSWORD;
+ const operatorPassword = process.env.DEMO_OPERATOR_PASSWORD ?? local.DEMO_OPERATOR_PASSWORD;
+-const evidence = '../artifacts/evidence/sprint1';
++const evidence = process.env.LAB7_EVIDENCE_DIR ?? '../artifacts/evidence/sprint1';
+ test.afterAll(() => db.$disconnect());
+ function publicShape(body: unknown) {
+   const paths: string[] = [];
+@@ -29,6 +29,7 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
+   const operatorA = await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } });
+   const contexts: BrowserContext[] = []; const sessions: string[] = [];
+   let entryId: string | undefined;
++  let unassignedId: string | undefined;
+   async function page(width: number) { const context = await browser.newContext({ baseURL, viewport: { width, height: 1000 } }); contexts.push(context); return context.newPage(); }
+   async function login(target: Page, email: string, password: string) {
+     await target.goto('/login'); await target.getByLabel('Email').fill(email); await target.getByLabel('Password', { exact: true }).fill(password); await target.getByRole('button', { name: 'Sign in', exact: true }).click();
+@@ -48,7 +49,7 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
+     await expect(customer.getByText('R-0001', { exact: true })).toBeVisible();
+     const duplicate = await customer.request.post(`/api/v1/queues/${queue.id}/entries`, { headers: { Origin: origin }, data: { partySize: 4 } }); const duplicateBody = await duplicate.json(); expect(duplicate.status()).toBe(409); expect(duplicateBody.error.code).toBe('DUPLICATE_ACTIVE_ENTRY');
+     await customer.getByRole('link', { name: 'View my queue' }).click(); await expect(customer.getByText('WAITING', { exact: true })).toBeVisible();
+-    await login(host, operatorA.email, operatorPassword); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(1); await expect(host.getByLabel('Assigned queue').locator('option')).toContainText('R');
++    await login(host, operatorA.email, operatorPassword); await expect(host.getByLabel('Assigned queue').locator('option')).toHaveCount(2); await host.getByLabel('Assigned queue').selectOption(queue.id);
+     await host.getByRole('button', { name: 'Call Next', exact: true }).click(); await expect(host.getByText('CALLED', { exact: true })).toBeVisible();
+     await customer.getByRole('button', { name: 'Refresh status', exact: true }).click(); await expect(customer.getByText('CALLED', { exact: true })).toBeVisible();
+     await board.goto('/board/R'); await expect(board.getByText('R-0001', { exact: true })).toBeVisible();
+@@ -67,7 +68,9 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
+     expect((await board.context().cookies()).some(cookie => cookie.name === 'qs_session')).toBe(false); await expect(board.getByRole('button', { name: 'Log out' })).toHaveCount(0);
+     await login(otherCustomer, 'customer.b@example.test', customerPassword); const foreign = await otherCustomer.request.get(`/api/v1/customer/entries/${entryId}`); const foreignBody = await foreign.json(); expect(foreign.status()).toBe(404); expect(foreignBody.error.code).toBe('ENTRY_NOT_FOUND');
+     const before = await db.queueEntry.findUniqueOrThrow({ where: { id: entryId } }); const beforeEvents = await db.queueEvent.findMany({ where: { entryId }, orderBy: { occurredAt: 'asc' } });
+-    await login(otherOperator, 'operator.b@example.test', operatorPassword); await expect(otherOperator.getByLabel('Assigned queue').locator('option')).toContainText('S');
++    const unassigned = await db.user.create({ data: { email: `journey-unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned journey host', role: 'OPERATOR', passwordHash: operatorA.passwordHash } });
++    unassignedId = unassigned.id;
++    await login(otherOperator, unassigned.email, operatorPassword); await expect(otherOperator.getByText('No assigned queues.')).toBeVisible();
+     expect((await otherOperator.request.get(`/api/v1/operator/queues/${queue.id}/desk`)).status()).toBe(403);
+     const denials: { path: string; status: number; code: string }[] = [];
+     for (const path of [`/queues/${queue.id}/call-next`, `/entries/${entryId}/start-service`, `/entries/${entryId}/complete`]) { const denied = await otherOperator.request.post(`/api/v1/operator${path}`, { headers: { Origin: origin }, data: {} }); const deniedBody = await denied.json(); expect(denied.status()).toBe(403); expect(deniedBody.error.code).toBe('QUEUE_ACCESS_DENIED'); denials.push({ path, status: denied.status(), code: deniedBody.error.code }); }
+@@ -80,5 +83,6 @@ test('TEST-043 complete seeded R-0001 release journey with five isolated browser
+     // Clean only this test's saved entry/sessions; production never deletes history or resets counters.
+     if (entryId) { await db.queueEvent.deleteMany({ where: { entryId } }); await db.queueEntry.delete({ where: { id: entryId } }); await db.queue.update({ where: { id: queue.id }, data: { lastSequence: queue.lastSequence } }); }
+     await db.session.deleteMany({ where: { id: { in: sessions } } });
++    if (unassignedId) await db.user.delete({ where: { id: unassignedId } });
+   }
+ });
+diff --git a/client/tests/ui/lab7-shared-operators.test.tsx b/client/tests/ui/lab7-shared-operators.test.tsx
+index 355c786..5c40fd7 100644
+--- a/client/tests/ui/lab7-shared-operators.test.tsx
++++ b/client/tests/ui/lab7-shared-operators.test.tsx
+@@ -32,7 +32,7 @@ function api(initial: 'CALLED' | 'SERVING' | null = null) {
+   return { fetcher, states, conflict: () => { conflict = true; }, fail: (status: number) => { failure = status; } };
+ }
+ async function enabled(name: string) {
+-  const button = await screen.findByRole('button', { name, exact: true });
++  const button = await screen.findByRole('button', { name });
+   await waitFor(() => expect(button.hasAttribute('disabled')).toBe(false));
+   return button;
+ }
+diff --git a/server/tests/api/authorization.test.ts b/server/tests/api/authorization.test.ts
+index 69057a0..cd30d8b 100644
+--- a/server/tests/api/authorization.test.ts
++++ b/server/tests/api/authorization.test.ts
+@@ -13,6 +13,7 @@ let queueId: string;
+ let customerId: string;
+ let entryId: string;
+ let operatorId: string;
++let unassigned: { id: string; email: string };
+ async function login(email: string) {
+   const response = await request(app).post('/api/v1/auth/login').set('Origin', origin).send({
+     email, password: email.startsWith('customer') ? process.env.DEMO_CUSTOMER_PASSWORD : process.env.DEMO_OPERATOR_PASSWORD,
+@@ -41,29 +42,34 @@ beforeAll(async () => {
+   await seed(db);
+   queueId = (await db.queue.findUniqueOrThrow({ where: { code: 'R' } })).id;
+   customerId = (await db.user.findUniqueOrThrow({ where: { email: 'customer.a@example.test' } })).id;
+-  operatorId = (await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } })).id;
++  const assigned = await db.user.findUniqueOrThrow({ where: { email: 'operator.a@example.test' } });
++  operatorId = assigned.id;
++  unassigned = await db.user.create({ data: { email: `unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned operator', role: 'OPERATOR', passwordHash: assigned.passwordHash } });
+   const entry = await db.queueEntry.create({ data: { queueId, customerId, sequence: 700001n, displayNumber: `AUTH-${randomUUID().slice(0, 20)}`, partySize: 4 } });
+   entryId = entry.id;
+ });
+ afterEach(async () => { await db.session.deleteMany({ where: { id: { in: sessions.splice(0) } } }); });
+-afterAll(async () => { if (entryId) await db.queueEntry.delete({ where: { id: entryId } }); await db.$disconnect(); });
++afterAll(async () => { if (entryId) await db.queueEntry.delete({ where: { id: entryId } }); if (unassigned) await db.user.delete({ where: { id: unassigned.id } }); await db.$disconnect(); });
+ 
+-test('TEST-010 assigned operator receives only assigned queue public metadata', async () => {
+-  const cookie = await login('operator.a@example.test');
+-  const before = await state();
+-  const response = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie);
+-  expect(response.status).toBe(200);
+-  expect(response.body).toEqual({ data: [{ id: queueId, code: 'R', name: 'Restaurant Waiting Queue', state: 'OPEN' }] });
+-  expect(await state()).toEqual(before);
++test('TEST-010 both seeded operators receive R/S assigned queue public metadata', async () => {
++  const expected = await db.queue.findMany({ where: { code: { in: ['R', 'S'] } }, select: { id: true, code: true, name: true, state: true }, orderBy: { code: 'asc' } });
++  expect(expected.map(q => q.code)).toEqual(['R', 'S']);
++  for (const email of ['operator.a@example.test', 'operator.b@example.test']) {
++    const cookie = await login(email);
++    const before = await state();
++    const response = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie);
++    expect(response.status).toBe(200);
++    expect(response.body).toEqual({ data: expected });
++    expect(await state()).toEqual(before);
++  }
+ });
+ 
+-test('TEST-011 operator B lists S and cannot inspect or mutate R', async () => {
+-  const cookie = await login('operator.b@example.test');
++test('TEST-011 genuinely unassigned operator cannot inspect or mutate R despite forged identity', async () => {
++  const cookie = await login(unassigned.email);
+   const before = await state();
+   const list = await request(app).get('/api/v1/operator/queues').set('Cookie', cookie).set('operatorId', operatorId).query({ operatorId });
+   expect(list.status).toBe(200);
+-  const s = await db.queue.findUniqueOrThrow({ where: { code: 'S' } });
+-  expect(list.body).toEqual({ data: [{ id: s.id, code: 'S', name: s.name, state: 'OPEN' }] });
++  expect(list.body).toEqual({ data: [] });
+   denied(await request(app).get(`/api/v1/operator/queues/${queueId}/desk`).set('Cookie', cookie), 403, 'QUEUE_ACCESS_DENIED');
+   for (const path of [`queues/${queueId}/call-next`, `entries/${entryId}/start-service`, `entries/${entryId}/complete`]) {
+     denied(await request(app).post(`/api/v1/operator/${path}`).set('Cookie', cookie).set('Origin', origin).send({ operatorId }), 403, 'QUEUE_ACCESS_DENIED');
+diff --git a/server/tests/api/database.test.ts b/server/tests/api/database.test.ts
+index fe921fb..315f6dc 100644
+--- a/server/tests/api/database.test.ts
++++ b/server/tests/api/database.test.ts
+@@ -20,7 +20,7 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
+   }
+   expect(await db.user.count()).toBe(4);
+   expect(await db.queue.count()).toBe(2);
+-  expect(await db.operatorQueueAssignment.count()).toBe(2);
++  expect(await db.operatorQueueAssignment.count()).toBe(4);
+   const queue = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
+   expect(queue.state).toBe('OPEN');
+   const users = await db.user.findMany({ orderBy: { email: 'asc' } });
+@@ -28,7 +28,11 @@ test('TEST-009 migrations and seed repeat without duplicate records or resetting
+     expect(user.passwordHash).toMatch(/^\$argon2id\$/);
+     expect(await verify(user.passwordHash, user.role === 'CUSTOMER' ? env.DEMO_CUSTOMER_PASSWORD : env.DEMO_OPERATOR_PASSWORD)).toBe(true);
+   }
+-  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ where: { queueId: queue.id }, include: { operator: true } });
++  const pairs = await db.operatorQueueAssignment.findMany({ include: { operator: true, queue: true } });
++  expect(pairs.map(row => `${row.operator.email}/${row.queue.code}`).sort()).toEqual([
++    'operator.a@example.test/R', 'operator.a@example.test/S', 'operator.b@example.test/R', 'operator.b@example.test/S',
++  ]);
++  const assignment = await db.operatorQueueAssignment.findFirstOrThrow({ where: { queueId: queue.id, operator: { email: 'operator.a@example.test' } }, include: { operator: true } });
+   expect(assignment.operator.email).toBe('operator.a@example.test');
+   expect(assignment.queueId).toBe(queue.id);
+   const before = users.map(u => [u.id, u.passwordHash]);
+diff --git a/server/tests/api/party-routing.test.ts b/server/tests/api/party-routing.test.ts
+index c13552c..0f7c8ff 100644
+--- a/server/tests/api/party-routing.test.ts
++++ b/server/tests/api/party-routing.test.ts
+@@ -17,11 +17,11 @@ const join = (queueId: string, size: number, who = f.customer) => request(app).p
+ const call = (queueId: string, who: { cookie: string }) => request(app).post(`/api/v1/operator/queues/${queueId}/call-next`).set('Cookie', who.cookie).set('Origin', origin).send({});
+ const action = (entryId: string, name: string, who: { cookie: string }) => request(app).post(`/api/v1/operator/entries/${entryId}/${name}`).set('Cookie', who.cookie).set('Origin', origin).send({});
+ async function unchanged(run: () => PromiseLike<request.Response>, status: number, code: string) { const before = await f.state(); const r = await run(); expect(r.status).toBe(status); expect(r.body.error.code).toBe(code); expect(await f.state()).toEqual(before); }
+-test('TEST-053 seed adds both designated queues and assignments without changing existing records', async () => {
++test('TEST-053 seed adds both queues and four shared assignments without changing existing records', async () => {
+   const entry = await f.entry('COMPLETED'); const before = { users: await db.user.findMany({ orderBy: { id: 'asc' } }), sessions: await db.session.findMany({ orderBy: { id: 'asc' } }), entry: await db.queueEntry.findUnique({ where: { id: entry.id } }), events: await db.queueEvent.findMany() };
+   await seed(db); await seed(db);
+   expect(await db.queue.findMany({ where: { code: { in: ['R', 'S'] } }, select: { code: true, state: true }, orderBy: { code: 'asc' } })).toEqual([{ code: 'R', state: 'OPEN' }, { code: 'S', state: 'OPEN' }]);
+-  for (const [letter, code] of [['a', 'R'], ['b', 'S']] as const) { const user = await db.user.findUniqueOrThrow({ where: { email: `operator.${letter}@example.test` } }); const rows = await db.operatorQueueAssignment.findMany({ where: { operatorId: user.id }, include: { queue: true } }); expect(rows.map(r => r.queue.code)).toEqual([code]); }
++  for (const letter of ['a', 'b']) { const user = await db.user.findUniqueOrThrow({ where: { email: `operator.${letter}@example.test` } }); const rows = await db.operatorQueueAssignment.findMany({ where: { operatorId: user.id }, include: { queue: true } }); expect(rows.map(r => r.queue.code).sort()).toEqual(['R', 'S']); }
+   expect({ users: await db.user.findMany({ orderBy: { id: 'asc' } }), sessions: await db.session.findMany({ orderBy: { id: 'asc' } }), entry: await db.queueEntry.findUnique({ where: { id: entry.id } }), events: await db.queueEvent.findMany() }).toEqual(before);
+ });
+ test('TEST-054 R rejects large parties and unsupported queues reject new joins without writes', async () => { await unchanged(() => join(f.queue.id, 5), 422, 'VALIDATION_ERROR'); const other = await f.newQueue(); await unchanged(() => join(other.id, 4), 422, 'VALIDATION_ERROR'); });
+@@ -36,15 +36,19 @@ test('TEST-054 both queues reject joins while unavailable and a customer race ac
+   for (const [queue, size] of [[f.queue, 4], [s, 5]] as const) { for (const state of ['PAUSED', 'CLOSED'] as const) { await db.queue.update({ where: { id: queue.id }, data: { state } }); await unchanged(() => join(queue.id, size), 409, 'QUEUE_NOT_OPEN'); } await db.queue.update({ where: { id: queue.id }, data: { state: 'OPEN' } }); }
+   const rs = await Promise.all([join(f.queue.id, 4), join(s.id, 5)]); expect(rs.map(r => r.status).sort()).toEqual([201, 409]); expect(rs.find(r => r.status === 409)?.body.error.code).toBe('DUPLICATE_ACTIVE_ENTRY'); const snapshot = await f.state(); expect(snapshot.entries).toHaveLength(1); expect(snapshot.events).toHaveLength(1); expect(snapshot.queues.reduce((n, q) => n + q.lastSequence, 0n)).toBe(1n);
+ });
+-test('TEST-055 A lists and manages only R; B only S, including forged identities', async () => {
+-  const s = await f.useS(); const a = await operator('a'); const b = await operator('b');
++test('TEST-055 A/B list both queues while genuinely unassigned operators remain denied despite forged identities', async () => {
++  const s = await f.useS(); const a = await operator('a'); const b = await operator('b'); const unassigned = await f.actor('OPERATOR');
+   const rEntry = await f.entry(); const sEntry = await f.entry('WAITING', await f.actor(), s);
+-  for (const [who, own, foreign, foreignEntry, other] of [[a, f.queue, s, sEntry, b], [b, s, f.queue, rEntry, a]] as const) {
+-    const list = await request(app).get('/api/v1/operator/queues').set('Cookie', who.cookie); expect(list.body.data.map((q: { code: string }) => q.code)).toEqual([own.code]);
+-    expect((await request(app).get(`/api/v1/operator/queues/${own.id}/desk`).set('Cookie', who.cookie)).status).toBe(200);
+-    await unchanged(() => request(app).get(`/api/v1/operator/queues/${foreign.id}/desk`).set('Cookie', who.cookie), 403, 'QUEUE_ACCESS_DENIED');
+-    await unchanged(() => call(foreign.id, who), 403, 'QUEUE_ACCESS_DENIED');
+-    for (const name of ['start-service', 'complete']) await unchanged(() => action(foreignEntry.id, name, who).send({ operatorId: other.id, queueId: own.id }), 403, 'QUEUE_ACCESS_DENIED');
++  for (const who of [a, b]) {
++    const list = await request(app).get('/api/v1/operator/queues').set('Cookie', who.cookie);
++    expect(list.body.data.map((q: { code: string }) => q.code)).toEqual(['R', 'S']);
++    for (const queue of [f.queue, s]) expect((await request(app).get(`/api/v1/operator/queues/${queue.id}/desk`).set('Cookie', who.cookie)).status).toBe(200);
++  }
++  expect((await request(app).get('/api/v1/operator/queues').set('Cookie', unassigned.cookie)).body.data).toEqual([]);
++  for (const [queue, entry, other] of [[f.queue, rEntry, a], [s, sEntry, b]] as const) {
++    await unchanged(() => request(app).get(`/api/v1/operator/queues/${queue.id}/desk`).set('Cookie', unassigned.cookie), 403, 'QUEUE_ACCESS_DENIED');
++    await unchanged(() => call(queue.id, unassigned), 403, 'QUEUE_ACCESS_DENIED');
++    for (const name of ['start-service', 'complete']) await unchanged(() => action(entry.id, name, unassigned).send({ operatorId: other.id, queueId: queue.id }), 403, 'QUEUE_ACCESS_DENIED');
+   }
+ });
+ test('TEST-056 independent FIFO and forty simultaneous calls create one active slot and audit per queue', async () => {
+@@ -65,7 +69,9 @@ test('TEST-056 holding R row lock does not prevent S from calling', async () =>
+ test('TEST-053 seed preserves paused states and counters; contradictory assignment fails atomically', async () => {
+   const s = await f.useS(); const a = await operator('a');
+   await db.queue.update({ where: { id: s.id }, data: { state: 'PAUSED', lastSequence: 99n } }); const before = await f.state(); await seed(db); expect(await f.state()).toEqual(before);
+-  await db.operatorQueueAssignment.create({ data: { operatorId: a.id, queueId: s.id } });
+-  try { const assignments = await db.operatorQueueAssignment.findMany({ orderBy: [{ operatorId: 'asc' }, { queueId: 'asc' }] }); await expect(seed(db)).rejects.toThrow(/assignment/i); expect(await f.state()).toEqual(before); expect(await db.operatorQueueAssignment.findMany({ orderBy: [{ operatorId: 'asc' }, { queueId: 'asc' }] })).toEqual(assignments); }
+-  finally { await db.operatorQueueAssignment.delete({ where: { operatorId_queueId: { operatorId: a.id, queueId: s.id } } }); }
++  const outside = await f.newQueue();
++  await db.operatorQueueAssignment.create({ data: { operatorId: a.id, queueId: outside.id } });
++  const conflictedState = await f.state();
++  try { const assignments = await db.operatorQueueAssignment.findMany({ orderBy: [{ operatorId: 'asc' }, { queueId: 'asc' }] }); await expect(seed(db)).rejects.toThrow(/assignment/i); expect(await f.state()).toEqual(conflictedState); expect(await db.operatorQueueAssignment.findMany({ orderBy: [{ operatorId: 'asc' }, { queueId: 'asc' }] })).toEqual(assignments); }
++  finally { await db.operatorQueueAssignment.delete({ where: { operatorId_queueId: { operatorId: a.id, queueId: outside.id } } }); }
+ });
+diff --git a/server/tests/api/permission-guards.test.ts b/server/tests/api/permission-guards.test.ts
+index 1a9705c..69f7626 100644
+--- a/server/tests/api/permission-guards.test.ts
++++ b/server/tests/api/permission-guards.test.ts
+@@ -21,6 +21,7 @@ let customerCookie: string;
+ let ownerCookie: string;
+ let assignedCookie: string;
+ let unassignedCookie: string;
++let unassignedId: string;
+ const fixture = express();
+ fixture.use(express.json(), requireAuthentication(db));
+ fixture.get('/owned/:entryId', requireRole('CUSTOMER'), requireOwnedEntry(db), (_req, res) => res.status(204).end());
+@@ -52,11 +53,15 @@ beforeAll(async () => {
+   customerCookie = await session('customer.a@example.test');
+   ownerCookie = await session('customer.b@example.test');
+   assignedCookie = await session('operator.a@example.test');
+-  unassignedCookie = await session('operator.b@example.test');
++  const assigned = await db.user.findUniqueOrThrow({ where: { id: operatorId } });
++  const unassigned = await db.user.create({ data: { email: `unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned guard fixture', role: 'OPERATOR', passwordHash: assigned.passwordHash } });
++  unassignedId = unassigned.id;
++  unassignedCookie = await session(unassigned.email);
+ });
+ afterAll(async () => {
+   await db.session.deleteMany({ where: { id: { in: sessions } } });
+   if (entryId) await db.queueEntry.delete({ where: { id: entryId } });
++  if (unassignedId) await db.user.delete({ where: { id: unassignedId } });
+   await db.$disconnect();
+ });
+ 

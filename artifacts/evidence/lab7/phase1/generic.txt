@@ -1,0 +1,30 @@
+
+ RUN  v5.1.0 /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/server
+
+ ✓ tests/api/lab7-regression.test.ts > L7-005 generic assigned operators already support handoff without service ownership 62ms
+ ✓ tests/api/lab7-regression.test.ts > L7-006 customers remain forbidden even with forged operator and queue claims 49ms
+ ✓ tests/api/lab7-regression.test.ts > L7-007 genuinely unassigned and revoked operators remain denied by stored target queue 46ms
+ ✓ tests/api/lab7-regression.test.ts > L7-008 assigned operators cannot start WAITING entries in either queue 20ms
+ ✓ tests/api/lab7-regression.test.ts > L7-009 assigned operators cannot complete WAITING or CALLED entries 34ms
+ ✓ tests/api/lab7-regression.test.ts > L7-010 distinct assigned operators racing starts and completions have one winner and event 31ms
+ ✓ tests/api/lab7-regression.test.ts > L7-011 twenty mixed-operator calls preserve one FIFO head and one audit event per queue 60ms
+ ✓ tests/api/lab7-regression.test.ts > L7-012 each handoff audit actor comes from its session despite forged previous actors 29ms
+ ✓ tests/api/lab7-regression.test.ts > L7-013 FIFO uses immutable sequence despite insertion time, client order and operator choice 65ms
+ ✓ tests/api/lab7-regression.test.ts > L7-014 exact routing boundaries and invalid JSON values preserve all rejected join state 78ms
+ ✓ tests/api/lab7-regression.test.ts > L7-015 CALLED and SERVING share one slot while the other queue remains independently callable 31ms
+ ✓ tests/api/lab7-regression.test.ts > L7-016 anonymous sessions cannot read or mutate any protected operator endpoint 13ms
+ ✓ tests/api/lab7-regression.test.ts > L7-016 expired sessions cannot read or mutate any protected operator endpoint 14ms
+ ✓ tests/api/lab7-regression.test.ts > L7-016 revoked sessions cannot read or mutate any protected operator endpoint 14ms
+ ✓ tests/api/lab7-regression.test.ts > L7-016 inactive sessions cannot read or mutate any protected operator endpoint 14ms
+ ✓ tests/api/lab7-regression.test.ts > L7-016 customer isolation, duplicate-active prevention, exact public DTO and reconnect persistence remain 101ms
+ ✓ tests/api/lab7-regression.test.ts > L7-017 unexpected seeded assignments outside R/S fail atomically and preserve the actual assignment 78ms
+ ✓ tests/api/lab7-regression.test.ts > L7-018 terminal and repeated transitions are immutable; historical routing is not reinterpreted 114ms
+ ✓ tests/api/lab7-regression.test.ts > L7-019 holding R queue row lock does not block an independently authorized S call 9ms
+ ✓ tests/api/lab7-regression.test.ts > L7-020 event insert failure rolls back every action for either assigned operator, and retry records once 38ms
+
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+   Start at  04:03:51
+   Duration  1.22s (tests 85%, import 10%, transform 5%)
+
+JSON report written to /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/artifacts/evidence/lab7/phase1/generic-results.json

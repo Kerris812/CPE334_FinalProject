@@ -1,0 +1,15 @@
+{
+  "postgresql": "PostgreSQL 17 Homebrew, new cluster /private/tmp/lab7-red-postgres.OCM3Gc/data",
+  "TEST_DATABASE_URL": "postgresql://lab7_test_user@127.0.0.1:55473/lab7_red_test?connection_limit=8",
+  "DATABASE_URL_for_direct_api_tests": "same as TEST_DATABASE_URL",
+  "DATABASE_URL_for_browser_launcher": "postgresql://lab7_test_user@127.0.0.1:55473/lab7_unused (different name for existing safety guard; browser/API use TEST_DATABASE_URL)",
+  "DEMO_CUSTOMER_PASSWORD": "Lab7-Synthetic-Customer-Only",
+  "DEMO_OPERATOR_PASSWORD": "Lab7-Synthetic-Operator-Only",
+  "NODE_ENV": "test",
+  "TZ": "UTC",
+  "E2E_API_PORT": "3457",
+  "E2E_WEB_PORT": "5487",
+  "setup": "Existing migrations 0001/0002 applied successfully. Old seed executed successfully with valid synthetic passwords before RED. No manual A/S or B/R inserts. API runs sequential, pool limit 8. Generic operators G/H are independent disposable fixtures; no A/B permission is manufactured.",
+  "environment_incidents": "Docker socket, initdb shared memory and localhost sockets were denied inside sandbox; resolved using approved isolated local execution. No environment-related test failures.",
+  "deployment": "No deployed version was queried or assumed."
+}

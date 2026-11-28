@@ -1,0 +1,27 @@
+{
+  "server/tests/support/lab7-fixture.ts": {
+    "phase1Sha256": "38531fbaf3dae358c9fc0f2c10b75c8804605cbccee6094c948c8ae943c3a16f",
+    "currentSha256": "38531fbaf3dae358c9fc0f2c10b75c8804605cbccee6094c948c8ae943c3a16f",
+    "identical": true
+  },
+  "server/tests/api/lab7-provisioning.test.ts": {
+    "phase1Sha256": "74d961621a9cbfdd43e2496d5d12f196c980b63ddd06e147007a6973aa46b4cc",
+    "currentSha256": "74d961621a9cbfdd43e2496d5d12f196c980b63ddd06e147007a6973aa46b4cc",
+    "identical": true
+  },
+  "server/tests/api/lab7-regression.test.ts": {
+    "phase1Sha256": "f338bd3206b98031990adb03fb46cb39435d16ee0b5e16d52238a6442614cf4f",
+    "currentSha256": "f338bd3206b98031990adb03fb46cb39435d16ee0b5e16d52238a6442614cf4f",
+    "identical": true
+  },
+  "client/tests/ui/lab7-shared-operators.test.tsx": {
+    "phase1Sha256": "d49c748cdd42297d2430949b8bca33684aaa8ecefc24ffc52ac84c0190d082c8",
+    "currentSha256": "6611bcaaa4fa199cf7411f822a77f0aed7f6aad1b2d89a61a92fae1db359f337",
+    "identical": false
+  },
+  "client/tests/e2e/lab7-shared-operators.spec.ts": {
+    "phase1Sha256": "6268c5faaf30689fb4491239ade4d1fef1ba360f7c1c2cd3553f54f29c9a85fd",
+    "currentSha256": "6268c5faaf30689fb4491239ade4d1fef1ba360f7c1c2cd3553f54f29c9a85fd",
+    "identical": true
+  }
+}

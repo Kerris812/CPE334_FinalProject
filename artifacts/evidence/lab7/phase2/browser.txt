@@ -1,0 +1,18 @@
+[WebServer] (node:31841) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[WebServer] (node:31842) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[WebServer] (node:31874) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 2 tests using 1 worker
+
+(node:31876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/2] tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R
+[2/2] tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S
+  2 passed (5.6s)

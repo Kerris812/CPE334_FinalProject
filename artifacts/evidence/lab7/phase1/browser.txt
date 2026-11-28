@@ -1,0 +1,131 @@
+[WebServer] (node:21546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[WebServer] (node:21547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+[WebServer] (node:21588) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 2 tests using 1 worker
+
+(node:21594) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/2] tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R
+  1) tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByLabel('Assigned queue').locator('option')
+    Timeout: 5000ms
+    - Expected  - 1
+    + Received  + 0
+
+      Array [
+        "R — Restaurant Waiting Queue",
+    -   "S — Large Party Waiting Queue",
+      ]
+
+    Call log:
+      - Expect "toHaveText" getByLabel('Assigned queue').locator('option') with timeout 5000ms
+      - waiting for getByLabel('Assigned queue').locator('option')
+        14 × locator resolved to 1 element
+
+
+      36 |       await login(a, 'operator.a@example.test', process.env.DEMO_OPERATOR_PASSWORD!);
+      37 |       await login(b, 'operator.b@example.test', process.env.DEMO_OPERATOR_PASSWORD!);
+    > 38 |       await expect(a.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);
+         |                                                                      ^
+      39 |       await expect(b.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);
+      40 |       for (const page of [a, b]) await page.getByLabel('Assigned queue').selectOption(queue.id);
+      41 |       const caller = code === 'R' ? a : b;
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/error-context.md
+
+    Error Context: ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/trace.zip
+    Usage:
+
+        npx playwright show-trace ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-6a48f-r-handoff-completes-Queue-R/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:21682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[2/2] tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S
+  2) tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByLabel('Assigned queue').locator('option')
+    Timeout: 5000ms
+    - Expected  - 1
+    + Received  + 0
+
+      Array [
+        "R — Restaurant Waiting Queue",
+    -   "S — Large Party Waiting Queue",
+      ]
+
+    Call log:
+      - Expect "toHaveText" getByLabel('Assigned queue').locator('option') with timeout 5000ms
+      - waiting for getByLabel('Assigned queue').locator('option')
+        14 × locator resolved to 1 element
+
+
+      36 |       await login(a, 'operator.a@example.test', process.env.DEMO_OPERATOR_PASSWORD!);
+      37 |       await login(b, 'operator.b@example.test', process.env.DEMO_OPERATOR_PASSWORD!);
+    > 38 |       await expect(a.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);
+         |                                                                      ^
+      39 |       await expect(b.getByLabel('Assigned queue').locator('option')).toHaveText(['R — Restaurant Waiting Queue', 'S — Large Party Waiting Queue']);
+      40 |       for (const page of [a, b]) await page.getByLabel('Assigned queue').selectOption(queue.id);
+      41 |       const caller = code === 'R' ? a : b;
+        at /Users/saibhone/Desktop/CPE334_FinalProject/CPE334_FinalProject/client/tests/e2e/lab7-shared-operators.spec.ts:38:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/error-context.md
+
+    Error Context: ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/trace.zip
+    Usage:
+
+        npx playwright show-trace ../artifacts/evidence/lab7/phase1/browser-output/lab7-shared-operators-L7-0-c9c66-r-handoff-completes-Queue-S/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue R 
+    tests/e2e/lab7-shared-operators.spec.ts:17:3 › L7-001 L7-002 L7-005 seeded A/B browser handoff completes Queue S 

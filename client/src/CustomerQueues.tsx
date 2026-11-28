@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { queueRequest, QueueError } from './queue-api';
 import type { QueueEntry, QueueInfo } from './queue-api';
 import { useQueueResource } from './useQueueResource';
+import { TerminationControl } from './components/TerminationControl';
 import { QueueNumberDisplay } from './QueueNumberDisplay';
 import { BackLink, Button, Card, DetailList, EmptyState, ErrorState, FooterMeta, FormField, InlineNotice, PageHeader } from './components/ui';
 export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolean; onUnauthenticated: () => void }) {
@@ -44,6 +45,7 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
       else setMessage('Unable to join the queue. Please try again.');
     } finally { submitting.current = false; setPending(false); }
   }
+  const terminalAt = entry?.status === 'CANCELLED' ? entry.cancelledAt : entry?.status === 'NO_SHOW' ? entry.noShowAt : null;
   const active = entry && ['WAITING', 'CALLED', 'SERVING'].includes(entry.status);
   const Container = myQueue ? Card : 'section';
   const EntryContainer = myQueue ? Fragment : Card;
@@ -56,6 +58,11 @@ export function CustomerQueues({ myQueue, onUnauthenticated }: { myQueue: boolea
       {!resource.error && <>
         {entry && <EntryContainer>
           <QueueNumberDisplay number={entry.displayNumber} status={entry.status} />
+          {entry.status === 'WAITING' && <TerminationControl key={entry.id} action="customer-cancel" entry={entry}
+            disabled={resource.refreshing || pending} onUnauthenticated={onUnauthenticated}
+            onRefresh={() => { setJoined(null); resource.retry(); }} onSuccess={setMessage} onFailure={setMessage} />}
+          {myQueue && terminalAt && <p>Updated <time dateTime={terminalAt}>{new Date(terminalAt).toLocaleString('en-GB', { timeZone: 'Asia/Bangkok' })}</time> Bangkok time</p>}
+          {myQueue && !active && <a className="ui-ghost-link" href="/queues">Join a queue</a>}
           {myQueue ? <DetailList items={[
             { label: 'Queue', value: <>Queue {entry.queueCode ?? '—'}</> },
             { label: 'Party size', value: entry.partySize },

@@ -37,10 +37,10 @@ export async function joinQueue(db: PrismaClient, customerId: string, queueId: u
     throw error;
   }
 }
-const privateSelect = { id: true, displayNumber: true, partySize: true, status: true, joinedAt: true, calledAt: true, servingAt: true, completedAt: true, queue: { select: { code: true } } } satisfies Prisma.QueueEntrySelect;
+const privateSelect = { id: true, displayNumber: true, partySize: true, status: true, joinedAt: true, calledAt: true, servingAt: true, completedAt: true, cancelledAt: true, noShowAt: true, queue: { select: { code: true } } } satisfies Prisma.QueueEntrySelect;
 type PrivateRecord = Prisma.QueueEntryGetPayload<{ select: typeof privateSelect }>;
-function privateDto(entry: PrivateRecord) {
-  return { id: entry.id, queueCode: entry.queue.code, displayNumber: entry.displayNumber, partySize: entry.partySize, status: entry.status, joinedAt: entry.joinedAt, calledAt: entry.calledAt, servingAt: entry.servingAt, completedAt: entry.completedAt };
+export function privateDto(entry: PrivateRecord) {
+  return { id: entry.id, queueCode: entry.queue.code, displayNumber: entry.displayNumber, partySize: entry.partySize, status: entry.status, joinedAt: entry.joinedAt, calledAt: entry.calledAt, servingAt: entry.servingAt, completedAt: entry.completedAt, ...(entry.status === 'CANCELLED' || entry.status === 'NO_SHOW' ? { cancelledAt: entry.cancelledAt, noShowAt: entry.noShowAt, position: null, estimatedWaitMinutes: null } : {}) };
 }
 export async function readCustomerEntry(db: PrismaClient, customerId: string, entryId?: string) {
   const notFound = () => new ApiError(404, 'ENTRY_NOT_FOUND', 'Queue entry not found.');

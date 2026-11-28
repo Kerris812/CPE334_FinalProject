@@ -6,6 +6,7 @@ import { authentication } from './auth/auth.js';
 import { requireRole, requireQueueAssignment, requireEntryAssignment, currentUser } from './authorization/guards.js';
 import { queueRoutes, customerEntryRoutes, publicBoardRoutes } from './queues/routes.js';
 import { operate, readDesk } from './operator/service.js';
+import { cancelEntry, markNoShow } from './lifecycle/termination.js';
 import { ApiError, sendError } from './http/errors.js';
 
 interface AppOptions {
@@ -22,9 +23,10 @@ export function createApp(options: AppOptions = {}) {
   app.use('/api/v1', (_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   const parseJson = express.json({ limit: '16kb', strict: false });
   const db = options.db ?? database;
+  const now = options.now ?? (() => new Date());
   const auth = authentication(
     db,
-    options.now ?? (() => new Date()),
+    now,
     process.env.NODE_ENV === 'production' || process.env.COOKIE_SECURE === 'true',
     options.webOrigin ?? process.env.WEB_ORIGIN ?? 'http://127.0.0.1:5173',
   );
@@ -40,7 +42,7 @@ export function createApp(options: AppOptions = {}) {
     next();
   }, parseJson);
   app.use('/api/v1/queues', queueRoutes(db));
-  app.use('/api/v1/customer/entries', customerEntryRoutes(db));
+  app.use('/api/v1/customer/entries', customerEntryRoutes(db, now));
   app.use('/api/v1/public/queues', publicBoardRoutes(db));
   app.get('/api/v1/operator/queues', async (_req, res) => {
     const queues = await db.queue.findMany({
@@ -50,10 +52,12 @@ export function createApp(options: AppOptions = {}) {
     });
     res.json({ data: queues });
   });
-  app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db), async (req, res) => { res.json({ data: await readDesk(db, currentUser(res).id, String(req.params.queueId)) }); });
+  app.get('/api/v1/operator/queues/:queueId/desk', requireQueueAssignment(db), async (req, res) => { res.json({ data: await readDesk(db, currentUser(res).id, String(req.params.queueId), now) }); });
   app.post('/api/v1/operator/queues/:queueId/call-next', requireQueueAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { queueId: String(req.params.queueId) }) }); });
   app.post('/api/v1/operator/entries/:entryId/start-service', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'SERVING' }) }); });
   app.post('/api/v1/operator/entries/:entryId/complete', requireEntryAssignment(db), async (req, res) => { res.json({ data: await operate(db, currentUser(res).id, { entryId: String(req.params.entryId), to: 'COMPLETED' }) }); });
+  app.post('/api/v1/operator/entries/:entryId/cancel', requireEntryAssignment(db), async (req, res) => { res.json({ data: await cancelEntry(db, { id: currentUser(res).id, role: 'OPERATOR' }, req.params.entryId, req.body, now) }); });
+  app.post('/api/v1/operator/entries/:entryId/no-show', requireEntryAssignment(db), async (req, res) => { res.json({ data: await markNoShow(db, currentUser(res).id, String(req.params.entryId), req.body, now) }); });
   app.use((_req, res) => sendError(res, new ApiError(404, 'NOT_FOUND', 'Resource not found.')));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
     if (error instanceof ApiError) { sendError(res, error); return; }

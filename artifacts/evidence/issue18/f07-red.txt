@@ -1,0 +1,129 @@
+
+> restaurant-queue-server@0.1.0 test:api
+> tsx scripts/test-api.ts issue18-no-show
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "issue18_test", schema "public" at "127.0.0.1:55483"
+
+2 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+ RUN  v5.1.0 /Users/chanya/Desktop/CPE334_FinalProject/server
+
+ ❯ tests/api/issue18-no-show.test.ts (6 tests | 6 failed) 139ms
+   × S2-TEST-06: no-show boundary at 299999 ms 29ms
+   × S2-TEST-06: no-show boundary at 300000 ms 8ms
+   × S2-TEST-06: no-show boundary at 300001 ms 11ms
+   × S2-TEST-07: authorization, invalid states and missing call time produce no writes 8ms
+   × S2-TEST-08: start and no-show race commits one edge 8ms
+   × S2-TEST-08: audit failure rolls back no-show and keeps service slot occupied 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-06: no-show boundary at 299999 ms
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ tests/api/issue18-no-show.test.ts:45:29
+     43|   const response = await act(entry.id);
+     44|   if (elapsed < 300000) {
+     45|     expect(response.status).toBe(409);
+       |                             ^
+     46|     expect(response.body.error).toMatchObject({ code: 'NO_SHOW_TOO_EAR…
+     47|     expect(await f.state()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-06: no-show boundary at 300000 ms
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-06: no-show boundary at 300001 ms
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/api/issue18-no-show.test.ts:49:29
+     47|     expect(await f.state()).toEqual(before);
+     48|   } else {
+     49|     expect(response.status).toBe(200);
+       |                             ^
+     50|     expect(response.body.data).toMatchObject({ status: 'NO_SHOW', noSh…
+     51|     expect(await db.queueEvent.findMany({ where: { entryId: entry.id }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-07: authorization, invalid states and missing call time produce no writes
+AssertionError: expected 'NOT_FOUND' to be 'QUEUE_ACCESS_DENIED' // Object.is equality
+
+Expected: "QUEUE_ACCESS_DENIED"
+Received: "NOT_FOUND"
+
+ ❯ tests/api/issue18-no-show.test.ts:72:79
+     70|   expect((await act(entry.id, 'no-show', '')).status).toBe(401);
+     71|   expect((await act(entry.id, 'no-show', f.customer.cookie)).body.erro…
+     72|   expect((await act(entry.id, 'no-show', unassigned.cookie)).body.erro…
+       |                                                                               ^
+     73|   expect((await act(entry.id, 'no-show', operator.cookie, { force: tru…
+     74|   expect((await act(entry.id)).body.error.code).toBe('INVALID_TRANSITI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-08: start and no-show race commits one edge
+AssertionError: expected [ 200, 404 ] to deeply equal [ 200, 409 ]
+
+- Expected
++ Received
+
+  [
+    200,
+-   409,
++   404,
+  ]
+
+ ❯ tests/api/issue18-no-show.test.ts:88:55
+     86|   now = new Date(+calledAt + 300000);
+     87|   const results = await Promise.all([act(entry.id), act(entry.id, 'sta…
+     88|   expect(results.map(result => result.status).sort()).toEqual([200, 40…
+       |                                                       ^
+     89|   expect(results.find(result => result.status === 409)?.body.error.cod…
+     90|   expect(await db.queueEvent.count({ where: { entryId: entry.id, fromS…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/api/issue18-no-show.test.ts > S2-TEST-08: audit failure rolls back no-show and keeps service slot occupied
+AssertionError: expected 404 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 404
+
+ ❯ tests/api/issue18-no-show.test.ts:101:42
+     99|   try {
+    100|     await db.$executeRawUnsafe("CREATE TRIGGER issue18_reject_no_show …
+    101|     expect((await act(entry.id)).status).toBe(500);
+       |                                          ^
+    102|     expect((await callNext()).body.error.code).toBe('SERVICE_SLOT_BUSY…
+    103|     expect(await f.state()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+
+ Test Files  1 failed | 15 passed (16)
+      Tests  6 failed | 128 passed (134)
+   Start at  17:29:07
+   Duration  8.00s (tests 89%, import 10%, transform 1%)
+
+    Isolate  16 workers spawned · ~42ms startup each (spawn + environment, per file)
+             at least ~627ms faster with isolate: false — reuses workers across files instead of one per file

@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import { randomUUID } from 'node:crypto';
 
 export class ApiError extends Error {
-  constructor(public status: number, public code: string, message: string, public details?: { fields: Record<string, string> }) {
+  constructor(public status: number, public code: string, message: string, public details?: { fields: Record<string, string> } | { eligibleAt: string }) {
     super(message);
   }
 }

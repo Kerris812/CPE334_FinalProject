@@ -1,5 +1,5 @@
 export class HttpError extends Error {
-  constructor(public status: number, public code: string, public fields: Record<string, string> = {}) { super(code); }
+  constructor(public status: number, public code: string, public fields: Record<string, string> = {}, public eligibleAt?: string) { super(code); }
 }
 export async function requestData<T>(path: string, body?: unknown): Promise<T | null> {
   const response = await fetch(`/api/v1${path}`, {
@@ -8,7 +8,7 @@ export async function requestData<T>(path: string, body?: unknown): Promise<T | 
   });
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
-    throw new HttpError(response.status, payload?.error?.code ?? 'CONNECTION_ERROR', payload?.error?.details?.fields ?? {});
+    throw new HttpError(response.status, payload?.error?.code ?? 'CONNECTION_ERROR', payload?.error?.details?.fields ?? {}, payload?.error?.details?.eligibleAt);
   }
   if (response.status === 204) return null;
   return (await response.json()).data;

@@ -31,7 +31,7 @@ test('TEST-029 CALLED to SERVING, waiting changes, completion and empty queues r
   expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: current.displayNumber, serviceState: 'SERVING', waitingCount: 2 });
   await db.queueEntry.update({ where: { id: current.id }, data: { status: 'COMPLETED' } });
   expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 2 });
-  await db.queueEntry.update({ where: { id: waiting.id }, data: { status: 'CALLED' } });
+  await db.queueEntry.update({ where: { id: waiting.id }, data: { status: 'CALLED', counterId: f.counterId } });
   expect((await board()).body.data).toEqual({ queueCode: f.queue.code, calledNumber: waiting.displayNumber, serviceState: 'CALLED', waitingCount: 1 });
 });
 test('TEST-031 deeply related customer, session, entry and audit data cannot leak through public JSON', async () => {

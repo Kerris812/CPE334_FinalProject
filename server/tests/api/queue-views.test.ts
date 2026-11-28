@@ -43,7 +43,7 @@ test('TEST-029 board reflects CALLED/SERVING fixtures and nulls the completed se
   expect((await board()).body).toEqual({ data: { queueCode: f.queue.code, calledNumber: null, serviceState: null, waitingCount: 0 } });
   const entry = await f.entry('CALLED'); await f.entry('WAITING', await f.actor(), f.queue, 2n);
   for (const status of ['CALLED', 'SERVING', 'COMPLETED'] as const) {
-    await db.queueEntry.update({ where: { id: entry.id }, data: { status } });
+    await db.queueEntry.update({ where: { id: entry.id }, data: { status, counterId: f.counterId } });
     expect((await board()).body).toEqual({ data: { queueCode: f.queue.code, calledNumber: status === 'COMPLETED' ? null : entry.displayNumber, serviceState: status === 'COMPLETED' ? null : status, waitingCount: 1 } });
   }
 });

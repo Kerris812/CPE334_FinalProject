@@ -1,6 +1,6 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { ApiError } from '../http/errors.js';
-import { authorizeOperator, entryDto } from '../operator/service.js';
+import { authorizeOperator, entryDto, lockEntryCounter } from '../operator/service.js';
 import { privateDto } from '../queues/service.js';
 import { validId } from '../queues/rules.js';
 
@@ -78,18 +78,18 @@ export async function markNoShow(db: PrismaClient, operatorId: string, entryId: 
       if (entry.status !== 'CALLED' || !entry.calledAt) {
         throw new ApiError(409, 'INVALID_TRANSITION', 'This queue entry cannot be moved to that status.');
       }
+      await lockEntryCounter(tx, entry);
       const at = now();
       const eligibleAt = new Date(entry.calledAt.getTime() + 300_000);
       if (at < eligibleAt) {
         throw new ApiError(409, 'NO_SHOW_TOO_EARLY', 'This entry is not eligible for no-show yet.', { eligibleAt: eligibleAt.toISOString() });
       }
-      // Until #19, the status update releases the queue's single service slot.
       const updated = await tx.queueEntry.update({
         where: { id: entryId, status: 'CALLED' },
         data: { status: 'NO_SHOW', noShowAt: at },
       });
       await tx.queueEvent.create({ data: { entryId, actorId: operatorId, eventType: 'NO_SHOW', fromStatus: 'CALLED', toStatus: 'NO_SHOW', occurredAt: at } });
-      return { ...entryDto(updated), counterId: null, cancelledAt: updated.cancelledAt, noShowAt: updated.noShowAt };
+      return { ...entryDto(updated), cancelledAt: updated.cancelledAt, noShowAt: updated.noShowAt };
     }, { maxWait: 10000, timeout: 10000 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && ['P2025', 'P2034'].includes(error.code)) {

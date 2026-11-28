@@ -54,8 +54,9 @@ test('database constraints enforce active customer, service slot, party size and
   const customer = await db.user.findUniqueOrThrow({ where: { email: 'customer.a@example.test' } });
   const other = await db.user.findUniqueOrThrow({ where: { email: 'customer.b@example.test' } });
   const queue = await db.queue.findUniqueOrThrow({ where: { code: 'R' } });
+  const counter = await db.serviceCounter.findFirstOrThrow({ where: { queueId: queue.id } });
   const ids: string[] = [];
-  const create = (customerId: string, sequence: bigint, status: 'WAITING' | 'CALLED', partySize = 4, queueId = queue.id) => db.queueEntry.create({ data: { customerId, queueId, sequence, displayNumber: `FIX-${randomUUID().slice(0, 20)}`, status, partySize } });
+  const create = (customerId: string, sequence: bigint, status: 'WAITING' | 'CALLED', partySize = 4, queueId = queue.id) => db.queueEntry.create({ data: { customerId, queueId, sequence, displayNumber: `FIX-${randomUUID().slice(0, 20)}`, status, partySize, counterId: status === 'CALLED' ? counter.id : null } });
   try {
     const first = await create(customer.id, 100001n, 'CALLED'); ids.push(first.id);
     await expect(create(customer.id, 100002n, 'WAITING')).rejects.toMatchObject({ code: 'P2002' });

@@ -113,7 +113,8 @@ test('L7-011 twenty mixed-operator calls preserve one FIFO head and one audit ev
 test('L7-012 each handoff audit actor comes from its session despite forged previous actors', async () => {
   for (const [queue, actors] of [[f.r, [g, h, g]], [f.s, [h, g, h]]] as const) {
     const { customer, entry } = await f.join(queue);
-    const called = await post(`/operator/queues/${queue.id}/call-next`, actors[0], { operatorId: actors[1].id });
+    await rejected(() => post(`/operator/queues/${queue.id}/call-next`, actors[0], { operatorId: actors[1].id }), 'VALIDATION_ERROR', 422);
+    const called = await call(queue.id, actors[0]);
     expect(called.status).toBe(200);
     const started = await action(entry.id, 'start-service', actors[1], { operatorId: actors[0].id });
     const completed = await action(entry.id, 'complete', actors[2], { operatorId: actors[1].id });
@@ -180,7 +181,7 @@ test('L7-015 CALLED and SERVING share one slot while the other queue remains ind
   expect((await call(f.s.id, h)).body.data.id).toBe(sHead.entry.id);
   const other = await f.actor();
   const before = await snapshot();
-  await expect(db.queueEntry.create({ data: { queueId: f.r.id, customerId: other.id, sequence: 999n, displayNumber: 'R-0999', partySize: 4, status: 'CALLED' } })).rejects.toMatchObject({ code: 'P2002' });
+  await expect(db.queueEntry.create({ data: { queueId: f.r.id, customerId: other.id, sequence: 999n, displayNumber: 'R-0999', partySize: 4, status: 'CALLED', counterId: f.counterId } })).rejects.toMatchObject({ code: 'P2002' });
   expect(await snapshot()).toEqual(before);
   expect((await action(first.entry.id, 'complete', g)).status).toBe(200);
   expect((await call(f.r.id, h)).status).toBe(200);
@@ -263,7 +264,7 @@ test('L7-020 event insert failure rolls back every action for either assigned op
     for (const who of [g, h]) {
       const row = await entryAt('WAITING', f.r, who.id === g.id ? 1n : 2n);
       await rejected(() => call(f.r.id, who), 'INTERNAL_ERROR', 500);
-      await db.queueEntry.update({ where: { id: row.id }, data: { status: 'CALLED' } });
+      await db.queueEntry.update({ where: { id: row.id }, data: { status: 'CALLED', counterId: f.counterId } });
       await rejected(() => action(row.id, 'start-service', who), 'INTERNAL_ERROR', 500);
       await db.queueEntry.update({ where: { id: row.id }, data: { status: 'SERVING' } });
       await rejected(() => action(row.id, 'complete', who), 'INTERNAL_ERROR', 500);

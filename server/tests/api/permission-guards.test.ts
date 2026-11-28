@@ -21,6 +21,7 @@ let customerCookie: string;
 let ownerCookie: string;
 let assignedCookie: string;
 let unassignedCookie: string;
+let unassignedId: string;
 const fixture = express();
 fixture.use(express.json(), requireAuthentication(db));
 fixture.get('/owned/:entryId', requireRole('CUSTOMER'), requireOwnedEntry(db), (_req, res) => res.status(204).end());
@@ -52,11 +53,15 @@ beforeAll(async () => {
   customerCookie = await session('customer.a@example.test');
   ownerCookie = await session('customer.b@example.test');
   assignedCookie = await session('operator.a@example.test');
-  unassignedCookie = await session('operator.b@example.test');
+  const assigned = await db.user.findUniqueOrThrow({ where: { id: operatorId } });
+  const unassigned = await db.user.create({ data: { email: `unassigned-${randomUUID()}@example.test`, displayName: 'Unassigned guard fixture', role: 'OPERATOR', passwordHash: assigned.passwordHash } });
+  unassignedId = unassigned.id;
+  unassignedCookie = await session(unassigned.email);
 });
 afterAll(async () => {
   await db.session.deleteMany({ where: { id: { in: sessions } } });
   if (entryId) await db.queueEntry.delete({ where: { id: entryId } });
+  if (unassignedId) await db.user.delete({ where: { id: unassignedId } });
   await db.$disconnect();
 });
 

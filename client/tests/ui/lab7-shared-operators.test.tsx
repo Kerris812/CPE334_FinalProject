@@ -32,7 +32,7 @@ function api(initial: 'CALLED' | 'SERVING' | null = null) {
   return { fetcher, states, conflict: () => { conflict = true; }, fail: (status: number) => { failure = status; } };
 }
 async function enabled(name: string) {
-  const button = await screen.findByRole('button', { name, exact: true });
+  const button = await screen.findByRole('button', { name });
   await waitFor(() => expect(button.hasAttribute('disabled')).toBe(false));
   return button;
 }
